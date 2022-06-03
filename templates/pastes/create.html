@@ -1,0 +1,13 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}New Paste {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>New Paste</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <button class="btn btn-success mt-2" type="submit">Create New Paste</button>
+</form>
+{% endblock content %}
