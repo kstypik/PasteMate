@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView
 
 from .forms import PasteForm
 from .models import Paste
@@ -27,3 +27,17 @@ class PasteDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["title"] = self.object.title if self.object.title else "Untitled"
         return context
+
+
+class PasteUpdateView(UpdateView):
+    form_class = PasteForm
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    context_object_name = "paste"
+    template_name = "pastes/form.html"
+    extra_context = {
+        "action_type": "Edit",
+    }
+
+    def get_queryset(self):
+        return Paste.objects.filter(author=self.request.user)

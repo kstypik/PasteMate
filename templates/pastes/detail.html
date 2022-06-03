@@ -7,6 +7,11 @@
 {% block content %}
 <h1>{{ title }}</h1>
 <p>Added by {% if paste.author %}<a href="#">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
+<div>
+  {% if user == paste.author %}
+  <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
+  {% endif %}
+</div>
 <pre>
   <code>
     {{ paste.content }}
