@@ -12,4 +12,4 @@ class Paste(models.Model):
     # folder =
     password = models.CharField(max_length=100, blank=True)
     burn_after_read = models.BooleanField(default=False)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, blank=True)
