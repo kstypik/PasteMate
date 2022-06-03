@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "pastemate"
+version = "0.1.0"
+description = "Paste app with syntax highlighting"
+authors = ["Kacper Stypik <kacperstypik@mailbox.org>"]
+license = "GNU GPL v3"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.0.5"
+django-allauth = "^0.50.0"
+Pillow = "^9.1.1"
+django-crispy-forms = "^1.14.0"
+django-debug-toolbar = "^3.4.0"
+crispy-bootstrap5 = "^0.6"
+django-environ = "^0.8.1"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+isort = "^5.10.1"
+psycopg2-binary = "^2.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
