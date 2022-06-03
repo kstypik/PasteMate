@@ -4,7 +4,7 @@
 {% block title %}{{ action_type }} {{ block.super }}{% endblock %}
 
 {% block content %}
-<h2>{{ action_type }}{% if paste.title %} {{ paste.title }}{% endif %}</h2>
+<h2>{{ action_type }}{% if title %} {{ title }}{% endif %}</h2>
 <form method="post">
   {% csrf_token %}
   {{ form|crispy }}

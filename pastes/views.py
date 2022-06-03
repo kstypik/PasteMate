@@ -9,7 +9,10 @@ from .models import Paste
 class PasteCreateView(CreateView):
     model = Paste
     form_class = PasteForm
-    template_name = "pastes/create.html"
+    template_name = "pastes/form.html"
+    extra_context = {
+        "action_type": "Create New Paste",
+    }
 
     def form_valid(self, form):
         if self.request.user.is_authenticated:
@@ -17,17 +20,21 @@ class PasteCreateView(CreateView):
         return super().form_valid(form)
 
 
-class PasteDetailView(DetailView):
+class PasteInstanceMixin:
     model = Paste
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     context_object_name = "paste"
-    template_name = "pastes/detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = self.object.title if self.object.title else "Untitled"
+
         return context
+
+
+class PasteDetailView(PasteInstanceMixin, DetailView):
+    template_name = "pastes/detail.html"
 
 
 class PasteAuthorMixin:
@@ -39,27 +46,14 @@ class PasteAuthorMixin:
         return object
 
 
-class PasteUpdateView(PasteAuthorMixin, UpdateView):
-    model = Paste
+class PasteUpdateView(PasteAuthorMixin, PasteInstanceMixin, UpdateView):
     form_class = PasteForm
-    slug_field = "uuid"
-    slug_url_kwarg = "uuid"
-    context_object_name = "paste"
     template_name = "pastes/form.html"
     extra_context = {
         "action_type": "Edit",
     }
 
 
-class PasteDeleteView(PasteAuthorMixin, DeleteView):
-    model = Paste
-    slug_field = "uuid"
-    slug_url_kwarg = "uuid"
+class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
     success_url = "/"
-    context_object_name = "paste"
     template_name = "pastes/delete.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = self.object.title if self.object.title else "Untitled"
-        return context
