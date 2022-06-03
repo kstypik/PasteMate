@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
@@ -29,7 +30,17 @@ class PasteDetailView(DetailView):
         return context
 
 
-class PasteUpdateView(UpdateView):
+class PasteAuthorMixin:
+    def get_object(self, queryset=None):
+        object = super().get_object()
+        if not object.author == self.request.user:
+            raise Http404
+
+        return object
+
+
+class PasteUpdateView(PasteAuthorMixin, UpdateView):
+    model = Paste
     form_class = PasteForm
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -39,19 +50,14 @@ class PasteUpdateView(UpdateView):
         "action_type": "Edit",
     }
 
-    def get_queryset(self):
-        return Paste.objects.filter(author=self.request.user)
 
-
-class PasteDeleteView(DeleteView):
+class PasteDeleteView(PasteAuthorMixin, DeleteView):
+    model = Paste
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     success_url = "/"
     context_object_name = "paste"
     template_name = "pastes/delete.html"
-
-    def get_queryset(self):
-        return Paste.objects.filter(author=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
