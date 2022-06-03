@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block title %}Delete paste {{ title }} {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>Are you sure you want to delete {{ title }}?</h2>
+<div class="alert alert-danger" role="alert">
+  This action is irreversible!
+</div>
+<form method="post">
+  {% csrf_token %}
+  <button class="btn btn-danger" type="submit">Delete</button>
+  <a href="{{ paste.get_absolute_url }}" class="btn btn-link">No, take me back</a>
+</form>
+{% endblock content %}

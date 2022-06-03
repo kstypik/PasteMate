@@ -10,6 +10,7 @@
 <div>
   {% if user == paste.author %}
   <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
+  <a href="{% url 'pastes:delete' paste.uuid %}" class="btn btn-danger">Delete</a>
   {% endif %}
 </div>
 <pre>

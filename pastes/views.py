@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import CreateView, DetailView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 from .forms import PasteForm
 from .models import Paste
@@ -41,3 +41,19 @@ class PasteUpdateView(UpdateView):
 
     def get_queryset(self):
         return Paste.objects.filter(author=self.request.user)
+
+
+class PasteDeleteView(DeleteView):
+    slug_field = "uuid"
+    slug_url_kwarg = "uuid"
+    success_url = "/"
+    context_object_name = "paste"
+    template_name = "pastes/delete.html"
+
+    def get_queryset(self):
+        return Paste.objects.filter(author=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = self.object.title if self.object.title else "Untitled"
+        return context
