@@ -14,8 +14,8 @@
   {% endif %}
 </div>
 <pre>
-  <code>
-    {{ paste.content }}
-  </code>
+<code>
+{% if paste.content_html %}{{ paste.content_html|safe }}{% else %}{{ paste.content }}{% endif %}
+</code>
 </pre>
 {% endblock content %}
