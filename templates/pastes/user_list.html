@@ -21,7 +21,7 @@
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
       <td><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></td>
-      <td>Jun 3rd, 2022 </td>
+      <td>{{ paste.created }}</td>
       <td>{{ paste.expiration_time }}</td>
       <td>{{ paste.syntax }}</td>
     </tr>
