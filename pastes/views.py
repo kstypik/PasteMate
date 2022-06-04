@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
@@ -81,3 +82,11 @@ class UserPasteListView(ListView):
         context = super().get_context_data(**kwargs)
         context["user"] = self.user
         return context
+
+
+class PasteArchiveListView(ListView):
+    context_object_name = "pastes"
+    template_name = "pastes/archive.html"
+
+    def get_queryset(self):
+        return Paste.objects.all()[: settings.PASTES_ARCHIVE_LENGTH]
