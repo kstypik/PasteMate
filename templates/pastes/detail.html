@@ -13,9 +13,12 @@
   <a href="{% url 'pastes:delete' paste.uuid %}" class="btn btn-danger">Delete</a>
   {% endif %}
 </div>
-<pre>
-<code>
-{% if paste.content_html %}{{ paste.content_html|safe }}{% else %}{{ paste.content }}{% endif %}
-</code>
-</pre>
+
+<div class="mt-4">
+{% if paste.content_html %}
+  {{ paste.content_html|safe }}
+{% else %}
+<pre>{{ paste.content }}</pre>
+{% endif %}
+</div>
 {% endblock content %}
