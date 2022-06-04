@@ -6,9 +6,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
+        {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">My Pastes</a>
+          <a class="nav-link" href="{% url 'pastes:user_pastes' user.username %}">My Pastes</a>
         </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="#">Archive</a>
         </li>

@@ -5,6 +5,7 @@ from . import views
 app_name = "pastes"
 
 urlpatterns = [
+    path("user/<str:username>/", views.UserPasteListView.as_view(), name="user_pastes"),
     path("<uuid:uuid>/", views.PasteDetailView.as_view(), name="detail"),
     path("<uuid:uuid>/edit/", views.PasteUpdateView.as_view(), name="update"),
     path("<uuid:uuid>/delete/", views.PasteDeleteView.as_view(), name="delete"),

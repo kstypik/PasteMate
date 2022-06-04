@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ user }}'s Pastes {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>{{ user }}'s Pastes</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Title</th>
+      <th scope="col">Added</th>
+      <th scope="col">Expires</th>
+      <th scope="col">Syntax</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for paste in pastes %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></td>
+      <td>Jun 3rd, 2022 </td>
+      <td>{{ paste.expiration_time }}</td>
+      <td>{{ paste.syntax }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock content %}

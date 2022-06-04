@@ -1,9 +1,19 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-from django.shortcuts import render
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from .forms import PasteForm
 from .models import Paste
+
+User = get_user_model()
 
 
 class PasteCreateView(CreateView):
@@ -57,3 +67,17 @@ class PasteUpdateView(PasteAuthorMixin, PasteInstanceMixin, UpdateView):
 class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
     success_url = "/"
     template_name = "pastes/delete.html"
+
+
+class UserPasteListView(ListView):
+    context_object_name = "pastes"
+    template_name = "pastes/user_list.html"
+
+    def get_queryset(self):
+        self.user = get_object_or_404(User, username=self.kwargs["username"])
+        return Paste.objects.filter(author=self.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user"] = self.user
+        return context
