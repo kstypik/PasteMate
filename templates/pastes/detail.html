@@ -1,11 +1,11 @@
 {% extends '_base.html' %}
 
 {% block title %}
-{{ title }} {{ block.super }}
+{{ paste.title }} {{ block.super }}
 {% endblock title %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<h1>{{ paste.title }}</h1>
 <p>Added by {% if paste.author %}<a href="#">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
 <div>
   {% if user == paste.author %}

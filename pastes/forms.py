@@ -16,6 +16,7 @@ class PasteForm(forms.ModelForm):
         fields = [
             "content",
             "syntax",
+            "exposure",
             "expiration_time",
             "password",
             "burn_after_read",

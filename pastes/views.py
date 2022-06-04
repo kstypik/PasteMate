@@ -37,15 +37,18 @@ class PasteInstanceMixin:
     slug_url_kwarg = "uuid"
     context_object_name = "paste"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = self.object.title if self.object.title else "Untitled"
-
-        return context
-
 
 class PasteDetailView(PasteInstanceMixin, DetailView):
     template_name = "pastes/detail.html"
+
+    def get_object(self, queryset=None):
+        object = super().get_object()
+        if object.exposure == Paste.Exposure.PRIVATE:
+            if object.author == self.request.user:
+                return object
+            raise Http404
+
+        return object
 
 
 class PasteAuthorMixin:
@@ -76,7 +79,9 @@ class UserPasteListView(ListView):
 
     def get_queryset(self):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
-        return Paste.objects.filter(author=self.user)
+        if self.request.user == self.user:
+            return Paste.objects.filter(author=self.user)
+        return Paste.published.filter(author=self.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,4 +94,4 @@ class PasteArchiveListView(ListView):
     template_name = "pastes/archive.html"
 
     def get_queryset(self):
-        return Paste.objects.all()[: settings.PASTES_ARCHIVE_LENGTH]
+        return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
