@@ -27,6 +27,9 @@ class Paste(TimeStampedModel):
         return reverse("pastes:detail", kwargs={"uuid": self.uuid})
 
     def save(self, *args, **kwargs):
-        lexer = get_lexer_by_name(self.syntax, stripall=True)
-        self.content_html = highlight(self.content, lexer, HtmlFormatter(linenos=True))
+        if self.syntax:
+            lexer = get_lexer_by_name(self.syntax, stripall=True)
+            self.content_html = highlight(
+                self.content, lexer, HtmlFormatter(linenos=True)
+            )
         super().save(*args, **kwargs)
