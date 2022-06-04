@@ -5,6 +5,15 @@
 {% endblock title %}
 
 {% block content %}
+{% if burn_after_read %}
+<div class="alert alert-danger">
+  This paste has been marked as Burn After Read by its author. After reading, it will be deleted.
+</div>
+<form action="{% url 'pastes:detail' paste.uuid %}" method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-warning">Read and delete</button>
+</form>
+{% else %}
 <h1>{{ paste.title }}</h1>
 <p>Added by {% if paste.author %}<a href="#">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
 <div>
@@ -21,4 +30,5 @@
 <pre>{{ paste.content }}</pre>
 {% endif %}
 </div>
+{% endif %}
 {% endblock content %}

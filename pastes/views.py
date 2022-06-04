@@ -1,8 +1,10 @@
+import copy
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -28,6 +30,8 @@ class PasteCreateView(CreateView):
     def form_valid(self, form):
         if self.request.user.is_authenticated:
             form.instance.author = self.request.user
+        if form.instance.burn_after_read:
+            pass
         return super().form_valid(form)
 
 
@@ -49,6 +53,20 @@ class PasteDetailView(PasteInstanceMixin, DetailView):
             raise Http404
 
         return object
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.object.burn_after_read:
+            context["burn_after_read"] = True
+        response = super().render_to_response(context, **response_kwargs)
+        return response
+
+    def post(self, request, *args, **kwargs):
+        """For handling Burn After Read"""
+        self.object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
+        context = {"paste": self.object}
+        self.object.burn_after_read = False
+        self.object.delete()
+        return self.render_to_response(context)
 
 
 class PasteAuthorMixin:
