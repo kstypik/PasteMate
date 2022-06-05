@@ -21,7 +21,7 @@
       <th scope="row">{{ forloop.counter }}</th>
       <td><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></td>
       <td>{{ paste.created }}</td>
-      <td>{{ paste.get_syntax_display }}</td>
+      <td><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
     </tr>
     {% endfor %}
   </tbody>
