@@ -112,4 +112,7 @@ class PasteArchiveListView(ListView):
     template_name = "pastes/archive.html"
 
     def get_queryset(self):
+        syntax = self.kwargs.get("syntax")
+        if syntax:
+            return Paste.published.filter(syntax=self.kwargs["syntax"])
         return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
