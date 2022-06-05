@@ -16,7 +16,14 @@
   <body>
     {% include "_includes/navbar.html" %}
     <div class="container mt-5">
-      {% block content %}{% endblock content %}
+      <div class="row">
+        <div class="col-lg-9">
+          {% block content %}{% endblock content %}
+        </div>
+        <div class="col-lg-3 mt-3">
+          {% include "_includes/sidebar.html" %}
+        </div>
+      </div>
     </div>
 
     {% include "_includes/footer.html" %}

@@ -1,0 +1,17 @@
+{% load pastes_tags %}
+
+{% if user.is_authenticated %}
+  <div class="card mb-4">
+    <div class="card-header">My Pastes</div>
+    <div class="card-body">
+      {% show_my_pastes user %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="card mb-4">
+  <div class="card-header">Public Pastes</div>
+  <div class="card-body">
+    {% show_public_pastes %}
+  </div>
+</div>

@@ -1,0 +1,5 @@
+<ul>
+  {% for paste in public_pastes %}
+    <li><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></li>
+  {% endfor %}
+</ul>
