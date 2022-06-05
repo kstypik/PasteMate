@@ -10,4 +10,9 @@
   {{ form|crispy }}
   <button class="btn btn-success mt-2" type="submit">{{ action_type }}</button>
 </form>
+
+{% if not user.is_authenticated %}
+  <div class="alert alert-warning mt-3">You are not logged in. You won't be able to edit or delete the paste after creation. <a href="{% url 'account_signup' %}">Sign Up</a> or <a href="{% url 'account_login' %}">Login</a>.</div>
+{% endif %}
+
 {% endblock content %}
