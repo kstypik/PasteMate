@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
-from pygments import highlight
+from pygments import highlight, lexers
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
@@ -22,11 +22,17 @@ class Paste(TimeStampedModel):
         UNLISTED = "UN", "Unlisted"
         PRIVATE = "PR", "Private"
 
+    SYNTAX_HIGHLITHING_CHOICES = [
+        (lexer[1][0], lexer[0]) for lexer in lexers.get_all_lexers() if lexer[1]
+    ]
+
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     content = models.TextField()
     content_html = models.TextField(blank=True)
-    syntax = models.CharField(max_length=50, blank=True)
+    syntax = models.CharField(
+        max_length=50, choices=SYNTAX_HIGHLITHING_CHOICES, default="text"
+    )
     expiration_time = models.TimeField(null=True, blank=True)
     exposure = models.CharField(
         max_length=2, choices=Exposure.choices, default=Exposure.PUBLIC
