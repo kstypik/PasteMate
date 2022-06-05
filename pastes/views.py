@@ -141,6 +141,7 @@ class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
 class UserPasteListView(ListView):
     context_object_name = "pastes"
     template_name = "pastes/user_list.html"
+    paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
 
     def get_queryset(self):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
