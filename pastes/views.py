@@ -30,8 +30,6 @@ class PasteCreateView(CreateView):
     def form_valid(self, form):
         if self.request.user.is_authenticated:
             form.instance.author = self.request.user
-        if form.instance.burn_after_read:
-            pass
         return super().form_valid(form)
 
 
