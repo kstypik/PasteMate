@@ -3,6 +3,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 from model_utils.models import TimeStampedModel
 from pygments import highlight, lexers
 from pygments.formatters import HtmlFormatter
@@ -37,7 +38,9 @@ class Paste(TimeStampedModel):
     exposure = models.CharField(
         max_length=2, choices=Exposure.choices, default=Exposure.PUBLIC
     )
-    # folder =
+    folder = models.ForeignKey(
+        "Folder", on_delete=models.CASCADE, related_name="pastes", null=True, blank=True
+    )
     password = models.CharField(max_length=100, blank=True)
     burn_after_read = models.BooleanField(default=False)
     title = models.CharField(max_length=50, blank=True)
@@ -63,3 +66,18 @@ class Paste(TimeStampedModel):
                 self.content, lexer, HtmlFormatter(linenos=True)
             )
         super().save(*args, **kwargs)
+
+
+class Folder(TimeStampedModel):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="folders"
+    )
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)

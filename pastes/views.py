@@ -19,7 +19,15 @@ from .models import Paste
 User = get_user_model()
 
 
-class PasteCreateView(CreateView):
+class AuthenticatedUserInFormKwargsMixin:
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.user.is_authenticated:
+            kwargs.update({"user": self.request.user})
+        return kwargs
+
+
+class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
     model = Paste
     form_class = PasteForm
     template_name = "pastes/form.html"
@@ -115,7 +123,9 @@ class PasteAuthorMixin:
         return object
 
 
-class PasteUpdateView(PasteAuthorMixin, PasteInstanceMixin, UpdateView):
+class PasteUpdateView(
+    AuthenticatedUserInFormKwargsMixin, PasteAuthorMixin, PasteInstanceMixin, UpdateView
+):
     form_class = PasteForm
     template_name = "pastes/form.html"
     extra_context = {

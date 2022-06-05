@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Paste
+from .models import Folder, Paste
 
 
 @admin.register(Paste)
@@ -12,4 +12,8 @@ class PasteAdmin(admin.ModelAdmin):
         "burn_after_read",
         "created",
         "expiration_time",
+        "folder",
     ]
+
+
+admin.site.register(Folder)
