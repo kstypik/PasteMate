@@ -48,6 +48,9 @@ class Paste(TimeStampedModel):
     class Meta:
         ordering = ["-created"]
 
+    def __str__(self):
+        return self.title or "Untitled"
+
     def get_absolute_url(self):
         return reverse("pastes:detail", kwargs={"uuid": self.uuid})
 
