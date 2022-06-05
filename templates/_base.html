@@ -16,6 +16,13 @@
   <body>
     {% include "_includes/navbar.html" %}
     <div class="container mt-5">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message}}
+          </div>
+        {% endfor %}
+      {% endif %}
       <div class="row">
         <div class="col-lg-9">
           {% block content %}{% endblock content %}
