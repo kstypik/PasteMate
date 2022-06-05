@@ -39,6 +39,9 @@ class Paste(TimeStampedModel):
     objects = models.Manager()
     published = PublishedManager()
 
+    class Meta:
+        ordering = ["-created"]
+
     def get_absolute_url(self):
         return reverse("pastes:detail", kwargs={"uuid": self.uuid})
 
