@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container">
-    <a class="navbar-brand" href="#">PasteMate</a>
+    <a class="navbar-brand" href="{% url 'pastes:create' %}">PasteMate</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,7 +26,7 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
             <li><a class="dropdown-item" href="#">Edit My Profile</a></li>
-            <li><a class="dropdown-item" href="{% url 'account_set_password' %}">Edit Password</a></li>
+            <li><a class="dropdown-item" href="{% url 'account_change_password' %}">Edit Password</a></li>
             <li><a class="dropdown-item" href="#">Edit Preferences</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
