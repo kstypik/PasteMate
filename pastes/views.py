@@ -13,7 +13,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from .forms import PasteForm
+from .forms import PasswordProtectedPasteForm, PasteForm
 from .models import Paste
 
 User = get_user_model()
@@ -42,9 +42,7 @@ class PasteInstanceMixin:
     context_object_name = "paste"
 
 
-class PasteDetailView(PasteInstanceMixin, DetailView):
-    template_name = "pastes/detail.html"
-
+class PasteDetailMixin:
     def get_object(self, queryset=None):
         object = super().get_object()
         if object.exposure == Paste.Exposure.PRIVATE:
@@ -54,10 +52,14 @@ class PasteDetailView(PasteInstanceMixin, DetailView):
 
         return object
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.object.burn_after_read:
-            context["burn_after_read"] = True
-        response = super().render_to_response(context, **response_kwargs)
+
+class PasteDetailView(PasteInstanceMixin, PasteDetailMixin, DetailView):
+    template_name = "pastes/detail.html"
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if self.object.password:
+            return redirect("pastes:detail_with_password", uuid=self.object.uuid)
         return response
 
     def post(self, request, *args, **kwargs):
@@ -67,6 +69,43 @@ class PasteDetailView(PasteInstanceMixin, DetailView):
         self.object.burn_after_read = False
         self.object.delete()
         return self.render_to_response(context)
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.object.burn_after_read:
+            context["burn_after_read"] = True
+        response = super().render_to_response(context, **response_kwargs)
+        return response
+
+
+class PasteDetailWithPasswordView(PasteInstanceMixin, PasteDetailMixin, DetailView):
+    template_name = "pastes/detail.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.password:
+            context = self.get_context_data(object=self.object)
+            context["password_protected"] = True
+            context["password_form"] = PasswordProtectedPasteForm(
+                correct_password=self.object.password
+            )
+            return self.render_to_response(context)
+        else:
+            return redirect(self.object)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.password:
+            context = self.get_context_data(object=self.object)
+            context["password_protected"] = True
+            password_form = PasswordProtectedPasteForm(
+                request.POST, correct_password=self.object.password
+            )
+            context["password_form"] = password_form
+            if password_form.is_valid():
+                context["password_correct"] = True
+            return self.render_to_response(context)
+        else:
+            return redirect(self.object)
 
 
 class PasteAuthorMixin:

@@ -1,34 +1,47 @@
 {% extends '_base.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}
 {{ paste.title }} {{ block.super }}
 {% endblock title %}
 
 {% block content %}
 {% if burn_after_read %}
-<div class="alert alert-danger">
-  This paste has been marked as Burn After Read by its author. After reading, it will be deleted.
-</div>
-<form action="{% url 'pastes:detail' paste.uuid %}" method="post">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-warning">Read and delete</button>
-</form>
+  <div class="alert alert-danger">
+    This paste has been marked as Burn After Read by its author. After reading, it will be deleted.
+  </div>
+  <form action="{% url 'pastes:detail' paste.uuid %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning">Read and delete</button>
+  </form>
 {% else %}
-<h1>{{ paste.title }}</h1>
-<p>Added by {% if paste.author %}<a href="#">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
-<div>
-  {% if user == paste.author %}
-  <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
-  <a href="{% url 'pastes:delete' paste.uuid %}" class="btn btn-danger">Delete</a>
-  {% endif %}
-</div>
+  {% if not password_protected or password_correct %}
+    <h1>{{ paste.title }}</h1>
+    <p>Added by {% if paste.author %}<a href="#">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
+    <div>
+      {% if user == paste.author %}
+      <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
+      <a href="{% url 'pastes:delete' paste.uuid %}" class="btn btn-danger">Delete</a>
+      {% endif %}
+    </div>
 
-<div class="mt-4">
-{% if paste.content_html %}
-  {{ paste.content_html|safe }}
-{% else %}
-<pre>{{ paste.content }}</pre>
-{% endif %}
-</div>
+    <div class="mt-4">
+    {% if paste.content_html %}
+      {{ paste.content_html|safe }}
+    {% else %}
+    <pre>{{ paste.content }}</pre>
+    {% endif %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      This paste is protected with password by its author. Enter it to unlock the access.
+    </div>
+    <form action="{% url 'pastes:detail_with_password' paste.uuid %}" method="post">
+      {% csrf_token %}
+      {{ password_form|crispy }}
+      <button type="submit" class="btn btn-primary">Unlock the paste</button>
+    </form>
+  {% endif %}
 {% endif %}
 {% endblock content %}
