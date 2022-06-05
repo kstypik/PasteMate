@@ -33,8 +33,8 @@ class PasteForm(forms.ModelForm):
 
     def save(self, commit=True):
         paste = super().save(commit=False)
-        if self.user:
-            new_folder = self.cleaned_data["new_folder"]
+        new_folder = self.cleaned_data["new_folder"]
+        if self.user and new_folder:
             folder, _ = Folder.objects.get_or_create(
                 created_by=self.user, name=new_folder
             )
