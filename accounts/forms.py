@@ -5,7 +5,7 @@ User = get_user_model()
 
 
 class ProfileForm(forms.ModelForm):
-    username = forms.CharField(disabled=True)
+    username = forms.CharField(disabled=True, required=False)
 
     class Meta:
         model = User
