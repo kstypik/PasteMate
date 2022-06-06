@@ -86,25 +86,25 @@ class PasteDetailView(PasteInstanceMixin, PasteDetailMixin, DetailView):
         return response
 
 
-class RawPasteDetailView(PasteInstanceMixin, PasteDetailMixin, SingleObjectMixin, View):
+class EnsureStandardPasteMixin(PasteDetailMixin):
     def get_object(self):
         object = super().get_object()
         if object.password or object.burn_after_read:
             raise Http404
         return object
 
+
+class RawPasteDetailView(
+    PasteInstanceMixin, EnsureStandardPasteMixin, SingleObjectMixin, View
+):
     def get(self, request, *args, **kwargs):
         object = self.get_object()
         return HttpResponse(object.content, content_type="text/plain")
 
 
-class DownloadPasteView(PasteInstanceMixin, PasteDetailMixin, SingleObjectMixin, View):
-    def get_object(self):
-        object = super().get_object()
-        if object.password or object.burn_after_read:
-            raise Http404
-        return object
-
+class DownloadPasteView(
+    PasteInstanceMixin, EnsureStandardPasteMixin, SingleObjectMixin, View
+):
     def get(self, request, *args, **kwargs):
         object = self.get_object()
         response = HttpResponse(object.content, content_type="text/plain")
