@@ -18,7 +18,9 @@
 {% else %}
   {% if not password_protected or password_correct %}
     <h1>{{ paste.title }}</h1>
-    <p>Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
+    <p>
+      <img src="{{ paste.author.avatar.url }}" alt="{{ paste.author.username }}'s avatar" class="rounded-circle avatar-normal">
+       Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
     <div>
       {% if user == paste.author %}
       <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
