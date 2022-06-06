@@ -28,7 +28,23 @@
       {% endif %}
     </div>
 
-    <div class="mt-4">
+    <div class="card mt-4">
+      <div class="card-header mb-3 d-flex">
+        <div>
+          <a href="{% url 'pastes:syntax_archive' paste.syntax %}">
+            <span class="badge bg-secondary">{{ paste.get_syntax_display }}</span>
+          </a>
+        </div>
+        <div class="ms-auto">
+          <a href=""><span class="badge bg-secondary">copy</span></a>
+          <a href=""><span class="badge bg-secondary">raw</span></a>
+          <a href=""><span class="badge bg-secondary">download</span></a>
+          <a href=""><span class="badge bg-secondary">clone</span></a>
+          <a href=""><span class="badge bg-secondary">embed</span></a>
+          <a href=""><span class="badge bg-secondary">print</span></a>
+          <a href=""><span class="badge bg-secondary">report</span></a>
+        </div>
+      </div>
       {{ paste.content_html|safe }}
     </div>
   {% else %}
