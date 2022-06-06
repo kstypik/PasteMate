@@ -2,8 +2,6 @@ let toolbarCopy = document.querySelector(".toolbar-copy");
 let rawCopy = document.querySelector(".raw-copy");
 let rawCode = document.querySelector(".raw-paste-data");
 
-console.log(rawCode);
-
 getCopyHandler = (element, position) => {
     handleCopy = (event) => {
       event.preventDefault();
