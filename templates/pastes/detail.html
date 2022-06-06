@@ -40,7 +40,7 @@
           {% if not paste.password or paste.burn_after_read %}
             <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-secondary">raw</span></a>
           {% endif %}
-          <a href=""><span class="badge bg-secondary">download</span></a>
+          <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-secondary">download</span></a>
           <a href=""><span class="badge bg-secondary">clone</span></a>
           <a href=""><span class="badge bg-secondary">embed</span></a>
           <a href=""><span class="badge bg-secondary">print</span></a>

@@ -14,6 +14,7 @@ from django.views.generic import (
     View,
 )
 from django.views.generic.detail import SingleObjectMixin
+from pygments import lexers
 
 from .forms import PasswordProtectedPasteForm, PasteForm
 from .models import Paste
@@ -95,6 +96,27 @@ class RawPasteDetailView(PasteInstanceMixin, PasteDetailMixin, SingleObjectMixin
     def get(self, request, *args, **kwargs):
         object = self.get_object()
         return HttpResponse(object.content, content_type="text/plain")
+
+
+class DownloadPasteView(PasteInstanceMixin, PasteDetailMixin, SingleObjectMixin, View):
+    def get_object(self):
+        object = super().get_object()
+        if object.password or object.burn_after_read:
+            raise Http404
+        return object
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+        response = HttpResponse(object.content, content_type="text/plain")
+        lexer = lexers.get_lexer_by_name(object.syntax)
+        try:
+            ext = lexer.filenames[0].split("*")[1]
+        except:
+            ext = ""
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="paste-{object.uuid}{ext}'
+        return response
 
 
 class PasteDetailWithPasswordView(PasteInstanceMixin, PasteDetailMixin, DetailView):
