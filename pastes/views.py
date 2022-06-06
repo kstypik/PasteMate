@@ -30,6 +30,25 @@ class AuthenticatedUserInFormKwargsMixin:
         return kwargs
 
 
+class PastePublicOrIsAuthorMixin:
+    def get_object(self, queryset=None):
+        object = super().get_object()
+        if object.exposure == Paste.Exposure.PRIVATE:
+            if object.author == self.request.user:
+                return object
+            raise Http404
+
+        return object
+
+
+class EnsureStandardPasteMixin(PastePublicOrIsAuthorMixin):
+    def get_object(self):
+        object = super().get_object()
+        if object.password or object.burn_after_read:
+            raise Http404
+        return object
+
+
 class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
     model = Paste
     form_class = PasteForm
@@ -44,6 +63,28 @@ class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
         return super().form_valid(form)
 
 
+class ClonedGetObjectMixin:
+    def get_object(self):
+        object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
+        return object
+
+
+class PasteCloneView(
+    LoginRequiredMixin, EnsureStandardPasteMixin, ClonedGetObjectMixin, PasteCreateView
+):
+    extra_context = {
+        "action_type": "Clone",
+    }
+
+    def get_initial(self):
+        cloned_paste = self.get_object()
+        return {
+            "content": cloned_paste.content,
+            "syntax": cloned_paste.syntax,
+            "title": cloned_paste.title,
+        }
+
+
 class PasteInstanceMixin:
     model = Paste
     slug_field = "uuid"
@@ -51,18 +92,7 @@ class PasteInstanceMixin:
     context_object_name = "paste"
 
 
-class PasteDetailMixin:
-    def get_object(self, queryset=None):
-        object = super().get_object()
-        if object.exposure == Paste.Exposure.PRIVATE:
-            if object.author == self.request.user:
-                return object
-            raise Http404
-
-        return object
-
-
-class PasteDetailView(PasteInstanceMixin, PasteDetailMixin, DetailView):
+class PasteDetailView(PasteInstanceMixin, PastePublicOrIsAuthorMixin, DetailView):
     template_name = "pastes/detail.html"
 
     def get(self, request, *args, **kwargs):
@@ -84,14 +114,6 @@ class PasteDetailView(PasteInstanceMixin, PasteDetailMixin, DetailView):
             context["burn_after_read"] = True
         response = super().render_to_response(context, **response_kwargs)
         return response
-
-
-class EnsureStandardPasteMixin(PasteDetailMixin):
-    def get_object(self):
-        object = super().get_object()
-        if object.password or object.burn_after_read:
-            raise Http404
-        return object
 
 
 class RawPasteDetailView(
@@ -119,7 +141,9 @@ class DownloadPasteView(
         return response
 
 
-class PasteDetailWithPasswordView(PasteInstanceMixin, PasteDetailMixin, DetailView):
+class PasteDetailWithPasswordView(
+    PasteInstanceMixin, PastePublicOrIsAuthorMixin, DetailView
+):
     template_name = "pastes/detail.html"
 
     def get(self, request, *args, **kwargs):
