@@ -2,10 +2,16 @@ let toolbarCopy = document.querySelector(".toolbar-copy");
 let rawCopy = document.querySelector(".raw-copy");
 let rawCode = document.querySelector(".raw-paste-data");
 
+console.log(rawCode);
+
 getCopyHandler = (element, position) => {
     handleCopy = (event) => {
       event.preventDefault();
-      navigator.clipboard.writeText(rawCode.innerHTML);
+      
+      rawCode.select();
+      rawCode.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(rawCode.value);
+      
       successMsgSpan = document.createElement("span");
       successMsgSpan.innerHTML = "Copied";
       successMsgSpan.classList.add("text-success");
