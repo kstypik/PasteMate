@@ -3,7 +3,7 @@ import copy
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import (
     CreateView,
@@ -11,7 +11,9 @@ from django.views.generic import (
     DetailView,
     ListView,
     UpdateView,
+    View,
 )
+from django.views.generic.detail import SingleObjectMixin
 
 from .forms import PasswordProtectedPasteForm, PasteForm
 from .models import Paste
@@ -81,6 +83,18 @@ class PasteDetailView(PasteInstanceMixin, PasteDetailMixin, DetailView):
             context["burn_after_read"] = True
         response = super().render_to_response(context, **response_kwargs)
         return response
+
+
+class RawPasteDetailView(PasteInstanceMixin, PasteDetailMixin, SingleObjectMixin, View):
+    def get_object(self):
+        object = super().get_object()
+        if object.password or object.burn_after_read:
+            raise Http404
+        return object
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+        return HttpResponse(object.content, content_type="text/plain")
 
 
 class PasteDetailWithPasswordView(PasteInstanceMixin, PasteDetailMixin, DetailView):

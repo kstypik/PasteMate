@@ -13,6 +13,7 @@ urlpatterns = [
     ),
     path("user/<str:username>/", views.UserPasteListView.as_view(), name="user_pastes"),
     path("<uuid:uuid>/", views.PasteDetailView.as_view(), name="detail"),
+    path("<uuid:uuid>/raw/", views.RawPasteDetailView.as_view(), name="raw_detail"),
     path(
         "<uuid:uuid>/pass/",
         views.PasteDetailWithPasswordView.as_view(),
