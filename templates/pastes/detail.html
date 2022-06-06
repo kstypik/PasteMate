@@ -29,11 +29,7 @@
     </div>
 
     <div class="mt-4">
-    {% if paste.content_html %}
       {{ paste.content_html|safe }}
-    {% else %}
-    <pre>{{ paste.content }}</pre>
-    {% endif %}
     </div>
   {% else %}
     <div class="alert alert-info">
