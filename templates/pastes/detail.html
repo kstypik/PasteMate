@@ -36,7 +36,7 @@
           </a>
         </div>
         <div class="ms-auto">
-          <a href=""><span class="badge bg-secondary">copy</span></a>
+          <a href="#" class="toolbar-copy"><span class="badge bg-secondary">copy</span></a>
           <a href=""><span class="badge bg-secondary">raw</span></a>
           <a href=""><span class="badge bg-secondary">download</span></a>
           <a href=""><span class="badge bg-secondary">clone</span></a>
@@ -47,6 +47,9 @@
       </div>
       {{ paste.content_html|safe }}
     </div>
+
+    <h2 class="mt-4 h5">RAW Paste Data <a href="#" class="raw-copy">Copy</a></h2>
+    <textarea class="form-control raw-paste-data">{{ paste.content }}</textarea>
   {% else %}
     <div class="alert alert-info">
       This paste is protected with password by its author. Enter it to unlock the access.
@@ -59,3 +62,7 @@
   {% endif %}
 {% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+    {% include "_includes/toolbar.js" %}
+{% endblock extra_js %}
