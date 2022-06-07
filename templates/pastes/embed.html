@@ -1,0 +1,31 @@
+{% extends '_base.html' %}
+
+{% block title %}Embed {{ paste.title }} {{ block.super }}{% endblock title %}
+
+{% block content %}
+<h2>Embed this paste</h2>
+<p>This is an image version of this paste, so you can easily share it on your website.</p>
+
+<div class="mt-5">
+  <img src="{{ paste.embeddable_image.url}}" alt="Paste's content represented as an image">
+  <div class="mt-2">
+    <label for="image-link">Direct link to the image</label>
+    <input type="text" class="form-control" id="image-link" value="{{ direct_embed_link }}">
+  </div>
+
+  <div class="mt-2">
+    <label for="image-link">HTML code</label>
+    <input type="text" class="form-control" id="image-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
+  </div>
+
+  <div class="mt-2">
+    <label for="image-link">BBCode</label>
+    <input type="text" class="form-control" id="image-link" value="[img]{{ direct_embed_link }}[/img]">
+  </div>
+
+  <div class="mt-2">
+    <label for="image-link">Markdown</label>
+    <input type="text" class="form-control" id="image-link" value="!({{ direct_embed_link }})">
+  </div>
+</div>
+{% endblock content %}

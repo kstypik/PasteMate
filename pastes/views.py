@@ -13,6 +13,7 @@ from django.views.generic import (
     UpdateView,
     View,
 )
+from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from pygments import lexers
 
@@ -224,3 +225,14 @@ class PasteArchiveListView(ListView):
         if syntax:
             return Paste.published.filter(syntax=self.kwargs["syntax"])
         return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
+
+
+class EmbedPasteView(PasteInstanceMixin, EnsureStandardPasteMixin, DetailView):
+    template_name = "pastes/embed.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["direct_embed_link"] = (
+            self.request.get_host() + self.object.embeddable_image.url
+        )
+        return context
