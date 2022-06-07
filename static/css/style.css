@@ -72,6 +72,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .vm { color: #19177C } /* Name.Variable.Magic */
 .il { color: #666666 } /* Literal.Number.Integer.Long */
 
+.highlight {
+    overflow: auto;
+}
+
 
 .avatar-normal {
     max-height: 50px;
