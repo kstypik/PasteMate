@@ -17,6 +17,7 @@ urlpatterns = [
     path("<uuid:uuid>/dl/", views.DownloadPasteView.as_view(), name="paste_download"),
     path("<uuid:uuid>/clone/", views.PasteCloneView.as_view(), name="clone"),
     path("<uuid:uuid>/embed/", views.EmbedPasteView.as_view(), name="embed"),
+    path("<uuid:uuid>/print/", views.PrintPasteView.as_view(), name="print"),
     path(
         "<uuid:uuid>/pass/",
         views.PasteDetailWithPasswordView.as_view(),

@@ -44,8 +44,8 @@
               <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-secondary">clone</span></a>
             {% endif %}
             <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-secondary">embed</span></a>
+            <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-secondary">print</span></a>
           {% endif %}
-          <a href=""><span class="badge bg-secondary">print</span></a>
           <a href=""><span class="badge bg-secondary">report</span></a>
         </div>
       </div>

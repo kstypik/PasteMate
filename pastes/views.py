@@ -236,3 +236,18 @@ class EmbedPasteView(PasteInstanceMixin, EnsureStandardPasteMixin, DetailView):
             self.request.get_host() + self.object.embeddable_image.url
         )
         return context
+
+
+class PrintPasteView(
+    PasteInstanceMixin,
+    EnsureStandardPasteMixin,
+    TemplateResponseMixin,
+    SingleObjectMixin,
+    View,
+):
+    template_name = "pastes/print.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        return self.render_to_response(context)
