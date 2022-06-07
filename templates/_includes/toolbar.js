@@ -9,6 +9,7 @@ getCopyHandler = (element, position) => {
       rawCode.select();
       rawCode.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(rawCode.value);
+      rawCopy.focus();
       
       successMsgSpan = document.createElement("span");
       successMsgSpan.innerHTML = "Copied";
