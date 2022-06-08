@@ -9,6 +9,10 @@ class PasteForm(forms.ModelForm):
         required=False,
         help_text="You can type a new folder name, and it will be created and chosen instead of the one above.",
     )
+    post_anonymously = forms.BooleanField(
+        help_text="If checked, your account won't be associated with this paste. You won't be able to edit or delete it later.",
+        required=False,
+    )
 
     class Meta:
         model = Paste
@@ -30,15 +34,20 @@ class PasteForm(forms.ModelForm):
         if not self.user:
             del self.fields["folder"]
             del self.fields["new_folder"]
+        if kwargs.get("instance") or not self.user:
+            del self.fields["post_anonymously"]
 
     def save(self, commit=True):
         paste = super().save(commit=False)
         new_folder = self.cleaned_data["new_folder"]
-        if self.user and new_folder:
+        post_anonymously = self.cleaned_data["post_anonymously"]
+        if not post_anonymously and self.user and new_folder:
             folder, _ = Folder.objects.get_or_create(
                 created_by=self.user, name=new_folder
             )
             paste.folder = folder
+        if post_anonymously:
+            paste.folder = None
         if commit:
             paste.save()
         return paste
