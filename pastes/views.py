@@ -210,17 +210,27 @@ class UserListMixin:
 
 
 class UserPasteListView(UserListMixin, ListView):
+    def display_as_guest(self):
+        if self.request.GET.get("guest") == "1":
+            return True
+        return False
+
     def get_queryset(self):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
-        if self.request.user == self.user:
-            return Paste.objects.filter(author=self.user, folder=None)
-        return Paste.published.filter(author=self.user)
+
+        if self.request.user != self.user or self.display_as_guest():
+            return Paste.published.filter(author=self.user)
+        return Paste.objects.filter(author=self.user, folder=None)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["author"] = self.user
-        if self.request.user == self.user:
+
+        as_guest = True if self.request.GET.get("guest") == "1" else False
+        if self.request.user == self.user and not self.display_as_guest():
             context["folders"] = Folder.objects.filter(created_by=self.request.user)
+
+        context["as_guest"] = self.display_as_guest()
         return context
 
 

@@ -17,6 +17,12 @@
   </div>
 </div>
 
+{% if user == author and not as_guest %}
+<div class="alert alert-secondary mt-3">
+  To see what other people see on your pastebin, <a href="?guest=1">click here</a>.
+</div>
+{% endif %}
+
 <table class="table mt-3">
   <thead>
     <tr>
