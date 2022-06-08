@@ -97,11 +97,21 @@ class Paste(TimeStampedModel):
 
 
 class Folder(TimeStampedModel):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="folders"
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "created_by"], name="unique_folder"
+            ),
+            models.UniqueConstraint(
+                fields=["slug", "created_by"], name="unique_folder_slug"
+            ),
+        ]
 
     def __str__(self):
         return self.name
