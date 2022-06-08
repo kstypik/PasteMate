@@ -19,7 +19,7 @@
   {% if not password_protected or password_correct %}
     <h1>{{ paste.title }}</h1>
     <p>
-      <img src="{{ paste.author.avatar.url }}" alt="{{ paste.author.username }}'s avatar" class="rounded-circle avatar-normal">
+      <img src="{% if paste.author %}{{ paste.author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="Paste Author Avatar" class="rounded-circle avatar-normal">
        Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
     <div>
       {% if user == paste.author %}
