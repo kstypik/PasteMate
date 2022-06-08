@@ -19,7 +19,7 @@ from django.views.generic.detail import SingleObjectMixin
 from pygments import lexers
 
 from .forms import PasswordProtectedPasteForm, PasteForm, ReportForm
-from .models import Paste, Report
+from .models import Folder, Paste, Report
 
 User = get_user_model()
 
@@ -211,12 +211,14 @@ class UserPasteListView(ListView):
     def get_queryset(self):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
         if self.request.user == self.user:
-            return Paste.objects.filter(author=self.user)
+            return Paste.objects.filter(author=self.user, folder=None)
         return Paste.published.filter(author=self.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["author"] = self.user
+        if self.request.user == self.user:
+            context["folders"] = Folder.objects.filter(created_by=self.request.user)
         return context
 
 

@@ -20,7 +20,6 @@
 <table class="table mt-3">
   <thead>
     <tr>
-      <th scope="col"><i class="fa-solid fa-eye"></i></th>
       <th scope="col">Title</th>
       <th scope="col">Added</th>
       <th scope="col">Expires</th>
@@ -28,14 +27,24 @@
     </tr>
   </thead>
   <tbody>
+    {% if folders %} 
+    {% for folder in folders %}
+    <tr>
+      <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="">{{ folder.name }}</a></td>
+      <td>{{ folder.created }}</td>
+      <td></td>
+      <td></td>
+    </tr>    
+    {% endfor %}
+    {% endif %}
     {% for paste in pastes %}
     <tr>
-      <th scope="row">
+      <td>
         {% if paste.exposure == "PU" %}<i title="Public paste. Everyone can see it." class="fa-solid fa-globe"></i>{% endif %}
         {% if paste.exposure == "UN" %}<i title="Unlisted paste. Only people with link can see it." class="fa-solid fa-link"></i>{% endif %}
         {% if paste.exposure == "PR" %}<i title="Private paste. Only you can see it." class="fa-solid fa-lock"></i>{% endif %}
-      </th>
-      <td><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></td>
+        <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
+      </td>
       <td>{{ paste.created }}</td>
       <td>{{ paste.expiration_time }}</td>
       <td><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>

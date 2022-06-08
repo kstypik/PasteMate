@@ -98,12 +98,13 @@ class Paste(TimeStampedModel):
 
 class Folder(TimeStampedModel):
     name = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50)
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="folders"
     )
 
     class Meta:
+        ordering = ["name"]
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "created_by"], name="unique_folder"
