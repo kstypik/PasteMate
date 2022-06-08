@@ -37,6 +37,14 @@ class PasteForm(forms.ModelForm):
         if kwargs.get("instance") or not self.user:
             del self.fields["post_anonymously"]
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if (
+            cleaned_data.get("post_anonymously")
+            and cleaned_data.get("exposure") == "PR"
+        ):
+            raise forms.ValidationError("You can't create private paste as Anonymous.")
+
     def save(self, commit=True):
         paste = super().save(commit=False)
         new_folder = self.cleaned_data["new_folder"]
