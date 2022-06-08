@@ -31,6 +31,7 @@ class PasteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        self.fields["folder"].queryset = Folder.objects.filter(created_by=self.user)
         if not self.user:
             del self.fields["folder"]
             del self.fields["new_folder"]
