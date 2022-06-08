@@ -21,6 +21,11 @@ class PublishedManager(models.Manager):
         return super().get_queryset().filter(exposure=Paste.Exposure.PUBLIC)
 
 
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Paste(TimeStampedModel):
     class Exposure(models.TextChoices):
         PUBLIC = "PU", "Public"
@@ -51,7 +56,9 @@ class Paste(TimeStampedModel):
 
     embeddable_image = models.ImageField(upload_to="embed/", blank=True)
 
-    objects = models.Manager()
+    is_active = models.BooleanField(default=True)
+
+    objects = ActiveManager()
     published = PublishedManager()
 
     class Meta:
@@ -102,3 +109,17 @@ class Folder(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
+
+
+class Report(TimeStampedModel):
+    paste = models.ForeignKey(Paste, on_delete=models.CASCADE)
+    reason = models.TextField()
+    reporter_name = models.CharField(max_length=100)
+    moderated = models.BooleanField(default=False)
+    moderated_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    moderated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Report by {self.reporter_name}"

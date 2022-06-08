@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Report {{ reported_paste.title }} {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>Report paste {{ reported_paste.title }}</h2>
+
+<div class="alert alert-warning">You are trying to report <a href="{{ reported_paste.get_absolute_url }}">this paste</a>. Please provide a reason for doing so.</div>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <button class="btn btn-warning mt-2" type="submit">Report</button>
+</form>
+
+{% endblock content %}

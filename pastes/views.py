@@ -3,6 +3,7 @@ import copy
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import (
@@ -17,8 +18,8 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from pygments import lexers
 
-from .forms import PasswordProtectedPasteForm, PasteForm
-from .models import Paste
+from .forms import PasswordProtectedPasteForm, PasteForm, ReportForm
+from .models import Paste, Report
 
 User = get_user_model()
 
@@ -251,3 +252,32 @@ class PrintPasteView(
         self.object = self.get_object()
         context = self.get_context_data()
         return self.render_to_response(context)
+
+
+class ReportPasteView(SuccessMessageMixin, CreateView):
+    model = Report
+    form_class = ReportForm
+    template_name = "pastes/report.html"
+    success_message = "Your report was submitted and is awaiting for moderation."
+
+    def dispatch(self, request, *args, **kwargs):
+        self.paste_object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
+        if (
+            self.paste_object.password
+            or self.paste_object.burn_after_read
+            or self.paste_object.author == request.user
+        ):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reported_paste"] = self.paste_object
+        return context
+
+    def form_valid(self, form):
+        form.instance.paste = self.paste_object
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.paste_object.get_absolute_url()

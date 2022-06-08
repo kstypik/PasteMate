@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Folder, Paste
+from .models import Folder, Paste, Report
 
 
 class PasteForm(forms.ModelForm):
@@ -55,3 +55,9 @@ class PasswordProtectedPasteForm(forms.Form):
         password = self.cleaned_data["password"]
         if password != self.correct_password:
             raise forms.ValidationError("Password incorrect")
+
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ["reason", "reporter_name"]
