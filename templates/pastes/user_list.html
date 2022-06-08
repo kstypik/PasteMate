@@ -4,7 +4,7 @@
 {% block title %}{{ author }}'s Pastes {{ block.super }}{% endblock %}
 
 {% block content %}
-<h2>{{ author }}'s Pastes</h2>
+<h2>{{ author }}'s Pastes {% if folder %}from {{ folder.name }} folder{% endif %}</h2>
 
 <div class="row">
   <div class="col-md-1">
@@ -28,14 +28,14 @@
   </thead>
   <tbody>
     {% if folders %} 
-    {% for folder in folders %}
-    <tr>
-      <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="">{{ folder.name }}</a></td>
-      <td>{{ folder.created }}</td>
-      <td></td>
-      <td></td>
-    </tr>    
-    {% endfor %}
+      {% for folder in folders %}
+      <tr>
+        <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a></td>
+        <td>{{ folder.created }}</td>
+        <td></td>
+        <td></td>
+      </tr>    
+      {% endfor %}
     {% endif %}
     {% for paste in pastes %}
     <tr>

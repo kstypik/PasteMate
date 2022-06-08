@@ -203,11 +203,13 @@ class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
     template_name = "pastes/delete.html"
 
 
-class UserPasteListView(ListView):
+class UserListMixin:
     context_object_name = "pastes"
     template_name = "pastes/user_list.html"
     paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
 
+
+class UserPasteListView(UserListMixin, ListView):
     def get_queryset(self):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
         if self.request.user == self.user:
@@ -219,6 +221,20 @@ class UserPasteListView(ListView):
         context["author"] = self.user
         if self.request.user == self.user:
             context["folders"] = Folder.objects.filter(created_by=self.request.user)
+        return context
+
+
+class UserFolderListView(UserListMixin, ListView):
+    def get_queryset(self):
+        self.folder = get_object_or_404(
+            Folder, created_by=self.request.user, name=self.kwargs["folder_slug"]
+        )
+        return self.folder.pastes.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["folder"] = self.folder
+        context["author"] = self.request.user
         return context
 
 
