@@ -18,9 +18,18 @@
 {% else %}
   {% if not password_protected or password_correct %}
     <h1>{{ paste.title }}</h1>
-    <p>
-      <img src="{% if paste.author %}{{ paste.author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="Paste Author Avatar" class="rounded-circle avatar-normal">
-       Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}</p>
+    <div class="row">
+      <div class="col-md-1">
+        <img src="{% if paste.author %}{{ paste.author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="Paste Author Avatar" class="rounded-circle avatar-normal">
+      </div>
+      <div class="col align-self-center">
+       Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}
+       &bull; Posted on <span title="{{ paste.created }}">{{ paste.created|date }}</span>
+       {% if paste.author.location %}&bull; Location: {{ paste.author.location }}{% endif %}
+       {% if paste.author.website %}&bull; Website: <a href="{{ paste.author.website }}">View</a>{% endif %}
+      </div>
+    </div>
+    </p>
     <div>
       {% if user == paste.author %}
       <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>

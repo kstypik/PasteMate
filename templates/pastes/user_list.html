@@ -4,7 +4,18 @@
 {% block title %}{{ author }}'s Pastes {{ block.super }}{% endblock %}
 
 {% block content %}
-<h2><img src="{{ author.avatar.url }}" alt="{{ author.username }}'s avatar" class="rounded-circle avatar-normal"> {{ author }}'s Pastes</h2>
+<h2>{{ author }}'s Pastes</h2>
+
+<div class="row">
+  <div class="col-md-1">
+    <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+  </div>
+  <div class="col align-self-center">
+   Registered on <span title="{{ author.date_joined }}">{{ author.date_joined|date }}</span>
+   {% if author.location %}&bull; Location: {{ author.location }}{% endif %}
+   {% if author.website %}&bull; Website: <a href="{{ author.website }}">View</a>{% endif %}
+  </div>
+</div>
 
 <table class="table">
   <thead>
