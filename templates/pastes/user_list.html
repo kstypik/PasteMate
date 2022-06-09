@@ -11,7 +11,7 @@
     <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
   </div>
   <div class="col align-self-center">
-   Registered on <span title="{{ author.date_joined }}">{{ author.date_joined|date }}</span>
+   Joined <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
    {% if author.location %}&bull; Location: {{ author.location }}{% endif %}
    {% if author.website %}&bull; Website: <a href="{{ author.website }}">View</a>{% endif %}
   </div>
@@ -37,7 +37,7 @@
       {% for folder in folders %}
       <tr>
         <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a></td>
-        <td>{{ folder.created }}</td>
+        <td>{{ folder.created|date }}</td>
         <td></td>
         <td></td>
       </tr>    
@@ -51,7 +51,7 @@
         {% if paste.exposure == "PR" %}<i title="Private paste. Only you can see it." class="fa-solid fa-lock"></i>{% endif %}
         <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
       </td>
-      <td>{{ paste.created }}</td>
+      <td>{{ paste.created|date }}</td>
       <td>{{ paste.expiration_time }}</td>
       <td><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
     </tr>

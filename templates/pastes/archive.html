@@ -20,7 +20,7 @@
     <tr>
       <th scope="row">{{ forloop.counter }}</th>
       <td><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></td>
-      <td>{{ paste.created }}</td>
+      <td><span class="to-relative-datetime">{{ paste.created|date:"c" }}</span></td>
       <td><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
     </tr>
     {% endfor %}
