@@ -32,9 +32,37 @@ class Paste(TimeStampedModel):
         UNLISTED = "UN", "Unlisted"
         PRIVATE = "PR", "Private"
 
-    SYNTAX_HIGHLITHING_CHOICES = [
-        (lexer[1][0], lexer[0]) for lexer in lexers.get_all_lexers() if lexer[1]
-    ]
+    SYNTAX_HIGHLITHING_CHOICES = (
+        ("text", "Text only"),
+        (
+            "Popular languages",
+            (
+                ("bash", "Bash"),
+                ("c", "C"),
+                ("csharp", "C#"),
+                ("cpp", "C++"),
+                ("css", "CSS"),
+                ("html", "HTML"),
+                ("json", "JSON"),
+                ("java", "Java"),
+                ("javascript", "JavaScript"),
+                ("lua", "Lua"),
+                ("markdown", "Markdown"),
+                ("objective-c", "Objective C"),
+                ("php", "PHP"),
+                ("python", "Python"),
+                ("ruby", "Ruby"),
+            ),
+        ),
+        (
+            "All languages",
+            [
+                (lexer[1][0], lexer[0])
+                for lexer in lexers.get_all_lexers()
+                if lexer[1] and lexer[0] != "Text only"
+            ],
+        ),
+    )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
