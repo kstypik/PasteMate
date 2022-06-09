@@ -102,7 +102,7 @@ class PasteDetailView(PasteInstanceMixin, PastePublicOrIsAuthorMixin, DetailView
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        if self.object.password:
+        if self.object.password and self.request.user != self.object.author:
             return redirect("pastes:detail_with_password", uuid=self.object.uuid)
         return response
 
