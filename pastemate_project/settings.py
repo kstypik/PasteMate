@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import environ
+from django.contrib.messages import constants as messages
 from django.urls import reverse_lazy
 
 env = environ.Env(
@@ -161,6 +162,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SITE_ID = 1
 
+# Message tags
+# https://docs.djangoproject.com/en/3.2/ref/contrib/messages/#message-tags
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}
+
 # Crispy Forms
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -178,6 +186,7 @@ LOGOUT_REDIRECT_URL = reverse_lazy("pastes:create")
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy("account_email")
 
 
 # Pastes App (local)
