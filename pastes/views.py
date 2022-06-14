@@ -212,7 +212,27 @@ class UserListMixin:
     paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
 
 
-class UserPasteListView(UserListMixin, ListView):
+class UserStatsMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        show_stats = context.pop("show_stats", None)
+        if show_stats:
+            context["stats"] = {
+                "total_pastes": Paste.objects.filter(author=self.request.user).count(),
+                "public_pastes": Paste.published.filter(
+                    author=self.request.user
+                ).count(),
+                "unlisted_pastes": Paste.objects.filter(
+                    author=self.request.user, exposure=Paste.Exposure.UNLISTED
+                ).count(),
+                "private_pastes": Paste.objects.filter(
+                    author=self.request.user, exposure=Paste.Exposure.PRIVATE
+                ).count(),
+            }
+        return context
+
+
+class UserPasteListView(UserStatsMixin, UserListMixin, ListView):
     def display_as_guest(self):
         if self.request.GET.get("guest") == "1":
             return True
@@ -226,22 +246,9 @@ class UserPasteListView(UserListMixin, ListView):
         return Paste.objects.filter(author=self.user, folder=None)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        show_stats = True if self.request.user == self.user else False
+        context = super().get_context_data(show_stats=show_stats, **kwargs)
         context["author"] = self.user
-
-        if self.request.user == self.user:
-            context["stats"] = {
-                "total_pastes": Paste.objects.filter(author=self.request.user).count(),
-                "public_pastes": Paste.published.filter(
-                    author=self.request.user
-                ).count(),
-                "unlisted_pastes": Paste.objects.filter(
-                    author=self.request.user, exposure=Paste.Exposure.UNLISTED
-                ).count(),
-                "private_pastes": Paste.objects.filter(
-                    author=self.request.user, exposure=Paste.Exposure.PRIVATE
-                ).count(),
-            }
 
         as_guest = True if self.request.GET.get("guest") == "1" else False
         if self.request.user == self.user and not self.display_as_guest():
@@ -268,15 +275,16 @@ class SearchResultsView(LoginRequiredMixin, ListView):
         return context
 
 
-class UserFolderListView(UserListMixin, ListView):
+class UserFolderListView(UserStatsMixin, UserListMixin, ListView):
     def get_queryset(self):
+        self.user = get_object_or_404(User, username=self.kwargs["username"])
         self.folder = get_object_or_404(
             Folder, created_by=self.request.user, slug=self.kwargs["folder_slug"]
         )
         return self.folder.pastes.all()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(show_stats=True, **kwargs)
         context["folder"] = self.folder
         context["author"] = self.request.user
         return context
