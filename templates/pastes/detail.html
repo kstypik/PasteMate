@@ -54,7 +54,9 @@
             {% if user.is_authenticated %}
               <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-secondary">clone</span></a>
             {% endif %}
-            <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-secondary">embed</span></a>
+            {% if not paste.exposure == "PR" %}
+              <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-secondary">embed</span></a>
+            {% endif %}
             <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-secondary">print</span></a>
             {% if user != paste.author %}
               <a href="{% url 'pastes:report' paste.uuid %}"><span class="badge bg-secondary">report</span></a>

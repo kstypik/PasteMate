@@ -296,6 +296,12 @@ class PasteArchiveListView(ListView):
 class EmbedPasteView(PasteInstanceMixin, EnsureStandardPasteMixin, DetailView):
     template_name = "pastes/embed.html"
 
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if obj.exposure == Paste.Exposure.PRIVATE:
+            raise Http404
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context["direct_embed_link"] = (
