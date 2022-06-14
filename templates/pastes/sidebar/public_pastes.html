@@ -1,5 +1,9 @@
-<ul>
-  {% for paste in public_pastes %}
-    <li><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></li>
-  {% endfor %}
-</ul>
+{% if public_pastes %}
+  <ul>
+    {% for paste in public_pastes %}
+      <li><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>There are no pastes yet.</p>
+{% endif %}
