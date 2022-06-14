@@ -21,6 +21,16 @@
 <div class="alert alert-secondary mt-3">
   To see what other people see on your pastebin, <a href="?guest=1">click here</a>.
 </div>
+
+<div class="alert alert-info" role="alert">
+  <b>Your stats</b>:
+  <ul class="mb-0">
+    <li>Total number of active pastes: {{ stats.total_pastes }}</li>
+    <li>Number of public pastes: {{ stats.public_pastes }}</li>
+    <li>Number of unlisted pastes: {{ stats.unlisted_pastes }}</li>
+    <li>Number of private pastes: {{ stats.private_pastes }}</li>
+  </ul>
+</div>
 {% endif %}
 
 <table class="table mt-3">

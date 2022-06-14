@@ -226,6 +226,20 @@ class UserPasteListView(UserListMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["author"] = self.user
 
+        if self.request.user == self.user:
+            context["stats"] = {
+                "total_pastes": Paste.objects.filter(author=self.request.user).count(),
+                "public_pastes": Paste.published.filter(
+                    author=self.request.user
+                ).count(),
+                "unlisted_pastes": Paste.objects.filter(
+                    author=self.request.user, exposure=Paste.Exposure.UNLISTED
+                ).count(),
+                "private_pastes": Paste.objects.filter(
+                    author=self.request.user, exposure=Paste.Exposure.PRIVATE
+                ).count(),
+            }
+
         as_guest = True if self.request.GET.get("guest") == "1" else False
         if self.request.user == self.user and not self.display_as_guest():
             context["folders"] = Folder.objects.filter(created_by=self.request.user)
