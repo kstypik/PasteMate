@@ -1,7 +1,17 @@
+{% load pastes_tags %}
 {% if my_pastes %}
-  <ul>
+  <ul class="list-group list-group-flush">
     {% for paste in my_pastes %}
-      <li><a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a></li>
+      <li class="list-group-item">
+        {% include "_includes/pastes_exposure_icons.html" %} <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
+        <div class="text-muted text-small">
+          <small>
+            {{ paste.get_syntax_display }} |
+            <span class="to-relative-datetime">{{ paste.created|date:"c" }}</span>
+            | {{ paste.filesize|tokilobytes }}
+          </small>
+        </div>
+      </li>
     {% endfor %}
   </ul>
 {% else %}
