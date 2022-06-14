@@ -15,3 +15,8 @@ def show_public_pastes(count=8):
 def show_my_pastes(user, count=8):
     my_pastes = Paste.objects.filter(author=user)[:count]
     return {"my_pastes": my_pastes}
+
+
+@register.filter()
+def tokilobytes(value):
+    return "%.2f" % float(value / 1024) + " KB"

@@ -1,6 +1,7 @@
 {% extends '_base.html' %}
 
 {% load crispy_forms_tags %}
+{% load pastes_tags %}
 
 {% block title %}
 {{ paste.title }} {{ block.super }}
@@ -44,6 +45,7 @@
             <span class="badge bg-secondary">{{ paste.get_syntax_display }}</span>
           </a>
         </div>
+        <div class="mx-2">{{ paste.filesize|tokilobytes }}</div>
         <div class="ms-auto">
           <a href="#" class="toolbar-copy"><span class="badge bg-secondary">copy</span></a>
           {% if not paste.password or paste.burn_after_read %}

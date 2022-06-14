@@ -82,6 +82,8 @@ class Paste(TimeStampedModel):
     burn_after_read = models.BooleanField(default=False)
     title = models.CharField(max_length=50, blank=True)
 
+    filesize = models.IntegerField()
+
     embeddable_image = models.ImageField(upload_to="embed/", blank=True)
 
     is_active = models.BooleanField(default=True)
@@ -97,6 +99,9 @@ class Paste(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("pastes:detail", kwargs={"uuid": self.uuid})
+
+    def calculate_filesize(self):
+        return len(self.content.encode("utf-8"))
 
     def highlight_syntax(self, format="html"):
         lexer = get_lexer_by_name(self.syntax, stripall=True)
@@ -121,6 +126,8 @@ class Paste(TimeStampedModel):
             self.title = "Untitled"
         self.content_html = self.highlight_syntax()
         self.embeddable_image = self.make_embeddable_image()
+        self.filesize = self.calculate_filesize()
+
         super().save(*args, **kwargs)
 
 
