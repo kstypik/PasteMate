@@ -16,14 +16,14 @@ from pygments.lexers import get_lexer_by_name
 User = get_user_model()
 
 
-class PublishedManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(exposure=Paste.Exposure.PUBLIC)
-
-
 class ActiveManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
+
+
+class PublishedManager(ActiveManager):
+    def get_queryset(self):
+        return super().get_queryset().filter(exposure=Paste.Exposure.PUBLIC)
 
 
 class Paste(TimeStampedModel):
