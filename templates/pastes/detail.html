@@ -4,7 +4,7 @@
 {% load pastes_tags %}
 
 {% block title %}
-{{ paste.title }} {{ block.super }}
+{% if not password_protected or password_correct %}{{ paste.title }}{% else %}Password protected paste{% endif %} {{ block.super }}
 {% endblock title %}
 
 {% block content %}
