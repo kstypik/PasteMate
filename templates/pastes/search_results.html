@@ -1,47 +1,13 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ author }}'s Pastes {{ block.super }}{% endblock %}
+{% block title %}Searching for: {{ query }} {{ block.super }}{% endblock %}
 
 {% block content %}
-<h2>{{ author }}'s Pastes {% if folder %}from {{ folder.name }} folder{% endif %}</h2>
+<h2>Your pastes matching keyword: {{ query }}</h2>
 
-<div class="row">
-  <div class="col-md-1">
-    <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
-  </div>
-  <div class="col align-self-center">
-   Joined <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
-   {% if author.location %}&bull; Location: {{ author.location }}{% endif %}
-   {% if author.website %}&bull; Website: <a href="{{ author.website }}">View</a>{% endif %}
-  </div>
-</div>
-
-{% if user == author and not as_guest %}
-<div class="alert alert-secondary mt-3">
-  To see what other people see on your pastebin, <a href="?guest=1">click here</a>.
-</div>
-
-<div class="alert alert-info" role="alert">
-  <b>Your stats</b>:
-  <ul class="mb-0">
-    <li>Total number of active pastes: {{ stats.total_pastes }}</li>
-    <li>Number of public pastes: {{ stats.public_pastes }}</li>
-    <li>Number of unlisted pastes: {{ stats.unlisted_pastes }}</li>
-    <li>Number of private pastes: {{ stats.private_pastes }}</li>
-  </ul>
-</div>
-{% endif %}
-
+{% include "_includes/pastes_search.html" %}
 {% if pastes %}
-  {% if user == author %}
-    <form action="{% url 'pastes:search' %}" method="get" style="max-width: 300px;" class="ms-auto">
-      <div class="input-group mb-3">
-        <button class="btn btn-outline-secondary" type="submit" id="button-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <input name="q" type="text" class="form-control" placeholder="Search your pastes..." aria-label="Search your pastes" aria-describedby="button-addon1">
-      </div>
-    </form>
-  {% endif %}
   <table class="table mt-3">
     <thead>
       <tr>
@@ -52,16 +18,6 @@
       </tr>
     </thead>
     <tbody>
-      {% if folders %} 
-        {% for folder in folders %}
-        <tr>
-          <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a></td>
-          <td>{{ folder.created|date }}</td>
-          <td class="d-none d-sm-table-cell"></td>
-          <td class="d-none d-sm-table-cell"></td>
-        </tr>    
-        {% endfor %}
-      {% endif %}
       {% for paste in pastes %}
       <tr>
         <td>
@@ -78,7 +34,7 @@
     </tbody>
   </table>
 {% else %}
-  <p>There are no pastes yet.</p>
+  <p>There are no pastes matching your query.</p>
 {% endif %}
 
 <nav aria-label="User's Pastes Navigation" class="mt-4">

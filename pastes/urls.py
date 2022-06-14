@@ -12,6 +12,7 @@ urlpatterns = [
         name="syntax_archive",
     ),
     path("languages/", views.SyntaxLanguagesView.as_view(), name="syntax_languages"),
+    path("search/", views.SearchResultsView.as_view(), name="search"),
     path("user/<str:username>/", views.UserPasteListView.as_view(), name="user_pastes"),
     path(
         "user/<str:username>/folder/<slug:folder_slug>/",

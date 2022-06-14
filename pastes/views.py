@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.postgres.search import SearchVector
 from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -247,6 +248,23 @@ class UserPasteListView(UserListMixin, ListView):
             context["folders"] = Folder.objects.filter(created_by=self.request.user)
 
         context["as_guest"] = self.display_as_guest()
+        return context
+
+
+class SearchResultsView(LoginRequiredMixin, ListView):
+    context_object_name = "pastes"
+    template_name = "pastes/search_results.html"
+    paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
+
+    def get_queryset(self):
+        query = self.request.GET.get("q", "")
+        return Paste.objects.annotate(search=SearchVector("content", "title")).filter(
+            author=self.request.user, search=query
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q")
         return context
 
 
