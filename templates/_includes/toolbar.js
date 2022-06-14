@@ -2,6 +2,8 @@ let toolbarCopy = document.querySelector(".toolbar-copy");
 let rawCopy = document.querySelector(".raw-copy");
 let rawCode = document.querySelector(".raw-paste-data");
 
+let hasCopied = false;
+
 getCopyHandler = (element, position) => {
     handleCopy = (event) => {
       event.preventDefault();
@@ -9,15 +11,21 @@ getCopyHandler = (element, position) => {
       rawCode.select();
       rawCode.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(rawCode.value);
-      rawCopy.focus();
+      // rawCopy.focus();
       
-      successMsgSpan = document.createElement("span");
-      successMsgSpan.innerHTML = "Copied";
-      successMsgSpan.classList.add("text-success");
-      successMsgSpan.classList.add("mx-2");
-      element.insertAdjacentElement(position, successMsgSpan);
+
+      if (!hasCopied) {
+        successMsgSpan = document.createElement("span");
+        successMsgSpan.innerHTML = "Copied";
+        successMsgSpan.classList.add("text-success");
+        successMsgSpan.classList.add("mx-2");
+  
+        element.insertAdjacentElement(position, successMsgSpan);
+      }
+      hasCopied = true;
       setTimeout(() => {
         successMsgSpan.remove();
+        hasCopied = false;
       }, 2000);
     }
     return handleCopy;
