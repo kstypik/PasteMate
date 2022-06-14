@@ -313,6 +313,7 @@ class ReportPasteView(SuccessMessageMixin, CreateView):
             self.paste_object.password
             or self.paste_object.burn_after_read
             or self.paste_object.author == request.user
+            or self.paste_object.exposure == Paste.Exposure.PRIVATE
         ):
             raise Http404
         return super().dispatch(request, *args, **kwargs)
