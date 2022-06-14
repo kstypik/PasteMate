@@ -271,7 +271,7 @@ class SearchResultsView(LoginRequiredMixin, ListView):
 class UserFolderListView(UserListMixin, ListView):
     def get_queryset(self):
         self.folder = get_object_or_404(
-            Folder, created_by=self.request.user, name=self.kwargs["folder_slug"]
+            Folder, created_by=self.request.user, slug=self.kwargs["folder_slug"]
         )
         return self.folder.pastes.all()
 
