@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import (
@@ -11,6 +12,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
     View,
 )
@@ -326,3 +328,17 @@ class ReportPasteView(SuccessMessageMixin, CreateView):
 
     def get_success_url(self):
         return self.paste_object.get_absolute_url()
+
+
+class SyntaxLanguagesView(TemplateView):
+    template_name = "pastes/syntax_languages.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["languages"] = (
+            Paste.objects.order_by("syntax")
+            .distinct()
+            .values("syntax")
+            .annotate(used=Count("syntax"))
+        )
+        return context
