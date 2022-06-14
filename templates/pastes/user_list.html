@@ -60,9 +60,7 @@
       {% for paste in pastes %}
       <tr>
         <td>
-          {% if paste.exposure == "PU" %}<i title="Public paste. Everyone can see it." class="fa-solid fa-globe"></i>{% endif %}
-          {% if paste.exposure == "UN" %}<i title="Unlisted paste. Only people with link can see it." class="fa-solid fa-link"></i>{% endif %}
-          {% if paste.exposure == "PR" %}<i title="Private paste. Only you can see it." class="fa-solid fa-lock"></i>{% endif %}
+          {% include "_includes/pastes_exposure_icons.html" %}
           <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
         </td>
         <td>{{ paste.created|date }}</td>
