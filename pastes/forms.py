@@ -48,7 +48,7 @@ class PasteForm(forms.ModelForm):
 
     def save(self, commit=True):
         paste = super().save(commit=False)
-        new_folder = self.cleaned_data["new_folder"]
+        new_folder = self.cleaned_data.get("new_folder")
         post_anonymously = self.cleaned_data.get("post_anonymously")
         if not post_anonymously and self.user and new_folder:
             folder, _ = Folder.objects.get_or_create(

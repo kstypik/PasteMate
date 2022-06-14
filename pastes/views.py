@@ -64,7 +64,7 @@ class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
 
     def form_valid(self, form):
         if (
-            not form.cleaned_data["post_anonymously"]
+            not form.cleaned_data.get("post_anonymously")
             and self.request.user.is_authenticated
         ):
             form.instance.author = self.request.user
