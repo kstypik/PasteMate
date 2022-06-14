@@ -21,4 +21,52 @@
 $("#id_syntax").select2({
   theme: "bootstrap-5",
 });
+function randomstring(L) {
+  let s = '';
+  let randomchar = function() {
+    let n = Math.floor(Math.random() * 62);
+    if (n < 10) return n; //1-10
+    if (n < 36) return String.fromCharCode(n + 55); //A-Z
+    return String.fromCharCode(n + 61); //a-z
+  }
+  while (s.length < L) s += randomchar();
+  return s;
+}
+
+const pastePasswordField = document.querySelector("#id_password");
+pastePasswordField.setAttribute("disabled", true);
+pastePasswordField.value = "";
+
+const enablePasswordDiv = document.createElement("div");
+enablePasswordDiv.classList.add("form-check");
+enablePasswordDiv.classList.add("mb-2");
+
+const enablePasswordCheckbox = document.createElement("input");
+enablePasswordCheckbox.setAttribute("type", 'checkbox');
+enablePasswordCheckbox.setAttribute("value", 'checkbox');
+enablePasswordCheckbox.setAttribute("id", 'enablePassword');
+enablePasswordCheckbox.classList.add("form-check-input");
+
+const enablePasswordLabel = document.createElement("label");
+enablePasswordLabel.innerHTML = "Enable";
+enablePasswordLabel.setAttribute("for", "enablePassword");
+enablePasswordCheckbox.classList.add("form-check-label");
+
+enablePasswordDiv.appendChild(enablePasswordCheckbox);
+enablePasswordDiv.appendChild(enablePasswordLabel);
+
+pastePasswordField.insertAdjacentElement("beforebegin", enablePasswordDiv);
+
+enablePasswordCheckbox.addEventListener("change", () => {
+  if (enablePasswordCheckbox.checked) {
+    pastePasswordField.removeAttribute("disabled");
+    console.log(pastePasswordField)
+    pastePasswordField.value = randomstring(10);
+  } else {
+    pastePasswordField.setAttribute("disabled", true);
+    pastePasswordField.value = "";
+  }
+})
+
+
 {% endblock extra_js %}
