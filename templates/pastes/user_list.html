@@ -39,8 +39,8 @@
       <tr>
         <th scope="col">Title</th>
         <th scope="col">Added</th>
-        <th scope="col">Expires</th>
-        <th scope="col">Syntax</th>
+        <th scope="col" class="d-none d-sm-table-cell">Expires</th>
+        <th scope="col" class="d-none d-sm-table-cell">Syntax</th>
       </tr>
     </thead>
     <tbody>
@@ -49,8 +49,8 @@
         <tr>
           <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a></td>
           <td>{{ folder.created|date }}</td>
-          <td></td>
-          <td></td>
+          <td class="d-none d-sm-table-cell"></td>
+          <td class="d-none d-sm-table-cell"></td>
         </tr>    
         {% endfor %}
       {% endif %}
@@ -63,8 +63,8 @@
           <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
         </td>
         <td>{{ paste.created|date }}</td>
-        <td>{{ paste.expiration_time }}</td>
-        <td><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
+        <td class="d-none d-sm-table-cell">{{ paste.expiration_time }}</td>
+        <td class="d-none d-sm-table-cell"><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
       </tr>
       {% endfor %}
     </tbody>
