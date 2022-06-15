@@ -157,6 +157,12 @@ class Folder(TimeStampedModel):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse(
+            "pastes:user_folder",
+            kwargs={"username": self.created_by.username, "folder_slug": self.slug},
+        )
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
