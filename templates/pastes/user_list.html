@@ -57,7 +57,7 @@
       {% if folders %} 
         {% for folder in folders %}
         <tr>
-          <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a></td>
+          <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a> ({{ folder.num_pastes }})</td>
           <td>{{ folder.created|date }}</td>
           <td class="d-none d-sm-table-cell"></td>
           <td class="d-none d-sm-table-cell"></td>
