@@ -20,6 +20,7 @@ from django.views.generic import (
 )
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
+from hitcount.views import HitCountDetailView
 from pygments import lexers
 
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
@@ -101,8 +102,11 @@ class PasteInstanceMixin:
     context_object_name = "paste"
 
 
-class PasteDetailView(PasteInstanceMixin, PastePublicOrIsAuthorMixin, DetailView):
+class PasteDetailView(
+    PasteInstanceMixin, PastePublicOrIsAuthorMixin, HitCountDetailView
+):
     template_name = "pastes/detail.html"
+    count_hit = True
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)

@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "hitcount",
 ]
 
 LOCAL_APPS = [

@@ -187,6 +187,25 @@ docs = ["furo (>=2021.8.17b43,<2021.9.0)", "sphinx (>=3.5.0)", "sphinx-notfound-
 testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
+name = "django-etc"
+version = "1.3.1"
+description = "Tiny stuff for Django that won't fit into separate apps."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "django-hitcount"
+version = "1.3.5"
+description = "Hit counting application for Django."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+django-etc = ">=1.2.0"
+
+[[package]]
 name = "django-model-utils"
 version = "4.2.0"
 description = "Django model mixins and utilities"
@@ -401,7 +420,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "de63bedc990f9bcab5ee5b2884058be0eabf9d544a048960a2d541e643db3884"
+content-hash = "971f4b7eaca1d77356fb11392dc4d58ebfd9de7a0aa78d67dfcc25fa7e8dba7f"
 
 [metadata.files]
 asgiref = [
@@ -551,6 +570,14 @@ django-debug-toolbar = [
 django-environ = [
     {file = "django-environ-0.8.1.tar.gz", hash = "sha256:6f0bc902b43891656b20486938cba0861dc62892784a44919170719572a534cb"},
     {file = "django_environ-0.8.1-py2.py3-none-any.whl", hash = "sha256:42593bee519a527602a467c7b682aee1a051c2597f98c45f4f4f44169ecdb6e5"},
+]
+django-etc = [
+    {file = "django-etc-1.3.1.tar.gz", hash = "sha256:6568e2448d2648967c09799a1f11637f8802b50dff2d733207271d6b60db174e"},
+    {file = "django_etc-1.3.1-py2.py3-none-any.whl", hash = "sha256:c58f9a85872cbd88d6d98a6bf2cc4aba5eb739eccaaacc27d049435ff5378e4e"},
+]
+django-hitcount = [
+    {file = "django-hitcount-1.3.5.tar.gz", hash = "sha256:5fe70720a75e49bfcee5c4312a7df989bb9e22848039bba1de4406f96fb9cf4d"},
+    {file = "django_hitcount-1.3.5-py2.py3-none-any.whl", hash = "sha256:b04debff8fd7fe2d255e1d357c27f838aa45c54ed1835b3fd01af30df5319756"},
 ]
 django-model-utils = [
     {file = "django-model-utils-4.2.0.tar.gz", hash = "sha256:e7a95e102f9c9653427eadab980d5d59e1dea972913b9c9e01ac37f86bba0ddf"},

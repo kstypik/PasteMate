@@ -26,6 +26,7 @@
       <div class="col align-self-center">
        Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}
        &bull; Posted on <span title="{{ paste.created }}">{{ paste.created|date }}</span>
+       &bull; Visits: {{ hitcount.total_hits }}
        {% if paste.author.location %}&bull; Location: {{ paste.author.location }}{% endif %}
        {% if paste.author.website %}&bull; Website: <a href="{{ paste.author.website }}">View</a>{% endif %}
       </div>
