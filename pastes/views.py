@@ -20,7 +20,8 @@ from django.views.generic import (
 )
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
-from hitcount.views import HitCountDetailView
+from hitcount.models import HitCount
+from hitcount.views import HitCountDetailView, HitCountMixin
 from pygments import lexers
 
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
@@ -237,7 +238,7 @@ class UserStatsMixin:
         return context
 
 
-class UserPasteListView(UserStatsMixin, UserListMixin, ListView):
+class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
     def display_as_guest(self):
         if self.request.GET.get("guest") == "1":
             return True
@@ -254,6 +255,14 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView):
         show_stats = True if self.request.user == self.user else False
         context = super().get_context_data(show_stats=show_stats, **kwargs)
         context["author"] = self.user
+
+        hit_count = HitCount.objects.get_for_object(self.user)
+        hits = hit_count.hits
+
+        hit_count_response = self.hit_count(self.request, hit_count)
+        if hit_count_response.hit_counted:
+            hits = hits + 1
+        context["total_hits"] = hits
 
         as_guest = True if self.request.GET.get("guest") == "1" else False
         if self.request.user == self.user and not self.display_as_guest():

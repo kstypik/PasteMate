@@ -12,6 +12,7 @@
   </div>
   <div class="col align-self-center">
    Joined <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
+   &bull; Profile Visits: {{ total_hits }}
    {% if author.location %}&bull; Location: {{ author.location }}{% endif %}
    {% if author.website %}&bull; Website: <a href="{{ author.website }}">View</a>{% endif %}
   </div>
