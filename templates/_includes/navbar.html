@@ -1,3 +1,4 @@
+{% load pinax_messages_tags %}
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container">
     <a class="navbar-brand" href="{% url 'pastes:create' %}">PasteMate</a>
@@ -29,6 +30,7 @@
             {{ user.username}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+            <li><a class="dropdown-item" href="{% url 'pinax_messages:inbox' %}">Inbox [{{ user|unread_thread_count }}]</a></li>
             <li><a class="dropdown-item" href="{% url 'accounts:profile_update' %}">Edit Profile</a></li>
             <li><a class="dropdown-item" href="{% url 'account_change_password' %}">Edit Password</a></li>
             <li><a class="dropdown-item" href="{% url 'account_email' %}">Edit E-mail</a></li>

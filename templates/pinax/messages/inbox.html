@@ -1,0 +1,43 @@
+{% extends '_base.html' %}
+{% load pinax_messages_tags %}
+
+{% block title %}Messages {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="pinax-messages-inbox-container">
+    <h2>Inbox</h2>
+    <a class="btn btn-primary my-2" href="{% url "pinax_messages:message_create" %}">
+      New Message
+    </a>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Subject</th>
+          <th class="text-end" scope="col">Last message</th>
+          <th class="text-end" scope="col">Participants</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for thread in threads %}
+        <tr>
+            <td>
+              {% if thread|unread:user %}
+                <i title="Unread messages in thread" class="fa-solid fa-envelope"></i>
+              {% else%}
+                <i title="No unread messages in thread" class="fa-solid fa-envelope-open"></i>
+              {% endif%}
+              <a href="{{ thread.get_absolute_url }}">{{ thread.subject }}</a>
+            </td>
+            <td class="to-relative-datetime text-end">{{ thread.latest_message.sent_at|date:"c" }}</td>
+            <td class="text-end">
+              {% for user in thread.users.all %}
+                <a href="{{ user.get_absolute_url }}">{{ user }}</a>{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock %}
