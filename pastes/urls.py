@@ -19,6 +19,16 @@ urlpatterns = [
         views.UserFolderListView.as_view(),
         name="user_folder",
     ),
+    path(
+        "user/<str:username>/folder/<slug:folder_slug>/edit/",
+        views.UserFolderUpdateView.as_view(),
+        name="user_folder_edit",
+    ),
+    path(
+        "user/<str:username>/folder/<slug:folder_slug>/delete/",
+        views.UserFolderDeleteView.as_view(),
+        name="user_folder_delete",
+    ),
     path("<uuid:uuid>/", views.PasteDetailView.as_view(), name="detail"),
     path("<uuid:uuid>/raw/", views.RawPasteDetailView.as_view(), name="raw_detail"),
     path("<uuid:uuid>/dl/", views.DownloadPasteView.as_view(), name="paste_download"),

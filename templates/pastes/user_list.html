@@ -17,6 +17,13 @@
   </div>
 </div>
 
+{% if folder %}
+  <div class="mt-2">
+    <a href="{% url 'pastes:user_folder_edit' author.username folder.slug %}" class="btn btn-primary"><i class="fa-solid fa-folder"></i> Edit</a>
+    <a href="{% url 'pastes:user_folder_delete' author.username folder.slug %}" class="btn btn-danger"><i class="fa-solid fa-folder"></i> Delete</a>
+  </div>
+{% endif %}
+
 {% if user == author and not as_guest %}
 <div class="alert alert-secondary mt-3">
   To see what other people see on your pastebin, <a href="?guest=1">click here</a>.

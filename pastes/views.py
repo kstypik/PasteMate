@@ -8,6 +8,7 @@ from django.contrib.postgres.search import SearchVector
 from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -21,7 +22,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from pygments import lexers
 
-from .forms import PasswordProtectedPasteForm, PasteForm, ReportForm
+from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
 from .models import Folder, Paste, Report
 
 User = get_user_model()
@@ -288,6 +289,46 @@ class UserFolderListView(UserStatsMixin, UserListMixin, ListView):
         context["folder"] = self.folder
         context["author"] = self.request.user
         return context
+
+
+class UserFolderUpdateView(
+    SuccessMessageMixin, AuthenticatedUserInFormKwargsMixin, UpdateView
+):
+    slug_url_kwarg = "folder_slug"
+    form_class = FolderForm
+    context_object_name = "folder"
+    success_message = 'Folder "%(name)s" has been updated.'
+    template_name = "pastes/folder_form.html"
+
+    def get_queryset(self):
+        return Folder.objects.filter(created_by=self.request.user)
+
+    def get_success_url(self):
+        return reverse(
+            "pastes:user_folder",
+            kwargs={
+                "username": self.request.user.username,
+                "folder_slug": self.object.slug,
+            },
+        )
+
+
+class UserFolderDeleteView(SuccessMessageMixin, DeleteView):
+    slug_url_kwarg = "folder_slug"
+    context_object_name = "folder"
+    template_name = "pastes/folder_delete.html"
+    success_message = "Folder has been deleted."
+
+    def get_queryset(self):
+        return Folder.objects.filter(created_by=self.request.user)
+
+    def get_success_url(self):
+        return reverse(
+            "pastes:user_pastes",
+            kwargs={
+                "username": self.request.user.username,
+            },
+        )
 
 
 class PasteArchiveListView(ListView):

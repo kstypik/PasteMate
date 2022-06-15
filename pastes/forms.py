@@ -79,3 +79,21 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ["reason", "reporter_name"]
+
+
+class FolderForm(forms.ModelForm):
+    class Meta:
+        model = Folder
+        fields = ["name"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        if Folder.objects.filter(
+            created_by=self.user, name__iexact=self.cleaned_data["name"]
+        ).exists():
+            raise forms.ValidationError("You already have a folder with that name")
+
+        return self.cleaned_data
