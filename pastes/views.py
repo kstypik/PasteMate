@@ -266,9 +266,11 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
 
         as_guest = True if self.request.GET.get("guest") == "1" else False
         if self.request.user == self.user and not self.display_as_guest():
-            context["folders"] = Folder.objects.filter(
-                created_by=self.request.user
-            ).annotate(num_pastes=Count("pastes"))
+            context["folders"] = (
+                Folder.objects.filter(created_by=self.request.user)
+                .annotate(num_pastes=Count("pastes"))
+                .order_by("slug")
+            )
 
         context["as_guest"] = self.display_as_guest()
         return context
