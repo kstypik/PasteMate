@@ -36,7 +36,10 @@ class PasteForm(forms.ModelForm):
         if not self.user:
             del self.fields["folder"]
             del self.fields["new_folder"]
+            # drop private option for guests
+            self.fields["exposure"].choices = self.fields["exposure"].choices[:2]
             self.fields["hcaptcha"] = hCaptchaField(label="hCaptcha")
+            self
         if kwargs.get("instance") or not self.user:
             del self.fields["post_anonymously"]
 
