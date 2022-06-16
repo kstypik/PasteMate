@@ -36,6 +36,23 @@ function randomstring(L) {
   return s;
 }
 
+const newFolderDiv = document.querySelector("#div_id_new_folder");
+newFolderDiv.classList.add("d-none");
+
+const chooseFolderSelect = document.querySelector("#div_id_folder .select2");
+const newFolderBtn = document.createElement("button");
+newFolderBtn.title = "Add New Folder";
+newFolderBtn.classList.add("btn", "btn-light");
+newFolderBtn.innerHTML = "+";
+chooseFolderSelect.prepend(newFolderBtn);
+chooseFolderSelect.classList.add("d-flex");
+const selectionSpan = document.querySelector("#div_id_folder .selection");
+selectionSpan.classList.add("flex-grow-1", "ms-1");
+newFolderBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+  newFolderDiv.classList.toggle("d-none");
+})
+
 const pastePasswordField = document.querySelector("#id_password");
 pastePasswordField.setAttribute("disabled", true);
 pastePasswordField.value = "";
