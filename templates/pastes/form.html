@@ -55,6 +55,14 @@ function randomstring(L) {
   })
 {% endif %}
 
+const exposureSelect = document.querySelector("#id_exposure");
+const burnCheckbox = document.querySelector("#id_burn_after_read");
+burnCheckbox.addEventListener("click", () => {
+  if (burnCheckbox.checked && exposureSelect.selectedOptions[0].value == "PU") {
+    exposureSelect.value = "UN";
+  }
+});
+
 const pastePasswordField = document.querySelector("#id_password");
 pastePasswordField.setAttribute("disabled", true);
 pastePasswordField.value = "";
