@@ -206,6 +206,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "django-hcaptcha-field"
+version = "1.3.0"
+description = "Django hCaptcha Field provides a simple way to protect your Django forms using hCaptcha."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[[package]]
 name = "django-hitcount"
 version = "1.3.5"
 description = "Hit counting application for Django."
@@ -443,7 +454,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "93c7c6780dae1fcbcaca250ca2f4a3fa3c4c00b96b0eca6d54fe12fcf884f996"
+content-hash = "4fc1a5310b72a24ca4d03e1ead6c2461db1415e0920e93fd4af4c057629ae954"
 
 [metadata.files]
 asgiref = [
@@ -601,6 +612,10 @@ django-environ = [
 django-etc = [
     {file = "django-etc-1.3.1.tar.gz", hash = "sha256:6568e2448d2648967c09799a1f11637f8802b50dff2d733207271d6b60db174e"},
     {file = "django_etc-1.3.1-py2.py3-none-any.whl", hash = "sha256:c58f9a85872cbd88d6d98a6bf2cc4aba5eb739eccaaacc27d049435ff5378e4e"},
+]
+django-hcaptcha-field = [
+    {file = "django-hcaptcha-field-1.3.0.tar.gz", hash = "sha256:146a664fa67b425ae1ee3c0e5fe78a4427637415b5665bf2ccd980173b9946e8"},
+    {file = "django_hcaptcha_field-1.3.0-py3-none-any.whl", hash = "sha256:ebc1a0f6e4ffb79156bb53853f7c5fca25a63e90145fc1948901d867cb9f6b99"},
 ]
 django-hitcount = [
     {file = "django-hitcount-1.3.5.tar.gz", hash = "sha256:5fe70720a75e49bfcee5c4312a7df989bb9e22848039bba1de4406f96fb9cf4d"},

@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "hitcount",
     "pinax.messages",
+    "hcaptcha_field",
 ]
 
 LOCAL_APPS = [

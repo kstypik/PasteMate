@@ -1,4 +1,5 @@
 from django import forms
+from hcaptcha_field import hCaptchaField
 
 from .models import Folder, Paste, Report
 
@@ -35,6 +36,7 @@ class PasteForm(forms.ModelForm):
         if not self.user:
             del self.fields["folder"]
             del self.fields["new_folder"]
+            self.fields["hcaptcha"] = hCaptchaField(label="hCaptcha")
         if kwargs.get("instance") or not self.user:
             del self.fields["post_anonymously"]
 
