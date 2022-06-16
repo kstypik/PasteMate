@@ -12,12 +12,24 @@
   <div class="alert alert-danger">
     This paste has been marked as Burn After Read by its author. After reading, it will be deleted.
   </div>
-  <form action="{% url 'pastes:detail' paste.uuid %}" method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-warning">Read and delete</button>
-  </form>
-{% else %}
-  {% if not password_protected or password_correct %}
+  {% if not password_protected %}
+    <form action="{% url 'pastes:detail' paste.uuid %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-warning">Read and delete</button>
+    </form>
+  {% endif %}
+{% endif %}
+{% if password_protected and not password_correct %}
+    <div class="alert alert-info">
+      This paste is protected with password by its author. Enter it to unlock the access.
+    </div>
+    <form action="{% url 'pastes:detail_with_password' paste.uuid %}" method="post">
+      {% csrf_token %}
+      {{ password_form|crispy }}
+      <button type="submit" class="btn btn-primary">Unlock the paste</button>
+    </form>
+{% endif %}
+{% if not burn_after_read and not password_protected or password_correct %}
     <h1>{{ paste.title }}</h1>
     <div class="row">
       <div class="col-md-1">
@@ -70,16 +82,7 @@
 
     <h2 class="mt-4 h5">RAW Paste Data <a href="#" class="raw-copy">Copy</a></h2>
     <textarea class="form-control raw-paste-data" spellcheck="false">{{ paste.content }}</textarea>
-  {% else %}
-    <div class="alert alert-info">
-      This paste is protected with password by its author. Enter it to unlock the access.
-    </div>
-    <form action="{% url 'pastes:detail_with_password' paste.uuid %}" method="post">
-      {% csrf_token %}
-      {{ password_form|crispy }}
-      <button type="submit" class="btn btn-primary">Unlock the paste</button>
-    </form>
-  {% endif %}
+
 {% endif %}
 {% endblock content %}
 

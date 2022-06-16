@@ -168,6 +168,10 @@ class PasteDetailWithPasswordView(
             context["password_form"] = PasswordProtectedPasteForm(
                 correct_password=self.object.password
             )
+
+            if self.object.burn_after_read:
+                context["burn_after_read"] = True
+
             return self.render_to_response(context)
         else:
             return redirect(self.object)
@@ -183,6 +187,8 @@ class PasteDetailWithPasswordView(
             context["password_form"] = password_form
             if password_form.is_valid():
                 context["password_correct"] = True
+                if self.object.burn_after_read:
+                    self.object.delete()
             return self.render_to_response(context)
         else:
             return redirect(self.object)
