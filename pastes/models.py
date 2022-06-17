@@ -1,5 +1,6 @@
 import tempfile
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -31,6 +32,27 @@ class Paste(TimeStampedModel):
         PUBLIC = "PU", "Public"
         UNLISTED = "UN", "Unlisted"
         PRIVATE = "PR", "Private"
+
+    TEN_MINUTES = timedelta(minutes=10)
+    ONE_HOUR = timedelta(hours=1)
+    ONE_DAY = timedelta(days=1)
+    ONE_WEEK = timedelta(weeks=1)
+    TWO_WEEKS = timedelta(weeks=2)
+    ONE_MONTH = timedelta(days=30)
+    SIX_MONTHS = timedelta(days=180)
+    ONE_YEAR = timedelta(days=365)
+
+    EXPIRATION_CHOICES = (
+        (None, "Never"),
+        (TEN_MINUTES, "10 minutes"),
+        (ONE_HOUR, "1 Hour"),
+        (ONE_DAY, "1 Day"),
+        (ONE_WEEK, "1 Week"),
+        (TWO_WEEKS, "2 Weeks"),
+        (ONE_MONTH, "1 Month"),
+        (SIX_MONTHS, "6 Month"),
+        (ONE_YEAR, "1 Year"),
+    )
 
     SYNTAX_HIGHLITHING_CHOICES = (
         ("text", "Text only"),
@@ -71,7 +93,9 @@ class Paste(TimeStampedModel):
     syntax = models.CharField(
         max_length=50, choices=SYNTAX_HIGHLITHING_CHOICES, default="text"
     )
-    expiration_time = models.TimeField(null=True, blank=True)
+    expiration_time = models.DurationField(
+        null=True, blank=True, choices=EXPIRATION_CHOICES
+    )
     exposure = models.CharField(
         max_length=2, choices=Exposure.choices, default=Exposure.PUBLIC
     )
