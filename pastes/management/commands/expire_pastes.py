@@ -16,13 +16,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        qs = Paste.objects.filter(
-            GreaterThanOrEqual(Now(), F("created") + F("expiration_time"))
-        )
+        qs = Paste.objects.filter(GreaterThanOrEqual(Now(), F("expiration_date")))
         removed_pastes_num = qs.count()
         if removed_pastes_num > 0:
             if options["only_show"]:
-                self.stdout.write("Pastes to delete: ", qs)
+                self.stdout.write(f"Pastes to delete: {qs}")
             else:
                 qs.delete()
                 self.stdout.write(

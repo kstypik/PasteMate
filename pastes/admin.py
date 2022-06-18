@@ -14,7 +14,7 @@ class PasteAdmin(admin.ModelAdmin):
         "author",
         "burn_after_read",
         "created",
-        "expiration_time",
+        "expiration_date",
         "folder",
         "is_active",
     ]

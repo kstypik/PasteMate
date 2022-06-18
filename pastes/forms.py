@@ -21,7 +21,7 @@ class PasteForm(forms.ModelForm):
             "content",
             "syntax",
             "exposure",
-            "expiration_time",
+            "expiration_interval_symbol",
             "folder",
             "new_folder",
             "password",
@@ -31,6 +31,10 @@ class PasteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+
+        if kwargs.get("instance"):
+            kwargs["initial"].update({"expiration_interval_symbol": "PRE"})
+
         super().__init__(*args, **kwargs)
         self.fields["folder"].queryset = Folder.objects.filter(created_by=self.user)
         if not self.user:
@@ -43,6 +47,11 @@ class PasteForm(forms.ModelForm):
         if kwargs.get("instance") or not self.user:
             del self.fields["post_anonymously"]
 
+        if not kwargs.get("instance"):
+            self.fields["expiration_interval_symbol"].choices = self.fields[
+                "expiration_interval_symbol"
+            ].choices[1:]
+
     def clean(self):
         cleaned_data = super().clean()
         if (
@@ -50,6 +59,10 @@ class PasteForm(forms.ModelForm):
             and cleaned_data.get("exposure") == "PR"
         ):
             raise forms.ValidationError("You can't create private paste as Anonymous.")
+
+        if cleaned_data.get("expiration_interval_symbol") == "PRE":
+            del cleaned_data["expiration_interval_symbol"]
+        return cleaned_data
 
     def save(self, commit=True):
         paste = super().save(commit=False)

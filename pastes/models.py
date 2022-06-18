@@ -8,6 +8,7 @@ from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 from model_utils.models import TimeStampedModel
 from pygments import highlight, lexers
@@ -33,17 +34,20 @@ class Paste(TimeStampedModel):
         UNLISTED = "UN", "Unlisted"
         PRIVATE = "PR", "Private"
 
-    TEN_MINUTES = timedelta(minutes=10)
-    ONE_HOUR = timedelta(hours=1)
-    ONE_DAY = timedelta(days=1)
-    ONE_WEEK = timedelta(weeks=1)
-    TWO_WEEKS = timedelta(weeks=2)
-    ONE_MONTH = timedelta(days=30)
-    SIX_MONTHS = timedelta(days=180)
-    ONE_YEAR = timedelta(days=365)
+    NEVER = ""
+    NO_CHANGE = "PRE"
+    TEN_MINUTES = "10M"
+    ONE_HOUR = "1H"
+    ONE_DAY = "1D"
+    ONE_WEEK = "1W"
+    TWO_WEEKS = "2W"
+    ONE_MONTH = "1m"
+    SIX_MONTHS = "6M"
+    ONE_YEAR = "1Y"
 
     EXPIRATION_CHOICES = (
-        (None, "Never"),
+        (NO_CHANGE, "Don't Change"),
+        (NEVER, "Never"),
         (TEN_MINUTES, "10 minutes"),
         (ONE_HOUR, "1 Hour"),
         (ONE_DAY, "1 Day"),
@@ -93,9 +97,13 @@ class Paste(TimeStampedModel):
     syntax = models.CharField(
         max_length=50, choices=SYNTAX_HIGHLITHING_CHOICES, default="text"
     )
-    expiration_time = models.DurationField(
-        null=True, blank=True, choices=EXPIRATION_CHOICES
+    expiration_interval_symbol = models.CharField(
+        verbose_name="Paste Expiration",
+        max_length=3,
+        blank=True,
+        choices=EXPIRATION_CHOICES,
     )
+    expiration_date = models.DateTimeField(null=True, blank=True)
     exposure = models.CharField(
         max_length=2, choices=Exposure.choices, default=Exposure.PUBLIC
     )
@@ -145,6 +153,22 @@ class Paste(TimeStampedModel):
 
         return filepath
 
+    def calculate_expiration_date(self):
+        if not self.expiration_interval_symbol:
+            return None
+
+        to_interval_mapping = {
+            Paste.TEN_MINUTES: timedelta(minutes=10),
+            Paste.ONE_HOUR: timedelta(hours=1),
+            Paste.ONE_DAY: timedelta(days=1),
+            Paste.ONE_WEEK: timedelta(weeks=1),
+            Paste.TWO_WEEKS: timedelta(weeks=2),
+            Paste.ONE_MONTH: timedelta(days=30),
+            Paste.SIX_MONTHS: timedelta(days=180),
+            Paste.ONE_YEAR: timedelta(days=365),
+        }
+        return timezone.now() + to_interval_mapping[self.expiration_interval_symbol]
+
     def save(self, *args, **kwargs):
         if not self.title:
             self.title = "Untitled"
@@ -156,6 +180,8 @@ class Paste(TimeStampedModel):
         ):
             self.embeddable_image = self.make_embeddable_image()
         self.filesize = self.calculate_filesize()
+
+        self.expiration_date = self.calculate_expiration_date()
 
         super().save(*args, **kwargs)
 
