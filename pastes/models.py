@@ -1,5 +1,6 @@
 import tempfile
 import uuid
+import zipfile
 from datetime import timedelta
 
 from django.conf import settings
@@ -152,6 +153,21 @@ class Paste(TimeStampedModel):
             fh.write(self.highlight_syntax(format="image"))
 
         return filepath
+
+    @classmethod
+    def make_backup_archive(cls, destination, user_obj):
+        archive = zipfile.ZipFile(destination, "w")
+
+        pastes = cls.objects.filter(author=user_obj)
+        for paste in pastes:
+            filename = (
+                f"{paste.title}-{paste.uuid}.txt"
+                if paste.title != "Untitled"
+                else f"{paste.uuid}.txt"
+            )
+            archive.writestr(filename, paste.content)
+
+        return archive
 
     def calculate_expiration_date(self):
         if not self.expiration_interval_symbol:

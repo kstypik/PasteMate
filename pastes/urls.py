@@ -13,6 +13,7 @@ urlpatterns = [
     ),
     path("languages/", views.SyntaxLanguagesView.as_view(), name="syntax_languages"),
     path("search/", views.SearchResultsView.as_view(), name="search"),
+    path("backup/", views.BackupUserPastesView.as_view(), name="backup"),
     path("user/<str:username>/", views.UserPasteListView.as_view(), name="user_pastes"),
     path(
         "user/<str:username>/folder/<slug:folder_slug>/",

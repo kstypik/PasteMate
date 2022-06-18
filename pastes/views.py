@@ -9,6 +9,7 @@ from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -439,3 +440,15 @@ class SyntaxLanguagesView(TemplateView):
             .annotate(used=Count("syntax"))
         )
         return context
+
+
+class BackupUserPastesView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="application/zip")
+
+        archive = Paste.make_backup_archive(response, self.request.user)
+        date_str = timezone.now().strftime("%Y%m%d")
+        archive_name = f"pastemate_backup_{date_str}.zip"
+
+        response["Content-Disposition"] = f"attachment; filename={archive_name}"
+        return response
