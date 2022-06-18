@@ -32,6 +32,15 @@ class PasteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
 
+        if self.user and not kwargs.get("instance"):
+            kwargs["initial"].update(
+                {
+                    "syntax": self.user.preferences.default_syntax,
+                    "exposure": self.user.preferences.default_exposure,
+                    "expiration_interval_symbol": self.user.preferences.default_expiration_interval_symbol,
+                }
+            )
+
         if kwargs.get("instance"):
             kwargs["initial"].update({"expiration_interval_symbol": "PRE"})
 

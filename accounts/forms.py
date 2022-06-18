@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 
+from .models import Preferences
+
 User = get_user_model()
 
 
@@ -29,3 +31,13 @@ class AccountDeleteForm(forms.Form):
             self.request, username=self.request.user.username, password=input_password
         ):
             raise forms.ValidationError("Entered password is invalid.")
+
+
+class PreferencesForm(forms.ModelForm):
+    class Meta:
+        model = Preferences
+        fields = [
+            "default_syntax",
+            "default_expiration_interval_symbol",
+            "default_exposure",
+        ]

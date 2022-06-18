@@ -4,7 +4,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, UpdateView
 
-from .forms import AccountDeleteForm, ProfileForm
+from .forms import AccountDeleteForm, PreferencesForm, ProfileForm
 
 User = get_user_model()
 
@@ -33,3 +33,14 @@ class AccountDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
+
+
+class PreferencesUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    form_class = PreferencesForm
+    template_name = "account/preferences.html"
+    success_message = "Your preferences have been updated."
+    success_url = reverse_lazy("accounts:preferences")
+
+    def get_object(self, queryset=None):
+        print(self.request.user.preferences)
+        return self.request.user.preferences
