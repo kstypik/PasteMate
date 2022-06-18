@@ -12,9 +12,11 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from model_utils.models import TimeStampedModel
-from pygments import highlight, lexers
+from pygments import highlight
 from pygments.formatters import HtmlFormatter, ImageFormatter
 from pygments.lexers import get_lexer_by_name
+
+from . import choices
 
 User = get_user_model()
 
@@ -31,20 +33,20 @@ class PublishedManager(ActiveManager):
 
 class Paste(TimeStampedModel):
     class Exposure(models.TextChoices):
-        PUBLIC = "PU", "Public"
-        UNLISTED = "UN", "Unlisted"
-        PRIVATE = "PR", "Private"
+        PUBLIC = choices.PUBLIC
+        UNLISTED = choices.UNLISTED
+        PRIVATE = choices.PRIVATE
 
-    NEVER = ""
-    NO_CHANGE = "PRE"
-    TEN_MINUTES = "10M"
-    ONE_HOUR = "1H"
-    ONE_DAY = "1D"
-    ONE_WEEK = "1W"
-    TWO_WEEKS = "2W"
-    ONE_MONTH = "1m"
-    SIX_MONTHS = "6M"
-    ONE_YEAR = "1Y"
+    NEVER = choices.NEVER
+    NO_CHANGE = choices.NO_CHANGE
+    TEN_MINUTES = choices.TEN_MINUTES
+    ONE_HOUR = choices.ONE_HOUR
+    ONE_DAY = choices.ONE_DAY
+    ONE_WEEK = choices.ONE_WEEK
+    TWO_WEEKS = choices.TWO_WEEKS
+    ONE_MONTH = choices.ONE_MONTH
+    SIX_MONTHS = choices.SIX_MONTHS
+    ONE_YEAR = choices.ONE_YEAR
 
     EXPIRATION_CHOICES = (
         (NO_CHANGE, "Don't Change"),
@@ -59,44 +61,12 @@ class Paste(TimeStampedModel):
         (ONE_YEAR, "1 Year"),
     )
 
-    SYNTAX_HIGHLITHING_CHOICES = (
-        ("text", "Text only"),
-        (
-            "Popular languages",
-            (
-                ("bash", "Bash"),
-                ("c", "C"),
-                ("csharp", "C#"),
-                ("cpp", "C++"),
-                ("css", "CSS"),
-                ("html", "HTML"),
-                ("json", "JSON"),
-                ("java", "Java"),
-                ("javascript", "JavaScript"),
-                ("lua", "Lua"),
-                ("markdown", "Markdown"),
-                ("objective-c", "Objective C"),
-                ("php", "PHP"),
-                ("python", "Python"),
-                ("ruby", "Ruby"),
-            ),
-        ),
-        (
-            "All languages",
-            [
-                (lexer[1][0], lexer[0])
-                for lexer in lexers.get_all_lexers()
-                if lexer[1] and lexer[0] != "Text only"
-            ],
-        ),
-    )
-
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     content = models.TextField()
     content_html = models.TextField(blank=True)
     syntax = models.CharField(
-        max_length=50, choices=SYNTAX_HIGHLITHING_CHOICES, default="text"
+        max_length=50, choices=choices.SYNTAX_HIGHLITHING_CHOICES, default="text"
     )
     expiration_interval_symbol = models.CharField(
         verbose_name="Paste Expiration",
