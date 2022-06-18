@@ -76,7 +76,13 @@
           <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
         </td>
         <td>{{ paste.created|date }}</td>
-        <td class="d-none d-sm-table-cell">{{ paste.get_expiration_time_display }}</td>
+        <td class="d-none d-sm-table-cell">
+          {% if paste.expiration_date %}
+            <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
+          {% else %}
+              Never
+          {% endif %}
+        </td>
         <td class="d-none d-sm-table-cell"><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
       </tr>
       {% endfor %}
