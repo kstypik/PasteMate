@@ -19,7 +19,7 @@
           <span class="to-relative-datetime">{{ message.sent_at|date:"c"}}</span>
         </div>
         <div class="card-body">
-          <p class="card-text">{{ message.content|urlize|linebreaks }}</p>
+          <p class="card-text">{{ message.content|urlize|linebreaksbr }}</p>
         </div>
       </div>
     {% endfor %}
