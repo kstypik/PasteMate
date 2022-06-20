@@ -1,5 +1,7 @@
 from django import template
+from pygments import lexers
 
+from .. import choices
 from ..models import Paste
 
 register = template.Library()
@@ -20,3 +22,11 @@ def show_my_pastes(user, count=8):
 @register.filter()
 def tokilobytes(value):
     return "%.2f" % float(value / 1024) + " KB"
+
+
+@register.filter()
+def fulllangname(value):
+    languages = choices.get_all_languages()
+    for language in languages:
+        if language[0] == value:
+            return language[1]

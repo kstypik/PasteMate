@@ -434,7 +434,8 @@ class SyntaxLanguagesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["languages"] = (
-            Paste.objects.order_by("syntax")
+            Paste.objects.exclude(syntax="text")
+            .order_by("syntax")
             .distinct()
             .values("syntax")
             .annotate(used=Count("syntax"))

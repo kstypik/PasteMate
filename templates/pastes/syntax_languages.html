@@ -1,5 +1,6 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
+{% load pastes_tags %}
 
 {% block title %}Syntax Highlighting Languages {{ block.super }}{% endblock %}
 
@@ -11,7 +12,7 @@
     <div class="col-6 col-md-3">
       <div class="card mb-2">
         <div class="card-body d-flex justify-content-between">
-        <div>{{ forloop.counter }} <a class="ms-2" href="{% url 'pastes:syntax_archive' language.syntax %}">{{ language.syntax }}</a></div>
+        <div>{{ forloop.counter }} <a class="ms-2" href="{% url 'pastes:syntax_archive' language.syntax %}">{{ language.syntax|fulllangname }}</a></div>
         <div>{{ language.used }}</div>
       </div>
     </div>
