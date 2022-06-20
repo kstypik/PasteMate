@@ -168,3 +168,4 @@ media
 *.DS_STORE
 
 node_modules
+static/js/editor.bundle.js
