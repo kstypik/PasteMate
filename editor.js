@@ -72,5 +72,4 @@ $('#id_syntax').on('select2:select', function (e) {
   view.dispatch({
     effects: language.reconfigure(config)
   })
-  console.log(syntax.value)
 });
