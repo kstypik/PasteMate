@@ -25,7 +25,7 @@
     {% endfor %}
   </div>
 
-    <form action="{% url "pinax_messages:thread_detail" thread.pk %}" method="post">
+    <form class="mt-4" action="{% url "pinax_messages:thread_detail" thread.pk %}" method="post">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary">Add Reply</button>

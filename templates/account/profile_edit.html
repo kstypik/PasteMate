@@ -9,7 +9,7 @@
   {% csrf_token %}
   {{ form|crispy }}
   <div class="d-flex justify-content-between">
-    <button class="btn btn-success" type="submit">Edit profile</button>
+    <button class="btn btn-primary" type="submit">Edit profile</button>
     <a href="{% url 'accounts:delete' %}" class="btn btn-danger">Delete account</a>
   </div>
 </form>

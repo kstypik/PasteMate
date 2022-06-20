@@ -31,54 +31,77 @@
 {% endif %}
 {% if not burn_after_read or paste.author == user and not password_protected or password_correct %}
     <h1>{{ paste.title }}</h1>
-    <div class="row">
-      <div class="col-md-1">
-        <img src="{% if paste.author %}{{ paste.author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="Paste Author Avatar" class="rounded-circle avatar-normal">
-      </div>
-      <div class="col align-self-center">
-       Added by {% if paste.author %}<a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a>{% else %}Anonymous{% endif %}
-       &bull; Posted on <span title="{{ paste.created }}">{{ paste.created|date }}</span>
-       &bull; Visits: {{ hitcount.total_hits }}
-       &bull; Expires: 
-        {% if paste.expiration_date %}
-          <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
-        {% else %}
-          Never
-        {% endif %}
-       {% if paste.author.location %}&bull; Location: {{ paste.author.location }}{% endif %}
-       {% if paste.author.website %}&bull; Website: <a href="{{ paste.author.website }}">View</a>{% endif %}
-      </div>
+    {% with paste.author as author %}
+      <div class="d-flex align-items-center">
+        <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+        <div class="ms-3">
+          <span class="me-2">
+            <i class="fa-solid fa-user me-1"></i> 
+            {% if paste.author %}
+              <a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a> 
+              {% if user.is_authenticated and not user == paste.author %}
+                <a href="{% url "pinax_messages:message_user_create" user_id=paste.author.id %}">
+                  <i class="fa-solid fa-envelope" title="Send private message to this user"></i>
+                </a>
+              {% endif %}
+            {% else %}
+              Anonymous
+            {% endif %}
+          </span>
+          <span class="me-2">
+            <i class="fa-solid fa-eye me-1" title="Unique visits of this paste"></i> {{ hitcount.total_hits }}
+          </span>
+          <span class="me-2">
+            <i class="fa-solid fa-clock me-1" title="When this paste will expire and get deleted"></i>
+            {% if paste.expiration_date %}
+              <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
+            {% else %}
+              Never
+            {% endif %}
+          </span>
+          {% if author.location %}
+            <span class="me-2">
+              <i class="fa-solid fa-location-dot me-1" title="User's location"></i> {{ author.location }}
+            </span>
+          {% endif %}
+          {% if author.website %}
+            <span class="me-2">
+              <i class="fa-solid fa-globe me-1" title="User's website"></i> 
+              <a href="{{ author.website }}">{{ author.website}}</a>
+            </span>
+          {% endif %}
+        </div>
     </div>
-    </p>
-    <div>
+    {% endwith %}
+    <div class="mt-4">
       {% if user == paste.author %}
       <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
       <a href="{% url 'pastes:delete' paste.uuid %}" class="btn btn-danger">Delete</a>
       {% endif %}
     </div>
 
-    <div class="card mt-4">
+    <div class="card mt-2">
       <div class="card-header mb-3 d-flex">
         <div>
           <a href="{% url 'pastes:syntax_archive' paste.syntax %}">
-            <span class="badge bg-secondary">{{ paste.get_syntax_display }}</span>
+            <span class="badge bg-info">{{ paste.get_syntax_display }}</span>
           </a>
         </div>
         <div class="mx-2">{{ paste.filesize|tokilobytes }}</div>
         <div class="ms-auto">
-          <a href="#" class="toolbar-copy"><span class="badge bg-secondary">copy</span></a>
+          <a href="#" class="toolbar-copy"><span class="badge bg-primary">copy</span></a>
           {% if not paste.password or paste.burn_after_read %}
-            <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-secondary">raw</span></a>
-            <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-secondary">download</span></a>
+            <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-primary">raw</span></a>
+            <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-primary">download</span></a>
             {% if user.is_authenticated %}
-              <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-secondary">clone</span></a>
+              <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-primary">clone</span></a>
             {% endif %}
             {% if not paste.exposure == "PR" %}
-              <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-secondary">embed</span></a>
+              <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-primary">embed</span></a>
             {% endif %}
-            <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-secondary">print</span></a>
+            <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-primary">print</span></a>
             {% if user != paste.author %}
-              <a href="{% url 'pastes:report' paste.uuid %}"><span class="badge bg-secondary">report</span></a>
+              <a href="{% url 'pastes:report' paste.uuid %}"><span class="badge bg-primary">report</span></a>
             {% endif %}
           {% endif %}
         </div>
@@ -86,7 +109,7 @@
       {{ paste.content_html|safe }}
     </div>
 
-    <h2 class="mt-4 h5">RAW Paste Data <a href="#" class="raw-copy">Copy</a></h2>
+    <h2 class="mt-4 h5">RAW Paste Data <a href="#" class="raw-copy ms-2"><i class="fa-solid fa-clipboard" title="Copy raw paste data to clipboard"></i></a></h2>
     <textarea class="form-control raw-paste-data" spellcheck="false">{{ paste.content }}</textarea>
 
 {% endif %}

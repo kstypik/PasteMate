@@ -6,15 +6,27 @@
 {% block content %}
 <h2>{{ author }}'s Pastes {% if folder %}from {{ folder.name }} folder{% endif %}</h2>
 
-<div class="row">
-  <div class="col-md-1">
-    <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
-  </div>
-  <div class="col align-self-center">
-   Joined <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
-   &bull; Profile Visits: {{ total_hits }}
-   {% if author.location %}&bull; Location: {{ author.location }}{% endif %}
-   {% if author.website %}&bull; Website: <a href="{{ author.website }}">View</a>{% endif %}
+<div class="d-flex align-items-center">
+  <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+  <div class="ms-3">
+    <span class="me-2">
+      <i class="fa-solid fa-calendar me-1" title="User joined"></i> 
+      <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
+    </span>
+    <span class="me-2">
+      <i class="fa-solid fa-eye me-1" title="Unique visits of this profile"></i> {{ total_hits }}
+    </span>
+    {% if author.location %}
+      <span class="me-2">
+        <i class="fa-solid fa-location-dot me-1" title="User's location"></i> {{ author.location }}
+      </span>
+    {% endif %}
+    {% if author.website %}
+      <span class="me-2">
+        <i class="fa-solid fa-globe me-1" title="User's website"></i> 
+        <a href="{{ author.website }}">{{ author.website}}</a>
+      </span>
+    {% endif %}
   </div>
 </div>
 
@@ -62,7 +74,7 @@
       {% if folders %} 
         {% for folder in folders %}
         <tr>
-          <td><i class="fa-solid fa-folder" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a> ({{ folder.num_pastes }})</td>
+          <td><i class="fa-solid fa-folder me-2" title="Folder. Only you can see it."></i> <a href="{% url 'pastes:user_folder' author.username folder.slug %}">{{ folder.name }}</a> ({{ folder.num_pastes }})</td>
           <td>{{ folder.created|date }}</td>
           <td class="d-none d-sm-table-cell"></td>
           <td class="d-none d-sm-table-cell"></td>

@@ -1,32 +1,34 @@
 {% load pinax_messages_tags %}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'pastes:create' %}">PasteMate</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <i class="fa fa-bars"></i>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <a class="navbar-brand" href="{% url 'pastes:create' %}">PasteMate</a>
       <ul class="navbar-nav">
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{ user.get_absolute_url }}">My Pastes</a>
-        </li>
-        {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'pastes:archive' %}">Archive</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'pastes:syntax_languages' %}">Languages</a>
         </li>
-        <li class="nav-item">
-          <a href="{% url 'pastes:create' %}" class="nav-link btn btn-outline-success">Paste</a>
-        </li>
+        <div class="d-flex align-items-center">
+          <a href="{% url 'pastes:create' %}" class="btn btn-outline-success">Paste</a>
+        </div>
       </ul>
-      <ul class="navbar-nav ms-auto">
+    </div>
+      <div class="d-flex align-items-center">
+        
         {% if user.is_authenticated %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s avatar" class="rounded-circle avatar-small">
+        <ul class="navbar-nav me-2">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'pastes:user_pastes' user %}">My Pastes</a>
+          </li>
+        </ul>
+        <div class="dropdown">
+          <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s avatar" class="rounded-circle avatar-small me-1">
             {{ user.username}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
@@ -38,16 +40,14 @@
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
           </ul>
-        </li>
+        </div>
         {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'account_login' %}">Login</a>
-        </li>
-        <li class="nav-item">
-          <a href="{% url 'account_signup' %}" class="nav-link btn btn-outline-primary">Sign Up</a>
-        </li>
+          <div class="d-flex align-items-center">
+            <a href="{% url 'account_login' %}" class="btn btn-link">Login</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-outline-primary">Sign Up</a>
+          </div>
         {% endif %}
-      </ul>
-    </div>
+      </div>
+    
   </div>
 </nav>

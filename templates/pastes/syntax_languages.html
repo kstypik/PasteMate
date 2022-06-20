@@ -7,9 +7,9 @@
 {% block content %}
 <h2>Syntax Highlighting Languages</h2>
 
-<div class="row">
+<div class="row mt-4 mb-2">
   {% for language in languages %}
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4 col-xl-3">
       <div class="card mb-2">
         <div class="card-body d-flex justify-content-between">
         <div>{{ forloop.counter }} <a class="ms-2" href="{% url 'pastes:syntax_archive' language.syntax %}">{{ language.syntax|fulllangname }}</a></div>

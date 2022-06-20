@@ -1,60 +1,82 @@
-<div class="mt-5">
-  <footer style="background-color: #deded5">
-    <div class="container p-4">
-      <div class="row">
-        <div class="col-lg-6 col-md-12 mb-4">
-          <h5 class="mb-3" style="letter-spacing: 2px; color: #818963">
-            footer content
-          </h5>
+<!-- Footer -->
+<footer class="text-center text-lg-start bg-light text-muted p-2">
+  <!-- Section: Social media -->
+
+  <!-- Section: Links  -->
+  <section class="">
+    <div class="container text-center text-md-start mt-5">
+      <!-- Grid row -->
+      <div class="row mt-3">
+        <!-- Grid column -->
+        <div class="col-md-5 col-lg-6 col-xl-5 mx-auto mb-6">
+          <!-- Content -->
+          <h6 class="text-uppercase fw-bold mb-4">
+            <i class="fa-solid fa-paste me-3"></i>PasteMate
+          </h6>
           <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste atque
-            ea quis molestias. Fugiat pariatur maxime quis culpa corporis vitae
-            repudiandae aliquam voluptatem veniam, est atque cumque eum delectus
-            sint!
+            PasteMate allows you to post text, which you can easily share with others. 
+            With optional syntax highlighting for many popular programming languages, it makes for a prefect fit for developers.
           </p>
         </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-          <h5 class="mb-3" style="letter-spacing: 2px; color: #818963">
-            links
-          </h5>
-          <ul class="list-unstyled mb-0">
-            <li class="mb-1">
-              <a href="#!" style="color: #4f4f4f">Frequently Asked Questions</a>
-            </li>
-            <li class="mb-1">
-              <a href="#!" style="color: #4f4f4f">Delivery</a>
-            </li>
-            <li class="mb-1">
-              <a href="#!" style="color: #4f4f4f">Pricing</a>
-            </li>
-            <li>
-              <a href="#!" style="color: #4f4f4f">Where we deliver?</a>
-            </li>
-          </ul>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+          <!-- Links -->
+          <h6 class="text-uppercase fw-bold mb-4">
+            Links
+          </h6>
+          <p>
+            <a href="{% url 'pastes:create' %}" class="text-reset">Create Paste</a>
+          </p>
+          <p>
+            <a href="{% url 'pastes:archive' %}" class="text-reset">Archive</a>
+          </p>
+          <p>
+            <a href="{% url 'pastes:syntax_languages' %}" class="text-reset">Languages</a>
+          </p>
         </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-          <h5 class="mb-1" style="letter-spacing: 2px; color: #818963">
-            opening hours
-          </h5>
-          <table class="table" style="color: #4f4f4f; border-color: #666">
-            <tbody>
-              <tr>
-                <td>Mon - Fri:</td>
-                <td>8am - 9pm</td>
-              </tr>
-              <tr>
-                <td>Sat - Sun:</td>
-                <td>8am - 1am</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-4">
+            Account links
+          </h6>
+          {% if user.is_authenticated %}
+            <p>
+              <a href="{% url 'accounts:profile_update' %}" class="text-reset">Edit profile</a>
+            </p>
+            <p>
+              <a href="{% url 'account_change_password' %}" class="text-reset">Edit password</a>
+            </p>
+            <p>
+              <a href="{% url 'account_email' %}" class="text-reset">Edit e-mail</a>
+            </p>
+            <p>
+              <a href="{% url 'accounts:preferences' %}" class="text-reset">Edit preferences</a>
+            </p>
+          {% else %}
+          <p>
+            <a href="{% url 'account_signup' %}" class="text-reset">Sign Up</a>
+          </p>
+          <p>
+            <a href="{% url 'account_login' %}" class="text-reset">Login</a>
+          </p>
+          {% endif %}
         </div>
+        <!-- Grid column -->
       </div>
+      <!-- Grid row -->
     </div>
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
-      © 2022 Copyright:
-      <a class="text-dark" href="https://mdbootstrap.com/">PasteMate</a>
-    </div>
-    <!-- Copyright -->
-  </footer>
-</div>
+  </section>
+  <!-- Section: Links  -->
+
+  <!-- Copyright -->
+  <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+    © 2021 Copyright:
+    <a class="text-reset fw-bold" href="/">PasteMate</a>
+  </div>
+  <!-- Copyright -->
+</footer>
+<!-- Footer -->
