@@ -166,3 +166,5 @@ media
 !media/default_avatar.png
 
 *.DS_STORE
+
+node_modules

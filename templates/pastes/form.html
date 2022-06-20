@@ -1,5 +1,6 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}{{ action_type }} {{ block.super }}{% endblock %}
 
@@ -7,8 +8,9 @@
 <h2>{{ action_type }}{% if paste %} {{ paste.title }}{% endif %}</h2>
 <form method="post">
   {% csrf_token %}
+  <div id="editorTarget"></div>
   {{ form|crispy }}
-  <button class="btn btn-success mt-2" type="submit">{{ action_type }}</button>
+  <button class="btn btn-success mt-2" type="submit" id="submit-paste">{{ action_type }}</button>
 </form>
 
 {% if not user.is_authenticated %}
@@ -21,9 +23,11 @@
 $("#id_syntax").select2({
   theme: "bootstrap-5",
 });
+
 $("#id_folder").select2({
   theme: "bootstrap-5",
 });
+
 function randomstring(L) {
   let s = '';
   let randomchar = function() {
@@ -100,3 +104,7 @@ enablePasswordCheckbox.addEventListener("change", () => {
 
 
 {% endblock extra_js %}
+
+{% block extra_js_tags %}
+<script src="{% static 'js/editor.bundle.js' %}"></script>
+{% endblock extra_js_tags %}

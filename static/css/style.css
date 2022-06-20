@@ -89,3 +89,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     min-height: 60px;
     height: 100px;
 }
+
+.cm-editor { 
+    height: auto;
+    border: 1px solid #ced4da;
+}
+.cm-editor .cm-content, .cm-editor .cm-gutter { min-height: 300px }
