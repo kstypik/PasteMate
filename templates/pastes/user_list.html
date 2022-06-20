@@ -58,7 +58,7 @@
 {% endif %}
 
 {% if pastes or folders %}
-  {% if user == author %}
+  {% if user == author and not as_guest %}
     {% include "_includes/pastes_search.html" %}
   {% endif %}
   <table class="table mt-3">
