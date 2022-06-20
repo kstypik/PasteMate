@@ -26,7 +26,4 @@ def tokilobytes(value):
 
 @register.filter()
 def fulllangname(value):
-    languages = choices.get_all_languages()
-    for language in languages:
-        if language[0] == value:
-            return language[1]
+    return Paste.get_full_language_name(value)

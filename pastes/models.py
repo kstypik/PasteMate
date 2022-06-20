@@ -155,6 +155,13 @@ class Paste(TimeStampedModel):
         }
         return timezone.now() + to_interval_mapping[self.expiration_interval_symbol]
 
+    @staticmethod
+    def get_full_language_name(value):
+        languages = choices.get_all_languages()
+        for language in languages:
+            if language[0] == value:
+                return language[1]
+
     def save(self, *args, **kwargs):
         if not self.title:
             self.title = "Untitled"

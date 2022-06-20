@@ -25,6 +25,7 @@ from hitcount.models import HitCount
 from hitcount.views import HitCountDetailView, HitCountMixin
 from pygments import lexers
 
+from . import choices
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
 from .models import Folder, Paste, Report
 
@@ -360,10 +361,15 @@ class PasteArchiveListView(ListView):
     template_name = "pastes/archive.html"
 
     def get_queryset(self):
-        syntax = self.kwargs.get("syntax")
-        if syntax:
-            return Paste.published.filter(syntax=self.kwargs["syntax"])
+        self.syntax = Paste.get_full_language_name(self.kwargs.get("syntax"))
+        if self.syntax:
+            return Paste.published.filter(syntax=self.kwargs.get("syntax"))
         return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["syntax"] = self.syntax
+        return context
 
 
 class EmbedPasteView(PasteInstanceMixin, EnsureStandardPasteMixin, DetailView):
