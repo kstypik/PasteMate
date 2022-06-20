@@ -85,7 +85,7 @@ class PasteCloneView(
     LoginRequiredMixin, EnsureStandardPasteMixin, ClonedGetObjectMixin, PasteCreateView
 ):
     extra_context = {
-        "action_type": "Clone",
+        "action_type": "Clone Paste",
     }
 
     def get_initial(self):

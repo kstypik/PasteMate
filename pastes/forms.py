@@ -31,19 +31,24 @@ class PasteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        print(kwargs["initial"])
 
         if self.user and not kwargs.get("instance"):
             kwargs["initial"].update(
                 {
-                    "syntax": self.user.preferences.default_syntax,
                     "exposure": self.user.preferences.default_exposure,
                     "expiration_interval_symbol": self.user.preferences.default_expiration_interval_symbol,
                 }
             )
+            if not kwargs["initial"].get("syntax"):
+                kwargs["initial"].update(
+                    {
+                        "syntax": self.user.preferences.default_syntax,
+                    }
+                )
 
         if kwargs.get("instance"):
             kwargs["initial"].update({"expiration_interval_symbol": "PRE"})
-
         super().__init__(*args, **kwargs)
         self.fields["folder"].queryset = Folder.objects.filter(created_by=self.user)
         if not self.user:
