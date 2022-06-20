@@ -4,7 +4,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, UpdateView
 
-from .forms import AccountDeleteForm, PreferencesForm, ProfileForm
+from .forms import AccountDeleteForm, AvatarForm, PreferencesForm, ProfileForm
 
 User = get_user_model()
 
@@ -13,6 +13,16 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     form_class = ProfileForm
     template_name = "account/profile_edit.html"
     success_message = "Your profile has been updated!"
+    success_url = reverse_lazy("accounts:profile_update")
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+class AvatarUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    form_class = AvatarForm
+    template_name = "account/avatar_edit.html"
+    success_message = "Your avatar has been set!"
     success_url = reverse_lazy("accounts:profile_update")
 
     def get_object(self, queryset=None):

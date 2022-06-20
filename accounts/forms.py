@@ -1,3 +1,5 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Field, Layout, Submit
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 
@@ -11,7 +13,13 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["username", "avatar", "location", "website"]
+        fields = ["username", "location", "website"]
+
+
+class AvatarForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["avatar"]
 
 
 class AccountDeleteForm(forms.Form):

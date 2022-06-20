@@ -1,0 +1,20 @@
+{% extends '_base.html' %}
+
+{% block title %}Change Avatar {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>Change Avatar</h2>
+<form method="post" action="{% url 'accounts:avatar' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  
+  <div class="my-3">
+    <img class="mb-2" src="{{ user.avatar.url }}" alt="Avatar of {{ user.username }}">
+    <input type="file" class="form-control" id="id_avatar" name="avatar" />
+  </div>
+
+  <button type="submit" class="btn btn-primary">Change Avatar</button>
+  <a href="{% url 'accounts:profile_update' %}" class="btn btn-link">Go back to profile editing</a>
+</form>
+
+{% endblock content %}
