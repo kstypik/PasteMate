@@ -5,6 +5,7 @@ from .models import Folder, Paste, Report
 
 
 class PasteForm(forms.ModelForm):
+    content = forms.CharField(widget=forms.Textarea, label="")
     new_folder = forms.CharField(
         max_length=50,
         required=False,

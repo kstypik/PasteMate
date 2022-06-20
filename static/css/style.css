@@ -93,5 +93,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .cm-editor { 
     height: auto;
     border: 1px solid #ced4da;
+    margin-top: 1rem;
 }
 .cm-editor .cm-content, .cm-editor .cm-gutter { min-height: 300px }
+
+#error_1_id_content {
+    position: static;
+}
+
+#div_id_content {
+    margin-top: 1rem;
+}

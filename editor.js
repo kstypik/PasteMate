@@ -20,7 +20,7 @@ const submitButton = document.querySelector("#submit-paste");
 const editorSource = document.querySelector("#id_content");
 editorSource.setAttribute("hidden", "true");
 
-const editorTarget = document.querySelector("#div_id_content");
+const editorTarget = document.querySelector("#editorTarget");
 
 const syntax = document.querySelector("#id_syntax");
 
