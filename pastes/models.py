@@ -166,10 +166,10 @@ class Paste(TimeStampedModel):
         if not self.title:
             self.title = "Untitled"
         self.content_html = self.highlight_syntax()
-        if (
-            not self.exposure == Paste.Exposure.PRIVATE
-            or not self.password
-            or not self.burn_after_read
+        if not (
+            self.exposure == Paste.Exposure.PRIVATE
+            or self.password
+            or self.burn_after_read
         ):
             self.embeddable_image = self.make_embeddable_image()
         self.filesize = self.calculate_filesize()
