@@ -153,7 +153,7 @@ class DownloadPasteView(
             ext = ""
         response[
             "Content-Disposition"
-        ] = f'attachment; filename="paste-{object.uuid}{ext}'
+        ] = f'attachment; filename="paste-{object.uuid}{ext}"'
         return response
 
 
