@@ -32,7 +32,6 @@ class PasteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        print(kwargs["initial"])
 
         if self.user and not kwargs.get("instance"):
             kwargs["initial"].update(

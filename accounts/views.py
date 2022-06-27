@@ -52,5 +52,4 @@ class PreferencesUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView)
     success_url = reverse_lazy("accounts:preferences")
 
     def get_object(self, queryset=None):
-        print(self.request.user.preferences)
         return self.request.user.preferences
