@@ -3,10 +3,9 @@ import uuid
 import zipfile
 from datetime import timedelta
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
+from django.core.files.storage import default_storage
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -119,10 +118,12 @@ class Paste(TimeStampedModel):
 
     def make_embeddable_image(self, format=".png"):
         filepath = f"embed/{self.uuid}{format}"
-        with open(settings.MEDIA_ROOT / filepath, "wb") as fh:
-            fh.write(self.highlight_syntax(format="image"))
+        with tempfile.TemporaryFile() as fh:
+            django_file = File(fh)
+            django_file.write(self.highlight_syntax(format="image"))
+            saved_file = default_storage.save(filepath, django_file)
 
-        return filepath
+        return saved_file
 
     @classmethod
     def make_backup_archive(cls, destination, user_obj):
