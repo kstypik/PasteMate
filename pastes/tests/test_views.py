@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
+from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from pastemate_project.utils import login_redirect_url
 
 from .. import forms
-from ..models import Paste
+from ..models import Folder, Paste
 from ..views import PasteDetailView
 
 User = get_user_model()
@@ -209,3 +209,370 @@ class DownloadPasteViewTest(TestCase):
             f'attachment; filename="paste-{paste.uuid}.py"',
         )
         self.assertContains(response, paste.content)
+
+
+class PasteDetailWithPasswordViewTest(TestCase):
+    def setUp(self):
+        self.paste = Paste.objects.create(
+            content="Hello with password",
+            password="pass123",
+        )
+        self.paste_url = reverse("pastes:detail_with_password", args=[self.paste.uuid])
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertTemplateUsed(response, "pastes/detail.html")
+
+    def test_password_form_in_context(self):
+        response = self.client.get(self.paste_url)
+        form = response.context["password_form"]
+
+        self.assertIsInstance(form, forms.PasswordProtectedPasteForm)
+
+    def test_password_protected_in_context(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertTrue(response.context["password_protected"])
+
+    def test_redirects_to_normal_detail_on_GET_when_paste_has_no_password(self):
+        paste_without_pass = Paste.objects.create(content="Hi")
+
+        response = self.client.get(
+            reverse("pastes:detail_with_password", args=[paste_without_pass.uuid])
+        )
+
+        self.assertRedirects(response, paste_without_pass.get_absolute_url())
+
+    def test_redirects_to_normal_detail_on_POST_when_paste_has_no_password(self):
+        paste_without_pass = Paste.objects.create(content="Hi")
+
+        response = self.client.post(
+            reverse("pastes:detail_with_password", args=[paste_without_pass.uuid])
+        )
+
+        self.assertRedirects(response, paste_without_pass.get_absolute_url())
+
+    def test_can_access_paste_when_submitted_password_correct(self):
+        response = self.client.post(
+            self.paste_url,
+            data={
+                "password": "pass123",
+            },
+        )
+
+        self.assertTrue(response.context["password_correct"])
+        self.assertContains(response, self.paste.content)
+
+    def test_cannot_access_paste_when_submitted_password_wrong(self):
+        response = self.client.post(
+            self.paste_url,
+            data={
+                "password": "incorrect",
+            },
+        )
+
+        self.assertFalse(response.context.get("password_correct", False))
+        self.assertNotContains(response, self.paste.content)
+
+    def test_cannot_access_password_protected_paste_on_GET(self):
+        response = self.client.get(
+            self.paste_url,
+        )
+
+        self.assertNotContains(response, self.paste.content)
+
+    def test_can_burn_paste_when_also_password_protected(self):
+        burnable_paste_with_pass = Paste.objects.create(
+            content="Hello", burn_after_read=True, password="pass123"
+        )
+        burnable_paste_uuid = burnable_paste_with_pass.uuid
+        paste_url = reverse(
+            "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
+        )
+
+        response = self.client.post(paste_url, data={"password": "pass123"})
+
+        self.assertFalse(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
+
+    def test_cannot_burn_paste_with_password_when_wrong_password_provided(self):
+        burnable_paste_with_pass = Paste.objects.create(
+            content="Hello", burn_after_read=True, password="pass123"
+        )
+        burnable_paste_uuid = burnable_paste_with_pass.uuid
+        paste_url = reverse(
+            "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
+        )
+
+        response = self.client.post(paste_url, data={"password": "wrong"})
+
+        self.assertTrue(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
+
+    def test_cannot_burn_paste_with_password_on_GET(self):
+        burnable_paste_with_pass = Paste.objects.create(
+            content="Hello", burn_after_read=True, password="pass123"
+        )
+        burnable_paste_uuid = burnable_paste_with_pass.uuid
+        paste_url = reverse(
+            "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
+        )
+
+        response = self.client.get(paste_url)
+
+        self.assertTrue(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
+
+
+class PasteUpdateViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="Tester", email="test@test.com")
+        self.client.force_login(self.user)
+
+        self.paste = Paste.objects.create(content="Hello", author=self.user)
+        self.paste_url = reverse("pastes:update", args=[self.paste.uuid])
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertTemplateUsed(response, "pastes/form.html")
+
+    def test_form_in_context(self):
+        response = self.client.get(self.paste_url)
+        form = response.context["form"]
+
+        self.assertIsInstance(form, forms.PasteForm)
+
+    def test_cannot_update_if_not_paste_author(self):
+        client = Client()
+        another_user = User.objects.create_user(
+            username="NotAuthor", email="test@test.test"
+        )
+        client.force_login(another_user)
+
+        response = client.get(self.paste_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_action_type_in_template(self):
+        action_type = "Edit"
+
+        response = self.client.get(self.paste_url)
+
+        self.assertContains(response, action_type)
+
+    def test_can_update_paste(self):
+        data = {
+            "content": "Hello Updated",
+            "syntax": "html",
+            "exposure": "PU",
+        }
+
+        self.client.post(self.paste_url, data=data)
+        self.paste.refresh_from_db()
+
+        self.assertEqual(self.paste.content, "Hello Updated")
+        self.assertEqual(self.paste.syntax, "html")
+
+    def test_redirects_to_paste_after_successful_update(self):
+        data = {
+            "content": "Hello Updated",
+            "syntax": "html",
+            "exposure": "PU",
+        }
+
+        response = self.client.post(self.paste_url, data=data)
+
+        self.assertRedirects(response, self.paste.get_absolute_url())
+
+
+class PasteDeleteViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="Tester", email="test@test.com")
+        self.client.force_login(self.user)
+
+        self.paste = Paste.objects.create(content="Hello", author=self.user)
+        self.paste_url = reverse("pastes:delete", args=[self.paste.uuid])
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertTemplateUsed(response, "pastes/delete.html")
+
+    def test_cannot_delete_if_not_paste_author(self):
+        client = Client()
+        another_user = User.objects.create_user(
+            username="NotAuthor", email="test@test.test"
+        )
+        client.force_login(another_user)
+
+        response = client.get(self.paste_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_can_delete_paste(self):
+        self.client.post(self.paste_url)
+
+        self.assertEqual(Paste.objects.count(), 0)
+
+    def test_redirects_to_homepage_after_successful_delete(self):
+        response = self.client.post(self.paste_url)
+
+        self.assertRedirects(response, "/")
+
+
+class UserPasteListViewTest(TestCase):
+    def setUp(self):
+        self.first_user = User.objects.create_user(
+            username="logged", email="logged@email.com"
+        )
+        self.client.force_login(self.first_user)
+
+        self.another_user = User.objects.create_user(
+            username="another_user", email="another@user.com"
+        )
+        self.another_client = Client()
+        self.another_client.force_login(self.another_user)
+
+        self.first_user_userlist = reverse(
+            "pastes:user_pastes", args=[self.first_user.username]
+        )
+        self.another_user_userlist = reverse(
+            "pastes:user_pastes", args=[self.another_user.username]
+        )
+
+        self.public_paste = Paste.objects.create(
+            content="Public", exposure="PU", author=self.first_user
+        )
+        self.unlisted_paste = Paste.objects.create(
+            content="Unlisted", exposure="UN", author=self.first_user
+        )
+        self.private_paste = Paste.objects.create(
+            content="Priv", exposure="PR", author=self.first_user
+        )
+
+        self.folder1 = Folder.objects.create(name="folder1", created_by=self.first_user)
+        self.folder2 = Folder.objects.create(name="folder2", created_by=self.first_user)
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.first_user_userlist)
+
+        self.assertTemplateUsed(response, "pastes/user_list.html")
+
+    def test_user_can_see_their_own_pastes(self):
+        response = self.client.get(self.first_user_userlist)
+
+        self.assertIn(self.public_paste, response.context["pastes"])
+        self.assertIn(self.unlisted_paste, response.context["pastes"])
+        self.assertIn(self.private_paste, response.context["pastes"])
+
+    def test_others_cannot_see_users_private_pastes(self):
+        response = self.another_client.get(self.first_user_userlist)
+
+        self.assertIn(self.public_paste, response.context["pastes"])
+        self.assertNotIn(self.unlisted_paste, response.context["pastes"])
+        self.assertNotIn(self.private_paste, response.context["pastes"])
+
+    def test_user_can_see_their_list_as_guest(self):
+        response = self.client.get(self.first_user_userlist, {"guest": "1"})
+
+        self.assertIn(self.public_paste, response.context["pastes"])
+        self.assertNotIn(self.unlisted_paste, response.context["pastes"])
+        self.assertNotIn(self.private_paste, response.context["pastes"])
+
+    def test_user_can_see_their_folders_on_list(self):
+        response = self.client.get(self.first_user_userlist)
+
+        self.assertIn(self.folder1, response.context["folders"])
+        self.assertIn(self.folder2, response.context["folders"])
+
+    def test_show_count_of_pastes_in_folder(self):
+        Paste.objects.create(content="hi", folder=self.folder1)
+        Paste.objects.create(content="hi", folder=self.folder1)
+        Paste.objects.create(content="hi", folder=self.folder2)
+        Folder.objects.create(name="folder3", created_by=self.first_user)
+
+        response = self.client.get(self.first_user_userlist)
+
+        self.assertEqual(response.context["folders"].get(name="folder1").num_pastes, 2)
+        self.assertEqual(response.context["folders"].get(name="folder2").num_pastes, 1)
+        self.assertEqual(response.context["folders"].get(name="folder3").num_pastes, 0)
+
+    def test_user_cannot_see_other_users_folders_on_list(self):
+        response = self.another_client.get(self.another_user_userlist)
+
+        self.assertNotIn(self.folder1, response.context["folders"])
+        self.assertNotIn(self.folder2, response.context["folders"])
+
+    @override_settings(PASTES_USER_LIST_PAGINATE_BY=2)
+    def test_user_list_is_paginated(self):
+        for i in range(10):
+            Paste.objects.create(content="paginate me", author=self.another_user)
+
+        response = self.another_client.get(self.another_user_userlist)
+
+        self.assertEqual(response.context["page_obj"].paginator.num_pages, 5)
+
+    def test_show_statistics(self):
+        for _ in range(2):
+            Paste.objects.create(content="test", author=self.first_user, exposure="PU")
+
+        for _ in range(3):
+            Paste.objects.create(content="test", author=self.first_user, exposure="PR")
+
+        for _ in range(4):
+            Paste.objects.create(content="test", author=self.first_user, exposure="UN")
+
+        response = self.client.get(self.first_user_userlist)
+
+        stats = response.context["stats"]
+        self.assertEqual(stats["total_pastes"], 12)
+        self.assertEqual(stats["public_pastes"], 3)
+        self.assertEqual(stats["unlisted_pastes"], 5)
+        self.assertEqual(stats["private_pastes"], 4)
+
+
+class SearchResultsViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="logged", email="logged@email.com"
+        )
+        self.client.force_login(self.user)
+
+        # pastes that should be found
+        Paste.objects.create(
+            author=self.user,
+            content="Search me dhfasjhdsafj search",
+        )
+        Paste.objects.create(
+            author=self.user,
+            content="hfdjs dhfsaj search sdahfjjksd sdha",
+        )
+        Paste.objects.create(
+            author=self.user, content="dsfajfdhsafdjsah", title="Search me"
+        )
+
+        # pastes that shouldn't be found
+        Paste.objects.create(
+            author=self.user,
+            content="fasdfdsafdsafdsa",
+        )
+        Paste.objects.create(
+            author=self.user,
+            content="fdsadfsfsdafads",
+        )
+
+        self.search_url = reverse("pastes:search")
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.search_url)
+
+        self.assertTemplateUsed(response, "pastes/search_results.html")
+
+    def test_finds_appropriate_results(self):
+        response = self.client.get(self.search_url, {"q": "search"})
+
+        self.assertEqual(response.context["pastes"].count(), 3)
+
+    def test_query_in_context(self):
+        response = self.client.get(self.search_url, {"q": "search"})
+
+        self.assertEqual(response.context["query"], "search")
