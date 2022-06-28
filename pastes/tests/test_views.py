@@ -576,3 +576,150 @@ class SearchResultsViewTest(TestCase):
         response = self.client.get(self.search_url, {"q": "search"})
 
         self.assertEqual(response.context["query"], "search")
+
+
+class UserFolderListViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="test", email="test@test.com")
+        self.client.force_login(self.user)
+
+        self.folder = Folder.objects.create(name="Testing folder", created_by=self.user)
+
+        self.folder_list_url = reverse(
+            "pastes:user_folder", args=[self.user.username, self.folder.slug]
+        )
+        for _ in range(5):
+            Paste.objects.create(content="Hi", folder=self.folder, author=self.user)
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.folder_list_url)
+
+        self.assertTemplateUsed(response, "pastes/user_list.html")
+
+    def test_folder_and_user_in_context(self):
+        response = self.client.get(self.folder_list_url)
+
+        self.assertEqual(self.folder, response.context["folder"])
+        self.assertEqual(self.user, response.context["author"])
+
+    def test_author_can_view_pastes_in_folder(self):
+        response = self.client.get(self.folder_list_url)
+
+        self.assertEqual(response.context["pastes"].count(), 5)
+
+    def test_user_cannot_view_folders_of_other_users(self):
+        another_user = User.objects.create_user(
+            username="another", email="another@another.com"
+        )
+        client = Client()
+        client.force_login(another_user)
+        response = client.get(self.folder_list_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_login_required(self):
+        response = Client().get(self.folder_list_url)
+
+        self.assertRedirects(response, login_redirect_url(self.folder_list_url))
+
+
+class UserFolderUpdateView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="test", email="test@test.com")
+        self.client.force_login(self.user)
+
+        self.folder = Folder.objects.create(name="Testing folder", created_by=self.user)
+
+        self.folder_edit_url = reverse(
+            "pastes:user_folder_edit", args=[self.user.username, self.folder.slug]
+        )
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.folder_edit_url)
+
+        self.assertTemplateUsed(response, "pastes/folder_form.html")
+
+    def test_form_in_context(self):
+        response = self.client.get(self.folder_edit_url)
+        form = response.context["form"]
+
+        self.assertIsInstance(form, forms.FolderForm)
+
+    def test_success_url(self):
+        data = {
+            "name": "Updated",
+        }
+        response = self.client.post(self.folder_edit_url, data=data)
+        self.folder.refresh_from_db()
+
+        self.assertRedirects(
+            response,
+            reverse("pastes:user_folder", args=[self.user.username, self.folder.slug]),
+        )
+
+    def test_folder_author_can_update_its_name(self):
+        data = {
+            "name": "Updated",
+        }
+        self.client.post(self.folder_edit_url, data=data)
+        self.folder.refresh_from_db()
+
+        self.assertEqual(self.folder.name, "Updated")
+
+    def test_user_cannot_update_another_users_folder(self):
+        data = {
+            "name": "Updated",
+        }
+        another_client = Client()
+        another_user = User.objects.create_user(
+            username="another", email="another@user.com"
+        )
+        another_client.force_login(another_user)
+
+        response = another_client.post(self.folder_edit_url, data=data)
+        self.folder.refresh_from_db()
+
+        self.assertEqual(self.folder.name, "Testing folder")
+        self.assertEqual(response.status_code, 404)
+
+
+class UserFolderDeleteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="test", email="test@test.com")
+        self.client.force_login(self.user)
+
+        self.folder = Folder.objects.create(name="Testing folder", created_by=self.user)
+
+        self.folder_delete_url = reverse(
+            "pastes:user_folder_delete", args=[self.user.username, self.folder.slug]
+        )
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.folder_delete_url)
+
+        self.assertTemplateUsed(response, "pastes/folder_delete.html")
+
+    def test_success_url(self):
+        response = self.client.post(self.folder_delete_url)
+
+        self.assertRedirects(
+            response,
+            reverse("pastes:user_pastes", args=[self.user.username]),
+        )
+
+    def test_folder_author_can_delete_folder(self):
+        self.client.post(self.folder_delete_url)
+
+        self.assertEqual(Folder.objects.filter(created_by=self.user).count(), 0)
+
+    def test_user_cannot_delete_another_users_folder(self):
+        another_client = Client()
+        another_user = User.objects.create_user(
+            username="another", email="another@user.com"
+        )
+        another_client.force_login(another_user)
+
+        response = another_client.post(self.folder_delete_url)
+
+        self.assertEqual(self.folder.name, "Testing folder")
+        self.assertEqual(response.status_code, 404)
