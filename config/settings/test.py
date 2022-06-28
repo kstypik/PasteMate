@@ -23,6 +23,9 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
+# TEMPLATES
+TEMPLATES[-1]["OPTIONS"]["debug"] = True
+
 # MEDIA
 # MEDIA_ROOT = tempfile.gettempdir()
 MEDIA_ROOT = tempfile.gettempdir()
