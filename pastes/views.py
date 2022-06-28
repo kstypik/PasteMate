@@ -10,15 +10,9 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-    View,
-)
+from django.utils.functional import lazy
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  TemplateView, UpdateView, View)
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from hitcount.models import HitCount
@@ -26,7 +20,8 @@ from hitcount.views import HitCountDetailView, HitCountMixin
 from pygments import lexers
 
 from . import choices
-from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
+from .forms import (FolderForm, PasswordProtectedPasteForm, PasteForm,
+                    ReportForm)
 from .models import Folder, Paste, Report
 
 User = get_user_model()
@@ -223,7 +218,9 @@ class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
 class UserListMixin:
     context_object_name = "pastes"
     template_name = "pastes/user_list.html"
-    paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
+    
+    def get_paginate_by(self, queryset):
+        return settings.PASTES_USER_LIST_PAGINATE_BY
 
 
 class UserStatsMixin:
