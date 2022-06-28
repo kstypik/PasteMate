@@ -1,11 +1,11 @@
 import tempfile
 from io import BytesIO
 
+from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from pastemate_project.utils import login_redirect_url
 from PIL import Image
 
 from ..forms import AccountDeleteForm, AvatarForm, PreferencesForm, ProfileForm
