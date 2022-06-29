@@ -1,17 +1,22 @@
+import datetime
 from unittest.mock import patch
 
 from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .. import forms
-from ..models import Folder, Paste
+from ..models import Folder, Paste, Report
 from ..views import PasteDetailView
 
 User = get_user_model()
 
 PASTE_CREATE_URL = reverse("pastes:create")
+PASTES_ARCHIVE_URL = reverse("pastes:archive")
+LANGUAGES_URL = reverse("pastes:syntax_languages")
+BACKUP_URL = reverse("pastes:backup")
 
 
 class PasteCreateViewTest(TestCase):
@@ -202,11 +207,23 @@ class RawPasteDetailViewTest(TestCase):
 class DownloadPasteViewTest(TestCase):
     def test_can_download_paste(self):
         paste = Paste.objects.create(content="Hello World", syntax="python")
+
         response = self.client.get(reverse("pastes:paste_download", args=[paste.uuid]))
 
         self.assertEqual(
             response.headers["Content-Disposition"],
             f'attachment; filename="paste-{paste.uuid}.py"',
+        )
+        self.assertContains(response, paste.content)
+
+    def test_handles_file_without_extension(self):
+        paste = Paste.objects.create(content="Hello World", syntax="mime")
+
+        response = self.client.get(reverse("pastes:paste_download", args=[paste.uuid]))
+
+        self.assertEqual(
+            response.headers["Content-Disposition"],
+            f'attachment; filename="paste-{paste.uuid}"',
         )
         self.assertContains(response, paste.content)
 
@@ -623,7 +640,7 @@ class UserFolderListViewTest(TestCase):
         self.assertRedirects(response, login_redirect_url(self.folder_list_url))
 
 
-class UserFolderUpdateView(TestCase):
+class UserFolderUpdateViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="test", email="test@test.com")
         self.client.force_login(self.user)
@@ -683,7 +700,7 @@ class UserFolderUpdateView(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class UserFolderDeleteView(TestCase):
+class UserFolderDeleteViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="test", email="test@test.com")
         self.client.force_login(self.user)
@@ -723,3 +740,273 @@ class UserFolderDeleteView(TestCase):
 
         self.assertEqual(self.folder.name, "Testing folder")
         self.assertEqual(response.status_code, 404)
+
+
+class PasteArchiveListViewTest(TestCase):
+    def setUp(self):
+        self.first_added_paste = Paste.objects.create(content="no1", syntax="python")
+        self.second_added_paste = Paste.objects.create(content="no2")
+        self.last_added_paste = Paste.objects.create(content="no3", syntax="python")
+
+    def test_template_name_correct(self):
+        response = self.client.get(PASTES_ARCHIVE_URL)
+
+        self.assertTemplateUsed(response, "pastes/archive.html")
+
+    @override_settings(PASTES_ARCHIVE_LENGTH=2)
+    def test_can_view_archive(self):
+        response = self.client.get(PASTES_ARCHIVE_URL)
+
+        self.assertNotIn(self.first_added_paste, response.context["pastes"])
+        self.assertIn(self.second_added_paste, response.context["pastes"])
+        self.assertIn(self.last_added_paste, response.context["pastes"])
+
+    def test_can_view_archive_of_specific_language(self):
+        response = self.client.get(reverse("pastes:syntax_archive", args=["python"]))
+
+        self.assertIn(self.first_added_paste, response.context["pastes"])
+        self.assertNotIn(self.second_added_paste, response.context["pastes"])
+        self.assertIn(self.last_added_paste, response.context["pastes"])
+
+    def test_syntax_in_context_of_language_archive(self):
+        response = self.client.get(reverse("pastes:syntax_archive", args=["python"]))
+
+        self.assertEqual("Python", response.context["syntax"])
+
+
+class EmbedPasteViewTest(TestCase):
+    def setUp(self):
+        self.paste = Paste.objects.create(content="Hello World")
+        self.embed_url = reverse("pastes:embed", args=[self.paste.uuid])
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.embed_url)
+
+        self.assertTemplateUsed(response, "pastes/embed.html")
+
+    def test_direct_link_to_image_in_context(self):
+        response = self.client.get(self.embed_url)
+
+        self.assertEqual(
+            f"testserver/media/embed/{self.paste.uuid}.png",
+            response.context["direct_embed_link"],
+        )
+
+    def test_embed_image_is_displayed(self):
+        response = self.client.get(self.embed_url)
+
+        html = f'<img src="{self.paste.embeddable_image.url}" alt="Paste\'s content represented as an image">'
+        self.assertInHTML(html, response.content.decode("utf-8"))
+
+    def test_cannot_embed_burnable_paste(self):
+        burnable_paste = Paste.objects.create(content="Hi", burn_after_read=True)
+
+        response = self.client.get(reverse("pastes:embed", args=[burnable_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_embed_password_protected_paste(self):
+        paste_with_pass = Paste.objects.create(content="Hi", password="pass123")
+
+        response = self.client.get(reverse("pastes:embed", args=[paste_with_pass.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_embed_private_paste(self):
+        private_paste = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE
+        )
+
+        response = self.client.get(reverse("pastes:embed", args=[private_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_author_cannot_embed_their_private_paste(self):
+        user = User.objects.create(username="TEST", email="test@ters.com")
+        self.client.force_login(user)
+        private_paste = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE, author=user
+        )
+
+        response = self.client.get(reverse("pastes:embed", args=[private_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+
+class PrintPasteViewTest(TestCase):
+    def setUp(self):
+        self.paste = Paste.objects.create(content="Hello World")
+        self.print_url = reverse("pastes:print", args=[self.paste.uuid])
+
+    def test_template_name_correct(self):
+        response = self.client.get(self.print_url)
+
+        self.assertTemplateUsed(response, "pastes/print.html")
+
+    def test_print_window_is_loaded(self):
+        response = self.client.get(self.print_url)
+
+        html = '<body onload="window.print()">'
+        self.assertIn(html, response.content.decode("utf-8"))
+
+    def test_displays_content_html(self):
+        response = self.client.get(self.print_url)
+
+        self.assertIn(self.paste.content_html, response.content.decode("utf-8"))
+
+    def test_cannot_print_burnable_paste(self):
+        burnable_paste = Paste.objects.create(content="Hi", burn_after_read=True)
+
+        response = self.client.get(reverse("pastes:print", args=[burnable_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_print_password_protected_paste(self):
+        paste_with_pass = Paste.objects.create(content="Hi", password="pass123")
+
+        response = self.client.get(reverse("pastes:print", args=[paste_with_pass.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_print_private_paste(self):
+        private_paste = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE
+        )
+
+        response = self.client.get(reverse("pastes:print", args=[private_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_can_print_private_paste_if_its_author(self):
+        user = User.objects.create_user(username="User", email="user@user.com")
+        self.client.force_login(user)
+        private_paste_with_author = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE, author=user
+        )
+
+        response = self.client.get(
+            reverse("pastes:print", args=[private_paste_with_author.uuid])
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+
+class ReportPasteViewTest(TestCase):
+    def setUp(self):
+        self.paste = Paste.objects.create(content="Hello")
+        self.report_url = reverse("pastes:report", args=[self.paste.uuid])
+
+    def template_name_correct(self):
+        response = self.client.get(self.report_url)
+
+        self.assertTemplateUsed(response, "pastes/report.html")
+
+    def test_form_class_correct(self):
+        response = self.client.get(self.report_url)
+
+        self.assertIsInstance(response.context["form"], forms.ReportForm)
+
+    def test_reported_paste_in_context(self):
+        response = self.client.get(self.report_url)
+
+        self.assertEqual(response.context["reported_paste"], self.paste)
+
+    def test_can_report_paste(self):
+        data = {"reason": "Testing", "reporter_name": "Tester"}
+
+        self.client.post(self.report_url, data=data)
+
+        created_report = Report.objects.first()
+        self.assertEqual(Report.objects.count(), 1)
+        self.assertEqual(created_report.paste, self.paste)
+
+    def test_redirects_to_paste_on_success(self):
+        data = {"reason": "Testing", "reporter_name": "Tester"}
+
+        response = self.client.post(self.report_url, data=data)
+
+        self.assertRedirects(response, self.paste.get_absolute_url())
+
+    def test_cannot_report_burnable_paste(self):
+        burnable_paste = Paste.objects.create(content="Hi", burn_after_read=True)
+
+        response = self.client.get(reverse("pastes:report", args=[burnable_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_report_password_protected_paste(self):
+        paste_with_pass = Paste.objects.create(content="Hi", password="pass123")
+
+        response = self.client.get(
+            reverse("pastes:report", args=[paste_with_pass.uuid])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_report_private_paste(self):
+        private_paste = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE
+        )
+
+        response = self.client.get(reverse("pastes:report", args=[private_paste.uuid]))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_report_users_own_pastes(self):
+        user = User.objects.create_user(username="User", email="user@user.com")
+        self.client.force_login(user)
+        private_paste_with_author = Paste.objects.create(
+            content="Hi", exposure=Paste.Exposure.PRIVATE, author=user
+        )
+
+        response = self.client.get(
+            reverse("pastes:report", args=[private_paste_with_author.uuid])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+class SyntaxLanguagesViewTest(TestCase):
+    def test_template_name_correct(self):
+        response = self.client.get(LANGUAGES_URL)
+
+        self.assertTemplateUsed(response, "pastes/syntax_languages.html")
+
+    def test_displays_language_list_with_count(self):
+        for _ in range(3):
+            Paste.objects.create(content="hi", syntax="python")
+        for _ in range(2):
+            Paste.objects.create(content="hi", syntax="javascript")
+
+        response = self.client.get(LANGUAGES_URL)
+
+        self.assertEqual(response.context["languages"][0]["syntax"], "javascript")
+        self.assertEqual(response.context["languages"][0]["used"], 2)
+        self.assertEqual(response.context["languages"][1]["syntax"], "python")
+        self.assertEqual(response.context["languages"][1]["used"], 3)
+
+
+class BackupUserPastesView(TestCase):
+    def test_login_required(self):
+        response = self.client.get(BACKUP_URL)
+
+        self.assertRedirects(response, login_redirect_url(BACKUP_URL))
+
+    @patch.object(
+        timezone,
+        "now",
+        return_value=datetime.datetime(
+            2022, 6, 24, 12, 00, tzinfo=datetime.timezone.utc
+        ),
+    )
+    def test_backup_archive_with_correct_name(self, mock):
+        user = User.objects.create_user(username="Test", email="test@test.com")
+        self.client.force_login(user)
+        Paste.objects.create(content="Hi", author=user)
+
+        response = self.client.get(BACKUP_URL)
+
+        self.assertEqual(
+            response.headers["Content-Disposition"],
+            "attachment; filename=pastemate_backup_20220624.zip",
+        )
