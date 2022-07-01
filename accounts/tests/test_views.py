@@ -4,7 +4,8 @@ from io import BytesIO
 from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
+from django.forms import ValidationError
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
@@ -143,6 +144,11 @@ class AccountDeleteViewTest(TestCase):
         self.client.post(ACCOUNT_DELETE_URL, data={"password": "test123"})
 
         self.assertEqual(User.objects.count(), 0)
+
+    def test_cannot_delete_account_when_password_incorrect(self):
+        self.client.post(ACCOUNT_DELETE_URL, data={"password": "incorrect_pass"})
+
+        self.assertEqual(User.objects.count(), 1)
 
 
 class PreferencesUpdateViewTest(TestCase):
