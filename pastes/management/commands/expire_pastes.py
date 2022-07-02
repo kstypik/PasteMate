@@ -20,7 +20,9 @@ class Command(BaseCommand):
         removed_pastes_num = qs.count()
         if removed_pastes_num > 0:
             if options["only_show"]:
-                self.stdout.write(f"Pastes to delete: {qs}")
+                self.stdout.write(f"Pastes to delete:")
+                for paste in qs:
+                    self.stdout.write(f"{paste.uuid} - {paste.title}")
             else:
                 qs.delete()
                 self.stdout.write(
