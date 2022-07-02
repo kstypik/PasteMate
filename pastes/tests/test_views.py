@@ -5,7 +5,8 @@ from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import formats, timezone
+from django.utils.dateformat import format
 
 from .. import forms
 from ..models import Folder, Paste, Report
@@ -156,7 +157,22 @@ class PasteCloneViewTest(TestCase):
 
 class PasteDetailViewTest(TestCase):
     def setUp(self):
-        self.paste = Paste.objects.create(content="Hello World")
+        self.logged_user = User.objects.create_user(
+            username="Test",
+            email="test@test.com",
+        )
+        self.paste_author = User.objects.create_user(
+            username="Another Test",
+            email="anothertest@test.com",
+            location="Spain",
+            website="http://example.com",
+        )
+        self.client.force_login(self.logged_user)
+        self.paste = Paste.objects.create(
+            content="Hello World",
+            author=self.paste_author,
+            expiration_interval_symbol=Paste.TEN_MINUTES,
+        )
         self.paste_url = self.paste.get_absolute_url()
 
     def test_template_name_correct(self):
@@ -192,6 +208,48 @@ class PasteDetailViewTest(TestCase):
         response = self.client.get(burnable_paste.get_absolute_url())
 
         self.assertTrue(response.context["burn_after_read"])
+
+    def test_displays_private_message_to_author_url_for_logged(self):
+        response = self.client.get(self.paste_url)
+
+        pm_url = reverse(
+            "pinax_messages:message_user_create", args=[self.paste_author.id]
+        )
+        self.assertContains(response, pm_url)
+
+    def test_does_not_display_private_message_to_author_url_for_themselves(self):
+        authors_paste = Paste.objects.create(content="hi", author=self.logged_user)
+        response = self.client.get(authors_paste.get_absolute_url())
+
+        pm_url = reverse(
+            "pinax_messages:message_user_create", args=[self.logged_user.id]
+        )
+        self.assertNotContains(response, pm_url)
+
+    def test_does_not_display_private_message_to_author_url_for_unlogged(self):
+        response = Client().get(self.paste_url)
+
+        pm_url = reverse(
+            "pinax_messages:message_user_create", args=[self.paste_author.id]
+        )
+        self.assertNotContains(response, pm_url)
+
+    def test_displays_correct_expiration_date_when_set(self):
+        response = self.client.get(self.paste_url)
+
+        expiration_date = formats.date_format(self.paste.expiration_date, "c")
+        html = f'<span class="to-relative-datetime text-capitalize">{expiration_date}</span>'
+        self.assertInHTML(html, response.content.decode("utf-8"))
+
+    def test_displays_authors_location_when_set(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertContains(response, self.paste_author.location)
+
+    def test_displays_authors_website_when_set(self):
+        response = self.client.get(self.paste_url)
+
+        self.assertContains(response, self.paste_author.website)
 
 
 class RawPasteDetailViewTest(TestCase):
@@ -439,7 +497,10 @@ class PasteDeleteViewTest(TestCase):
 class UserPasteListViewTest(TestCase):
     def setUp(self):
         self.first_user = User.objects.create_user(
-            username="logged", email="logged@email.com"
+            username="logged",
+            email="logged@email.com",
+            location="Japan",
+            website="http://hkjlgs.com",
         )
         self.client.force_login(self.first_user)
 
@@ -457,13 +518,20 @@ class UserPasteListViewTest(TestCase):
         )
 
         self.public_paste = Paste.objects.create(
-            content="Public", exposure="PU", author=self.first_user
+            content="Public",
+            exposure="PU",
+            author=self.first_user,
         )
         self.unlisted_paste = Paste.objects.create(
             content="Unlisted", exposure="UN", author=self.first_user
         )
         self.private_paste = Paste.objects.create(
             content="Priv", exposure="PR", author=self.first_user
+        )
+        self.expiring_paste = Paste.objects.create(
+            content="Expires",
+            author=self.first_user,
+            expiration_interval_symbol=Paste.TEN_MINUTES,
         )
 
         self.folder1 = Folder.objects.create(name="folder1", created_by=self.first_user)
@@ -541,10 +609,28 @@ class UserPasteListViewTest(TestCase):
         response = self.client.get(self.first_user_userlist)
 
         stats = response.context["stats"]
-        self.assertEqual(stats["total_pastes"], 12)
-        self.assertEqual(stats["public_pastes"], 3)
+        self.assertEqual(stats["total_pastes"], 13)
+        self.assertEqual(stats["public_pastes"], 4)
         self.assertEqual(stats["unlisted_pastes"], 5)
         self.assertEqual(stats["private_pastes"], 4)
+
+    def test_displays_correct_expiration_date_when_set(self):
+        response = self.client.get(self.first_user_userlist)
+
+        expiration_date = formats.date_format(self.expiring_paste.expiration_date, "c")
+        html = f'<span class="to-relative-datetime text-capitalize">{expiration_date}</span>'
+        self.assertInHTML(html, response.content.decode("utf-8"))
+
+    def test_displays_authors_location_when_set(self):
+        response = self.client.get(self.first_user_userlist)
+
+        self.assertContains(response, self.first_user.location)
+
+    def test_displays_authors_website_when_set(self):
+        response = self.client.get(self.first_user_userlist)
+
+        html = f'<a href="{self.first_user.website}">{self.first_user.website}</a>'
+        self.assertInHTML(html, response.content.decode("utf-8"))
 
 
 class SearchResultsViewTest(TestCase):
@@ -772,6 +858,15 @@ class PasteArchiveListViewTest(TestCase):
         response = self.client.get(reverse("pastes:syntax_archive", args=["python"]))
 
         self.assertEqual("Python", response.context["syntax"])
+
+    def test_displays_message_when_no_pastes(self):
+        Paste.objects.all().delete()
+
+        response = self.client.get(PASTES_ARCHIVE_URL)
+
+        self.assertInHTML(
+            "<p>There are no pastes yet.</p>", response.content.decode("utf-8")
+        )
 
 
 class EmbedPasteViewTest(TestCase):
