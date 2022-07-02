@@ -1,7 +1,5 @@
 from django import template
-from pygments import lexers
 
-from .. import choices
 from ..models import Paste
 
 register = template.Library()

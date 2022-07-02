@@ -8,21 +8,15 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-    View,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  TemplateView, UpdateView, View)
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from hitcount.models import HitCount
 from hitcount.views import HitCountDetailView, HitCountMixin
 
-from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
+from .forms import (FolderForm, PasswordProtectedPasteForm, PasteForm,
+                    ReportForm)
 from .models import Folder, Paste, Report
 
 User = get_user_model()
@@ -265,7 +259,6 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
             hits = hits + 1
         context["total_hits"] = hits
 
-        as_guest = True if self.request.GET.get("guest") == "1" else False
         if self.request.user == self.user and not self.display_as_guest():
             context["folders"] = (
                 Folder.objects.filter(created_by=self.request.user)
@@ -446,7 +439,7 @@ class BackupUserPastesView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="application/zip")
 
-        archive = Paste.make_backup_archive(response, self.request.user)
+        Paste.make_backup_archive(response, self.request.user)
         date_str = timezone.now().strftime("%Y%m%d")
         archive_name = f"pastemate_backup_{date_str}.zip"
 

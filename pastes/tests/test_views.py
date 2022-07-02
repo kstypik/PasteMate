@@ -197,7 +197,7 @@ class PasteDetailViewTest(TestCase):
         burnable_paste = Paste.objects.create(content="Hello", burn_after_read=True)
         burnable_paste_uuid = burnable_paste.uuid
 
-        response = self.client.post(burnable_paste.get_absolute_url())
+        self.client.post(burnable_paste.get_absolute_url())
 
         self.assertFalse(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
 
@@ -354,7 +354,7 @@ class PasteDetailWithPasswordViewTest(TestCase):
             "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
         )
 
-        response = self.client.post(paste_url, data={"password": "pass123"})
+        self.client.post(paste_url, data={"password": "pass123"})
 
         self.assertFalse(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
 
@@ -367,7 +367,7 @@ class PasteDetailWithPasswordViewTest(TestCase):
             "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
         )
 
-        response = self.client.post(paste_url, data={"password": "wrong"})
+        self.client.post(paste_url, data={"password": "wrong"})
 
         self.assertTrue(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
 
@@ -380,7 +380,7 @@ class PasteDetailWithPasswordViewTest(TestCase):
             "pastes:detail_with_password", args=[burnable_paste_with_pass.uuid]
         )
 
-        response = self.client.get(paste_url)
+        self.client.get(paste_url)
 
         self.assertTrue(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
 
@@ -577,7 +577,7 @@ class UserPasteListViewTest(TestCase):
 
     @override_settings(PASTES_USER_LIST_PAGINATE_BY=2)
     def test_user_list_is_paginated(self):
-        for i in range(10):
+        for _ in range(10):
             Paste.objects.create(content="paginate me", author=self.another_user)
 
         response = self.another_client.get(self.another_user_userlist)
