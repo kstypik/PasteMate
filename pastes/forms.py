@@ -74,8 +74,6 @@ class PasteForm(forms.ModelForm):
         ):
             raise forms.ValidationError("You can't create private paste as Anonymous.")
 
-        if cleaned_data.get("expiration_interval_symbol") == "PRE":
-            del cleaned_data["expiration_interval_symbol"]
         return cleaned_data
 
     def save(self, commit=True):

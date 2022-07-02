@@ -141,9 +141,6 @@ class Paste(TimeStampedModel):
         return archive
 
     def calculate_expiration_date(self):
-        if not self.expiration_interval_symbol:
-            return None
-
         to_interval_mapping = {
             Paste.TEN_MINUTES: timedelta(minutes=10),
             Paste.ONE_HOUR: timedelta(hours=1),
@@ -154,6 +151,9 @@ class Paste(TimeStampedModel):
             Paste.SIX_MONTHS: timedelta(days=180),
             Paste.ONE_YEAR: timedelta(days=365),
         }
+
+        if not self.expiration_interval_symbol in to_interval_mapping:
+            return None
         return timezone.now() + to_interval_mapping[self.expiration_interval_symbol]
 
     @staticmethod
@@ -175,7 +175,12 @@ class Paste(TimeStampedModel):
             self.embeddable_image = self.make_embeddable_image()
         self.filesize = self.calculate_filesize()
 
-        self.expiration_date = self.calculate_expiration_date()
+        calculated_expiration = self.calculate_expiration_date()
+        if (
+            calculated_expiration
+            and not self.expiration_interval_symbol == Paste.NO_CHANGE
+        ):
+            self.expiration_date = calculated_expiration
 
         super().save(*args, **kwargs)
 
