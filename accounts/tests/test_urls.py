@@ -1,8 +1,8 @@
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.urls import resolve, reverse
 
 
-class AccountsUrlsTest(TestCase):
+class AccountsUrlsTest(SimpleTestCase):
     def test_profile_update(self):
         self.assertEqual(reverse("accounts:profile_update"), "/accounts/edit-profile/")
         self.assertEqual(
