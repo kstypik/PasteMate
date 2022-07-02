@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import formats, timezone
-from django.utils.dateformat import format
 
 from .. import forms
 from ..models import Folder, Paste, Report

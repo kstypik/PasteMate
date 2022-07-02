@@ -1,5 +1,3 @@
-import copy
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,10 +5,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.postgres.search import SearchVector
 from django.db.models import Count
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.functional import lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -26,7 +23,6 @@ from hitcount.models import HitCount
 from hitcount.views import HitCountDetailView, HitCountMixin
 from pygments import lexers
 
-from . import choices
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
 from .models import Folder, Paste, Report
 

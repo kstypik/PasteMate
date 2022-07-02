@@ -1,4 +1,4 @@
-from accounts.models import Preferences, User
+from accounts.models import User
 from django.test import TestCase
 
 

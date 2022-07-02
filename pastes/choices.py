@@ -1,5 +1,3 @@
-from pygments import lexers
-
 PUBLIC = "PU", "Public"
 UNLISTED = "UN", "Unlisted"
 PRIVATE = "PR", "Private"
