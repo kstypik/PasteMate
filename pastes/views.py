@@ -21,7 +21,6 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from hitcount.models import HitCount
 from hitcount.views import HitCountDetailView, HitCountMixin
-from pygments import lexers
 
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
 from .models import Folder, Paste, Report
@@ -143,14 +142,9 @@ class DownloadPasteView(
     def get(self, request, *args, **kwargs):
         object = self.get_object()
         response = HttpResponse(object.content, content_type="text/plain")
-        lexer = lexers.get_lexer_by_name(object.syntax)
-        try:
-            ext = lexer.filenames[0].split("*")[1]
-        except:
-            ext = ""
         response[
             "Content-Disposition"
-        ] = f'attachment; filename="paste-{object.uuid}{ext}"'
+        ] = f'attachment; filename="paste-{object.uuid}.txt"'
         return response
 
 

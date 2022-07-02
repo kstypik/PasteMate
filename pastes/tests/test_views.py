@@ -269,18 +269,7 @@ class DownloadPasteViewTest(TestCase):
 
         self.assertEqual(
             response.headers["Content-Disposition"],
-            f'attachment; filename="paste-{paste.uuid}.py"',
-        )
-        self.assertContains(response, paste.content)
-
-    def test_handles_file_without_extension(self):
-        paste = Paste.objects.create(content="Hello World", syntax="mime")
-
-        response = self.client.get(reverse("pastes:paste_download", args=[paste.uuid]))
-
-        self.assertEqual(
-            response.headers["Content-Disposition"],
-            f'attachment; filename="paste-{paste.uuid}"',
+            f'attachment; filename="paste-{paste.uuid}.txt"',
         )
         self.assertContains(response, paste.content)
 
