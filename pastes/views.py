@@ -438,7 +438,7 @@ class SyntaxLanguagesView(TemplateView):
 
 
 class BackupUserPastesView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         response = HttpResponse(content_type="application/zip")
 
         Paste.make_backup_archive(response, self.request.user)

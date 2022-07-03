@@ -104,3 +104,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 #div_id_content {
     margin-top: 1rem;
 }
+
+.btn-like-a {
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    overflow: visible;
+
+    background: transparent;
+
+    /* inherit font & color from ancestor */
+    color: #1266f1;
+    font: inherit;
+
+    /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+    line-height: normal;
+
+    /* Corrects font smoothing for webkit */
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+
+    /* Corrects inability to style clickable `input` types in iOS */
+    -webkit-appearance: none;
+}
+
+.btn-like-a:hover {
+    color: #0e52c1;
+}

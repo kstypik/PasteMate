@@ -45,7 +45,7 @@
 </div>
 
 <div class="alert alert-secondary mt-3">
-  If you want to back up all your pastes, <a href="{% url 'pastes:backup' %}">click here</a> to download an archive with them.
+  If you want to back up all your pastes, <form action="{% url 'pastes:backup' %}" method="POST" class="d-inline">{% csrf_token %}<button class="btn-like-a">click here</button></form> to download an archive with them.
 </div>
 
 <div class="alert alert-info" role="alert">
