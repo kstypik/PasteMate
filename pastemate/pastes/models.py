@@ -102,6 +102,17 @@ class Paste(TimeStampedModel):
     def get_absolute_url(self):
         return reverse("pastes:detail", kwargs={"uuid": self.uuid})
 
+    @property
+    def is_private(self):
+        return self.exposure == Paste.Exposure.PRIVATE
+
+    @property
+    def is_normally_accessible(self):
+        return not self.password and not self.burn_after_read
+
+    def is_author(self, user):
+        return self.author == user
+
     def calculate_filesize(self):
         return len(self.content.encode("utf-8"))
 
