@@ -38,7 +38,7 @@
             <li><a class="dropdown-item" href="{% url 'account_email' %}">Edit E-mail</a></li>
             <li><a class="dropdown-item" href="{% url 'accounts:preferences' %}">Edit Preferences</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+            <li><form method="POST" action="{% url 'account_logout' %}">{% csrf_token %}<button class="dropdown-item">Logout</button></form></li>
           </ul>
         </div>
         {% else %}
