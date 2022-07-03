@@ -195,7 +195,11 @@ class PasteAuthorMixin:
 
 
 class PasteUpdateView(
-    AuthenticatedUserInFormKwargsMixin, PasteAuthorMixin, PasteInstanceMixin, UpdateView
+    LoginRequiredMixin,
+    AuthenticatedUserInFormKwargsMixin,
+    PasteAuthorMixin,
+    PasteInstanceMixin,
+    UpdateView,
 ):
     form_class = PasteForm
     template_name = "pastes/form.html"
@@ -204,7 +208,9 @@ class PasteUpdateView(
     }
 
 
-class PasteDeleteView(PasteAuthorMixin, PasteInstanceMixin, DeleteView):
+class PasteDeleteView(
+    LoginRequiredMixin, PasteAuthorMixin, PasteInstanceMixin, DeleteView
+):
     success_url = "/"
     template_name = "pastes/delete.html"
 
@@ -305,7 +311,10 @@ class UserFolderListView(LoginRequiredMixin, UserStatsMixin, UserListMixin, List
 
 
 class UserFolderUpdateView(
-    SuccessMessageMixin, AuthenticatedUserInFormKwargsMixin, UpdateView
+    LoginRequiredMixin,
+    SuccessMessageMixin,
+    AuthenticatedUserInFormKwargsMixin,
+    UpdateView,
 ):
     slug_url_kwarg = "folder_slug"
     form_class = FolderForm
@@ -326,7 +335,7 @@ class UserFolderUpdateView(
         )
 
 
-class UserFolderDeleteView(SuccessMessageMixin, DeleteView):
+class UserFolderDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     slug_url_kwarg = "folder_slug"
     context_object_name = "folder"
     template_name = "pastes/folder_delete.html"
