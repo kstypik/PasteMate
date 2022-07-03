@@ -24,4 +24,5 @@ Pasting plain text web app with syntax highlighting, similar to Pastebin.com
 - Backing up of all pastes
 
 ## Screenshots
+For more screenshots, see [SCREENSHOTS.md](SCREENSHOTS.md)
 ![screenshot_view_paste](https://user-images.githubusercontent.com/53559764/177049349-1dbc4309-d25e-4d46-902e-c129ff860a3f.png)
