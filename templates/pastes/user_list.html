@@ -98,9 +98,9 @@
         <td>{{ paste.created|date }}</td>
         <td class="d-none d-sm-table-cell">
           {% if paste.expiration_date %}
-            <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
+            <span class="to-relative-datetime">{{ paste.expiration_date|date:"c" }}</span>
           {% else %}
-              Never
+              never
           {% endif %}
         </td>
         <td class="d-none d-sm-table-cell"><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>
