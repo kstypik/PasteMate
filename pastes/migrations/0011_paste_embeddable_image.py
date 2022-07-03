@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0010_folder_paste_folder'),
+        ("pastes", "0010_folder_paste_folder"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='paste',
-            name='embeddable_image',
-            field=models.ImageField(blank=True, upload_to=''),
+            model_name="paste",
+            name="embeddable_image",
+            field=models.ImageField(blank=True, upload_to=""),
         ),
     ]

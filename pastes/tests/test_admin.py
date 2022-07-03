@@ -37,7 +37,10 @@ class ReportAdminTest(TestCase):
     def test_shows_link_to_paste_on_list(self):
         response = self.client.get(REPORT_CHANGELIST_URL)
 
-        html = f'<td class="field-linked_paste">Should be linked <a href="{self.paste.get_absolute_url()}">(view)</a></td>'
+        html = f"""
+<td class="field-linked_paste">
+    Should be linked <a href="{self.paste.get_absolute_url()}">(view)</a>
+</td>"""
         self.assertInHTML(html, response.content.decode("utf-8"))
 
     @patch.object(

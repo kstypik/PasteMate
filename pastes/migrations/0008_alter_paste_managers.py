@@ -6,13 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0007_alter_paste_managers'),
+        ("pastes", "0007_alter_paste_managers"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='paste',
-            managers=[
-            ],
+            name="paste",
+            managers=[],
         ),
     ]

@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 from django.db.models.functions import Now
 from django.db.models.lookups import GreaterThanOrEqual
+
 from pastes.models import Paste
 
 
@@ -20,7 +21,7 @@ class Command(BaseCommand):
         removed_pastes_num = qs.count()
         if removed_pastes_num > 0:
             if options["only_show"]:
-                self.stdout.write(f"Pastes to delete:")
+                self.stdout.write("Pastes to delete:")
                 for paste in qs:
                     self.stdout.write(f"{paste.uuid} - {paste.title}")
             else:

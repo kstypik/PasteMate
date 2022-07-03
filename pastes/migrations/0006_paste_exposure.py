@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0005_paste_created_paste_modified'),
+        ("pastes", "0005_paste_created_paste_modified"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='paste',
-            name='exposure',
-            field=models.CharField(choices=[('PU', 'Public'), ('UN', 'Unlisted'), ('PR', 'Private')], default='PU', max_length=2),
+            model_name="paste",
+            name="exposure",
+            field=models.CharField(
+                choices=[("PU", "Public"), ("UN", "Unlisted"), ("PR", "Private")],
+                default="PU",
+                max_length=2,
+            ),
         ),
     ]

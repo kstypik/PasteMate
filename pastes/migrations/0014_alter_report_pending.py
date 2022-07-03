@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0013_report'),
+        ("pastes", "0013_report"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='report',
-            name='pending',
+            model_name="report",
+            name="pending",
             field=models.BooleanField(default=True),
         ),
     ]

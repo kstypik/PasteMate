@@ -6,22 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0021_alter_paste_expiration_time'),
+        ("pastes", "0021_alter_paste_expiration_time"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='paste',
-            name='expiration_time',
+            model_name="paste",
+            name="expiration_time",
         ),
         migrations.AddField(
-            model_name='paste',
-            name='expiration_date',
+            model_name="paste",
+            name="expiration_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='paste',
-            name='expiration_interval_symbol',
-            field=models.CharField(blank=True, choices=[('PRE', "Don't Change"), ('', 'Never'), ('10M', '10 minutes'), ('1H', '1 Hour'), ('1D', '1 Day'), ('1W', '1 Week'), ('2W', '2 Weeks'), ('1m', '1 Month'), ('6M', '6 Month'), ('1Y', '1 Year')], max_length=3, verbose_name='Paste Expiration'),
+            model_name="paste",
+            name="expiration_interval_symbol",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("PRE", "Don't Change"),
+                    ("", "Never"),
+                    ("10M", "10 minutes"),
+                    ("1H", "1 Hour"),
+                    ("1D", "1 Day"),
+                    ("1W", "1 Week"),
+                    ("2W", "2 Weeks"),
+                    ("1m", "1 Month"),
+                    ("6M", "6 Month"),
+                    ("1Y", "1 Year"),
+                ],
+                max_length=3,
+                verbose_name="Paste Expiration",
+            ),
         ),
     ]

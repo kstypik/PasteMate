@@ -1,11 +1,12 @@
 import datetime
 from unittest.mock import patch
 
-from config.utils import login_redirect_url
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import formats, timezone
+
+from config.utils import login_redirect_url
 
 from .. import forms
 from ..models import Folder, Paste, Report

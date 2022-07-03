@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0003_alter_paste_uuid'),
+        ("pastes", "0003_alter_paste_uuid"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='paste',
-            name='content_html',
+            model_name="paste",
+            name="content_html",
             field=models.TextField(blank=True),
         ),
     ]

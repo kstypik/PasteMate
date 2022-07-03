@@ -6,21 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0016_alter_report_moderated'),
+        ("pastes", "0016_alter_report_moderated"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='folder',
-            name='name',
+            model_name="folder",
+            name="name",
             field=models.CharField(max_length=50),
         ),
         migrations.AddConstraint(
-            model_name='folder',
-            constraint=models.UniqueConstraint(fields=('name', 'created_by'), name='unique_folder'),
+            model_name="folder",
+            constraint=models.UniqueConstraint(
+                fields=("name", "created_by"), name="unique_folder"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='folder',
-            constraint=models.UniqueConstraint(fields=('slug', 'created_by'), name='unique_folder_slug'),
+            model_name="folder",
+            constraint=models.UniqueConstraint(
+                fields=("slug", "created_by"), name="unique_folder_slug"
+            ),
         ),
     ]

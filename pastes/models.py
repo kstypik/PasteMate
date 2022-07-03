@@ -152,7 +152,7 @@ class Paste(TimeStampedModel):
             Paste.ONE_YEAR: timedelta(days=365),
         }
 
-        if not self.expiration_interval_symbol in to_interval_mapping:
+        if self.expiration_interval_symbol not in to_interval_mapping:
             return None
         return timezone.now() + to_interval_mapping[self.expiration_interval_symbol]
 

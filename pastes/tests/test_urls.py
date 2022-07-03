@@ -15,11 +15,9 @@ class PasteUrlsTest(SimpleTestCase):
 
         self.assertEqual(
             reverse("pastes:syntax_archive", kwargs={"syntax": "python"}),
-            f"/archive/python/",
+            "/archive/python/",
         )
-        self.assertEqual(
-            resolve(f"/archive/python/").view_name, "pastes:syntax_archive"
-        )
+        self.assertEqual(resolve("/archive/python/").view_name, "pastes:syntax_archive")
 
     def test_syntax_languages(self):
         self.assertEqual(reverse("pastes:syntax_languages"), "/languages/")
@@ -36,9 +34,9 @@ class PasteUrlsTest(SimpleTestCase):
     def test_user_pastes(self):
         self.assertEqual(
             reverse("pastes:user_pastes", kwargs={"username": "test"}),
-            f"/user/test/",
+            "/user/test/",
         )
-        self.assertEqual(resolve(f"/user/test/").view_name, "pastes:user_pastes")
+        self.assertEqual(resolve("/user/test/").view_name, "pastes:user_pastes")
 
     def test_user_folder(self):
         self.assertEqual(
@@ -46,10 +44,10 @@ class PasteUrlsTest(SimpleTestCase):
                 "pastes:user_folder",
                 kwargs={"username": "test", "folder_slug": "folder-test"},
             ),
-            f"/user/test/folder/folder-test/",
+            "/user/test/folder/folder-test/",
         )
         self.assertEqual(
-            resolve(f"/user/test/folder/folder-test/").view_name,
+            resolve("/user/test/folder/folder-test/").view_name,
             "pastes:user_folder",
         )
 
@@ -59,10 +57,10 @@ class PasteUrlsTest(SimpleTestCase):
                 "pastes:user_folder_edit",
                 kwargs={"username": "test", "folder_slug": "folder-test"},
             ),
-            f"/user/test/folder/folder-test/edit/",
+            "/user/test/folder/folder-test/edit/",
         )
         self.assertEqual(
-            resolve(f"/user/test/folder/folder-test/edit/").view_name,
+            resolve("/user/test/folder/folder-test/edit/").view_name,
             "pastes:user_folder_edit",
         )
 
@@ -72,10 +70,10 @@ class PasteUrlsTest(SimpleTestCase):
                 "pastes:user_folder_delete",
                 kwargs={"username": "test", "folder_slug": "folder-test"},
             ),
-            f"/user/test/folder/folder-test/delete/",
+            "/user/test/folder/folder-test/delete/",
         )
         self.assertEqual(
-            resolve(f"/user/test/folder/folder-test/delete/").view_name,
+            resolve("/user/test/folder/folder-test/delete/").view_name,
             "pastes:user_folder_delete",
         )
 

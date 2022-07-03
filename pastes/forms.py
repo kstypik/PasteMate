@@ -3,16 +3,20 @@ from hcaptcha_field import hCaptchaField
 
 from .models import Folder, Paste, Report
 
+NEW_FOLDER_HELP_TEXT = "You can type a new folder name, and it will be created and chosen instead of the one above."
+POST_ANONYMOUSLY_HELP_TEXT = "If checked, your account won't be associated with this paste.\
+                             You won't be able to edit or delete it later."
+
 
 class PasteForm(forms.ModelForm):
     content = forms.CharField(widget=forms.Textarea, label="")
     new_folder = forms.CharField(
         max_length=50,
         required=False,
-        help_text="You can type a new folder name, and it will be created and chosen instead of the one above.",
+        help_text=NEW_FOLDER_HELP_TEXT,
     )
     post_anonymously = forms.BooleanField(
-        help_text="If checked, your account won't be associated with this paste. You won't be able to edit or delete it later.",
+        help_text=POST_ANONYMOUSLY_HELP_TEXT,
         required=False,
     )
 

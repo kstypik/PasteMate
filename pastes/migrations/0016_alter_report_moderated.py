@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0015_rename_pending_report_moderated_paste_is_active_and_more'),
+        ("pastes", "0015_rename_pending_report_moderated_paste_is_active_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='report',
-            name='moderated',
+            model_name="report",
+            name="moderated",
             field=models.BooleanField(default=False),
         ),
     ]

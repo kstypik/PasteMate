@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pastes', '0017_alter_folder_name_folder_unique_folder_and_more'),
+        ("pastes", "0017_alter_folder_name_folder_unique_folder_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='folder',
-            options={'ordering': ['name']},
+            name="folder",
+            options={"ordering": ["name"]},
         ),
         migrations.AlterField(
-            model_name='folder',
-            name='slug',
+            model_name="folder",
+            name="slug",
             field=models.SlugField(),
         ),
     ]
