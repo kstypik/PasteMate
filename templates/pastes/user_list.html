@@ -39,11 +39,11 @@
 
 {% if user == author and not as_guest %}
 <div class="alert alert-secondary mt-3">
-  To see what other people see on your pastebin, <a href="?guest=1">click here</a>.
+  To get a preview of what other people see on your pastebin, <a href="?guest=1">click here</a>.
 </div>
 
 <div class="alert alert-secondary mt-3">
-  If you want to backup your all pastes, <a href="{% url 'pastes:backup' %}">click here</a> to download an archive with them.
+  If you want to back up all your pastes, <a href="{% url 'pastes:backup' %}">click here</a> to download an archive with them.
 </div>
 
 <div class="alert alert-info" role="alert">

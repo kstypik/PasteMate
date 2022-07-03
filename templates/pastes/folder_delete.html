@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Are you sure you want to delete folder {{ folder.name }}?</h2>
 <div class="alert alert-danger" role="alert">
-  This action is irreversible!
+  This action is irreversible! It will delete <strong>all your pastes</strong> in <strong>this folder</strong>!
 </div>
 <form method="post">
   {% csrf_token %}
