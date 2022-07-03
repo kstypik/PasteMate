@@ -107,11 +107,12 @@ class PasteDetailView(
     template_name = "pastes/detail.html"
     count_hit = True
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        if self.object.password and self.request.user != self.object.author:
-            return redirect("pastes:detail_with_password", uuid=self.object.uuid)
-        return response
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.password and request.user != obj.author:
+            return redirect("pastes:detail_with_password", uuid=obj.uuid)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """For handling Burn After Read"""
@@ -161,9 +162,6 @@ class PasteDetailWithPasswordView(
             context["password_form"] = PasswordProtectedPasteForm(
                 correct_password=self.object.password
             )
-
-            if self.object.burn_after_read:
-                context["burn_after_read"] = True
 
             return self.render_to_response(context)
         else:
