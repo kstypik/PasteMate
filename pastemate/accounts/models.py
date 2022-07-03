@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from pastes import choices
+from pastemate.pastes import choices
 
 
 class User(AbstractUser):

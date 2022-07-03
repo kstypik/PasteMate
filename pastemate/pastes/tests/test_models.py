@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.utils import timezone
 from django.utils.text import slugify
 
-from accounts.models import User
-from pastes.models import Folder, Paste, Report
+from pastemate.accounts.models import User
+from pastemate.pastes.models import Folder, Paste, Report
 
 
 class PasteModelTest(TestCase):

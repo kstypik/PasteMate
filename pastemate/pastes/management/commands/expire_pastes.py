@@ -3,7 +3,7 @@ from django.db.models import F
 from django.db.models.functions import Now
 from django.db.models.lookups import GreaterThanOrEqual
 
-from pastes.models import Paste
+from pastemate.pastes.models import Paste
 
 
 class Command(BaseCommand):
