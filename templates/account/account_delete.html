@@ -4,6 +4,8 @@
 {% block title %}Delete Your Account {{ block.super }}{% endblock %}
 
 {% block content %}
+{% include "account/_nav.html" with active="delete" %}
+
 <h2>Delete Your Account</h2>
 
 <div class="alert alert-danger" role="alert">

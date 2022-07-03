@@ -3,6 +3,8 @@
 {% block title %}Change Avatar {{ block.super }}{% endblock %}
 
 {% block content %}
+{% include "account/_nav.html" with active="profile" %}
+
 <h2>Change Avatar</h2>
 <form method="post" action="{% url 'accounts:avatar' %}" enctype="multipart/form-data">
   {% csrf_token %}

@@ -4,6 +4,8 @@
 {% block title %}Edit Profile {{ block.super }}{% endblock %}
 
 {% block content %}
+{% include "account/_nav.html" with active="profile" %}
+
 <h2>Edit Profile</h2>
 <form method="post">
   {% csrf_token %}
@@ -17,7 +19,6 @@
 
   <div class="d-flex justify-content-between">
     <button class="btn btn-primary" type="submit">Edit profile</button>
-    <a href="{% url 'accounts:delete' %}" class="btn btn-danger">Delete account</a>
   </div>
 </form>
 {% endblock content %}

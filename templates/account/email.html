@@ -5,7 +5,9 @@
 {% block title %}E-mail Addresses{% endblock title %}
 
 {% block content %}
-    <h1>E-mail Addresses</h1>
+{% include "account/_nav.html" with active="email" %}
+
+<h1>E-mail Addresses</h1>
 {% if user.emailaddress_set.all %}
 <p>The following e-mail addresses are associated with your account:</p>
 
