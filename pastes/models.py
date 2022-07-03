@@ -25,7 +25,7 @@ class ActiveManager(models.Manager):
         return super().get_queryset().filter(is_active=True)
 
 
-class PublishedManager(ActiveManager):
+class PublicManager(ActiveManager):
     def get_queryset(self):
         return super().get_queryset().filter(exposure=Paste.Exposure.PUBLIC)
 
@@ -91,7 +91,7 @@ class Paste(TimeStampedModel):
     is_active = models.BooleanField(default=True)
 
     objects = ActiveManager()
-    published = PublishedManager()
+    public = PublicManager()
 
     class Meta:
         ordering = ["-created"]

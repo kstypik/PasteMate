@@ -226,9 +226,7 @@ class UserStatsMixin:
         if show_stats:
             context["stats"] = {
                 "total_pastes": Paste.objects.filter(author=self.request.user).count(),
-                "public_pastes": Paste.published.filter(
-                    author=self.request.user
-                ).count(),
+                "public_pastes": Paste.public.filter(author=self.request.user).count(),
                 "unlisted_pastes": Paste.objects.filter(
                     author=self.request.user, exposure=Paste.Exposure.UNLISTED
                 ).count(),
@@ -249,7 +247,7 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
         self.user = get_object_or_404(User, username=self.kwargs["username"])
 
         if self.request.user != self.user or self.display_as_guest():
-            return Paste.published.filter(author=self.user)
+            return Paste.public.filter(author=self.user)
         return Paste.objects.filter(author=self.user, folder=None)
 
     def get_context_data(self, **kwargs):
@@ -355,8 +353,8 @@ class PasteArchiveListView(ListView):
     def get_queryset(self):
         self.syntax = self.kwargs.get("syntax")
         if self.syntax:
-            return Paste.published.filter(syntax=self.syntax)
-        return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
+            return Paste.public.filter(syntax=self.syntax)
+        return Paste.public.all()[: settings.PASTES_ARCHIVE_LENGTH]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -432,7 +430,7 @@ class SyntaxLanguagesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["languages"] = (
-            Paste.published.exclude(syntax="text")
+            Paste.public.exclude(syntax="text")
             .order_by("syntax")
             .distinct()
             .values("syntax")

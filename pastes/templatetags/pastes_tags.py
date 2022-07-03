@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.inclusion_tag("pastes/sidebar/public_pastes.html")
 def show_public_pastes(count=8):
-    public_pastes = Paste.published.all()[:count]
+    public_pastes = Paste.public.all()[:count]
     return {"public_pastes": public_pastes}
 
 
