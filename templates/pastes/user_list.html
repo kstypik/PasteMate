@@ -59,6 +59,12 @@
 </div>
 {% endif %}
 
+{% if as_guest %}
+<div class="alert alert-info mt-3">
+  This is what other people see on your list. To go back, please <a href="{% url 'pastes:user_pastes' user %}">click here</a>.
+</div>
+{% endif %}
+
 {% if pastes or folders %}
   {% if user == author and not as_guest %}
     {% include "_includes/pastes_search.html" %}
