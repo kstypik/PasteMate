@@ -6,7 +6,7 @@
 
 {% block content %}
 <h2>{{ action_type }}{% if paste %} {{ paste.title }}{% endif %}</h2>
-<form method="post">
+<form method="post" class="mb-5">
   {% csrf_token %}
   <div id="editorTarget"></div>
   {{ form|crispy }}
