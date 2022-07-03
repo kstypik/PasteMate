@@ -132,3 +132,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .btn-like-a:hover {
     color: #0e52c1;
 }
+
+.invalid-feedback {
+    position: static;
+}

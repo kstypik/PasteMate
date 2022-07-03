@@ -8,7 +8,6 @@
 <h2>{{ action_type }}{% if paste %} {{ paste.title }}{% endif %}</h2>
 <form method="post" class="mb-5">
   {% csrf_token %}
-  <div id="editorTarget"></div>
   {{ form|crispy }}
   <button class="btn btn-success mt-2" type="submit" id="submit-paste">{{ action_type }}</button>
 </form>
@@ -68,6 +67,11 @@ burnCheckbox.addEventListener("click", () => {
     exposureSelect.value = "UN";
   }
 });
+
+const editorTarget = document.createElement("div");
+editorTarget.id = "editorTarget";
+const contentDiv = document.querySelector("#div_id_content")
+contentDiv.insertAdjacentElement("beforebegin", editorTarget);
 
 const pastePasswordField = document.querySelector("#id_password");
 pastePasswordField.setAttribute("disabled", true);
