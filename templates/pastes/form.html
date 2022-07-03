@@ -46,6 +46,8 @@ function randomstring(L) {
   newFolderDiv.classList.add("d-none");
 
   const chooseFolderSelect = document.querySelector("#div_id_folder .select2");
+  const newFolderField = document.querySelector("#id_new_folder");
+  console.log(newFolderField);
   const newFolderBtn = document.createElement("button");
   newFolderBtn.title = "Add New Folder";
   newFolderBtn.classList.add("btn", "btn-light");
@@ -56,6 +58,7 @@ function randomstring(L) {
   selectionSpan.classList.add("flex-grow-1", "ms-1");
   newFolderBtn.addEventListener("click", (event) => {
     event.preventDefault();
+    newFolderField.value = "";
     newFolderDiv.classList.toggle("d-none");
   })
 {% endif %}
