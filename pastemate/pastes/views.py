@@ -36,22 +36,6 @@ class AuthenticatedUserInFormKwargsMixin:
         return kwargs
 
 
-class PasteNonPrivateOrUserIsAuthorMixin:
-    def get_object(self):
-        object = super().get_object()
-        if object.is_private and not object.is_author(self.request.user):
-            raise Http404
-        return object
-
-
-class NormallyAccessiblePasteMixin(PasteNonPrivateOrUserIsAuthorMixin):
-    def get_object(self):
-        object = super().get_object()
-        if not object.is_normally_accessible:
-            raise Http404
-        return object
-
-
 class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
     model = Paste
     form_class = PasteForm
@@ -69,7 +53,28 @@ class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
         return super().form_valid(form)
 
 
-class PasteCloneView(LoginRequiredMixin, NormallyAccessiblePasteMixin, PasteCreateView):
+class NonPrivatePasteOrUserIsAuthorMixin:
+    def get_object(self):
+        object = super().get_object()
+        if object.is_private and not object.is_author(self.request.user):
+            raise Http404
+        return object
+
+
+class NormallyAccessiblePasteMixin:
+    def get_object(self):
+        object = super().get_object()
+        if not object.is_normally_accessible:
+            raise Http404
+        return object
+
+
+class PasteCloneView(
+    LoginRequiredMixin,
+    NonPrivatePasteOrUserIsAuthorMixin,
+    NormallyAccessiblePasteMixin,
+    PasteCreateView,
+):
     extra_context = {
         "action_type": "Clone Paste",
     }
@@ -95,7 +100,7 @@ class PasteInstanceMixin:
 
 
 class PasteDetailView(
-    PasteInstanceMixin, PasteNonPrivateOrUserIsAuthorMixin, HitCountDetailView
+    PasteInstanceMixin, NonPrivatePasteOrUserIsAuthorMixin, HitCountDetailView
 ):
     template_name = "pastes/detail.html"
     count_hit = True
@@ -123,7 +128,11 @@ class PasteDetailView(
 
 
 class RawPasteDetailView(
-    PasteInstanceMixin, NormallyAccessiblePasteMixin, SingleObjectMixin, View
+    PasteInstanceMixin,
+    NonPrivatePasteOrUserIsAuthorMixin,
+    NormallyAccessiblePasteMixin,
+    SingleObjectMixin,
+    View,
 ):
     def get(self, request, *args, **kwargs):
         object = self.get_object()
@@ -131,7 +140,11 @@ class RawPasteDetailView(
 
 
 class DownloadPasteView(
-    PasteInstanceMixin, NormallyAccessiblePasteMixin, SingleObjectMixin, View
+    PasteInstanceMixin,
+    NonPrivatePasteOrUserIsAuthorMixin,
+    NormallyAccessiblePasteMixin,
+    SingleObjectMixin,
+    View,
 ):
     def get(self, request, *args, **kwargs):
         object = self.get_object()
@@ -143,7 +156,7 @@ class DownloadPasteView(
 
 
 class PasteDetailWithPasswordView(
-    PasteInstanceMixin, PasteNonPrivateOrUserIsAuthorMixin, DetailView
+    PasteInstanceMixin, NonPrivatePasteOrUserIsAuthorMixin, DetailView
 ):
     template_name = "pastes/detail.html"
 
@@ -247,9 +260,15 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
             return Paste.public.filter(author=self.user)
         return Paste.objects.filter(author=self.user, folder=None)
 
+    def should_show_stats(self):
+        if self.request.user == self.user:
+            return True
+        return False
+
     def get_context_data(self, **kwargs):
-        show_stats = True if self.request.user == self.user else False
-        context = super().get_context_data(show_stats=show_stats, **kwargs)
+        context = super().get_context_data(
+            show_stats=self.should_show_stats(), **kwargs
+        )
         context["author"] = self.user
 
         hit_count = HitCount.objects.get_for_object(self.user)
@@ -335,7 +354,7 @@ class UserFolderDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = "Folder has been deleted."
 
     def get_queryset(self):
-        return Folder.objects.filter(created_by=self.request.user)
+        return self.request.user.folders.all()
 
     def get_success_url(self):
         return reverse(
@@ -362,12 +381,17 @@ class PasteArchiveListView(ListView):
         return context
 
 
-class EmbedPasteView(PasteInstanceMixin, NormallyAccessiblePasteMixin, DetailView):
+class EmbedPasteView(
+    PasteInstanceMixin,
+    NonPrivatePasteOrUserIsAuthorMixin,
+    NormallyAccessiblePasteMixin,
+    DetailView,
+):
     template_name = "pastes/embed.html"
 
     def get_object(self, queryset=None):
         obj = super().get_object()
-        if obj.exposure == Paste.Exposure.PRIVATE:
+        if obj.is_private:
             raise Http404
         return obj
 
@@ -381,6 +405,7 @@ class EmbedPasteView(PasteInstanceMixin, NormallyAccessiblePasteMixin, DetailVie
 
 class PrintPasteView(
     PasteInstanceMixin,
+    NonPrivatePasteOrUserIsAuthorMixin,
     NormallyAccessiblePasteMixin,
     TemplateResponseMixin,
     SingleObjectMixin,
@@ -403,10 +428,9 @@ class ReportPasteView(SuccessMessageMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.paste_object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
         if (
-            self.paste_object.password
-            or self.paste_object.burn_after_read
-            or self.paste_object.author == request.user
-            or self.paste_object.exposure == Paste.Exposure.PRIVATE
+            not self.paste_object.is_normally_accessible
+            or self.paste_object.is_author(request.user)
+            or self.paste_object.is_private
         ):
             raise Http404
         return super().dispatch(request, *args, **kwargs)
