@@ -490,6 +490,7 @@ def get_all_languages():
         ("terminfo", "Terminfo"),
         ("terraform", "Terraform"),
         ("tex", "TeX"),
+        ("text", "Text"),
         ("ti", "ThingsDB"),
         ("thrift", "Thrift"),
         ("tid", "tiddler"),
@@ -550,11 +551,10 @@ def get_all_languages():
 
 
 SYNTAX_HIGHLITHING_CHOICES = (
-    ("text", "Text only"),
+    ("text", "Text"),
     (
         "Popular languages",
         (
-            ("bash", "Bash"),
             ("c", "C"),
             ("csharp", "C#"),
             ("cpp", "C++"),
@@ -563,12 +563,11 @@ SYNTAX_HIGHLITHING_CHOICES = (
             ("json", "JSON"),
             ("java", "Java"),
             ("javascript", "JavaScript"),
-            ("lua", "Lua"),
             ("markdown", "Markdown"),
-            ("objective-c", "Objective C"),
             ("php", "PHP"),
             ("python", "Python"),
-            ("ruby", "Ruby"),
+            ("rust", "Rust"),
+            ("xml", "XML"),
         ),
     ),
     ("All languages", get_all_languages()),

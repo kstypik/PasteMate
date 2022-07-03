@@ -8,15 +8,21 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  TemplateView, UpdateView, View)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+    View,
+)
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
 from hitcount.models import HitCount
 from hitcount.views import HitCountDetailView, HitCountMixin
 
-from .forms import (FolderForm, PasswordProtectedPasteForm, PasteForm,
-                    ReportForm)
+from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
 from .models import Folder, Paste, Report
 
 User = get_user_model()
@@ -347,14 +353,14 @@ class PasteArchiveListView(ListView):
     template_name = "pastes/archive.html"
 
     def get_queryset(self):
-        self.syntax = Paste.get_full_language_name(self.kwargs.get("syntax"))
+        self.syntax = self.kwargs.get("syntax")
         if self.syntax:
-            return Paste.published.filter(syntax=self.kwargs.get("syntax"))
+            return Paste.published.filter(syntax=self.syntax)
         return Paste.published.all()[: settings.PASTES_ARCHIVE_LENGTH]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["syntax"] = self.syntax
+        context["syntax"] = Paste.get_full_language_name(self.syntax)
         return context
 
 
