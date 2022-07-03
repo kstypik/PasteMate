@@ -93,7 +93,7 @@
       <div class="card-header mb-3 d-flex">
         <div>
           <a href="{% url 'pastes:syntax_archive' paste.syntax %}">
-            <span class="badge bg-info">{{ paste.get_syntax_display }}</span>
+            <span class="badge bg-dark">{{ paste.get_syntax_display }}</span>
           </a>
         </div>
         <div class="mx-2">{{ paste.filesize|tokilobytes }}</div>
