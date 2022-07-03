@@ -3,6 +3,7 @@
 {% block title %}Embed {{ paste.title }} {{ block.super }}{% endblock title %}
 
 {% block content %}
+<a href="{{ paste.get_absolute_url }}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left-long"></i> Go back to paste</a>
 <h2>Embed this paste</h2>
 <p>This is an image version of this paste for easy sharing on other websites.</p>
 
