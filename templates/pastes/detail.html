@@ -8,11 +8,16 @@
 {% endblock title %}
 
 {% block content %}
-{% if burn_after_read and not paste.author == user %}
+{% if paste.burn_after_read %}
   <div class="alert alert-danger">
-    This paste has been marked as Burn After Read by its author. After reading, it will be deleted.
+    <i class="fa-solid fa-fire-flame-curved"></i> This paste has been marked as Burn After Read by 
+    {% if paste.author == user %}
+      you. After someone else reads it, it will be deleted.
+    {% else %}
+      its author. After reading, it will be deleted.
+    {% endif %}
   </div>
-  {% if not password_protected %}
+  {% if not password_protected and not paste.author == user %}
     <form action="{% url 'pastes:detail' paste.uuid %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-warning">Read and delete</button>
@@ -26,10 +31,14 @@
     <form action="{% url 'pastes:detail_with_password' paste.uuid %}" method="post">
       {% csrf_token %}
       {{ password_form|crispy }}
-      <button type="submit" class="btn btn-primary">Unlock the paste</button>
+      {% if not paste.burn_after_read %}
+        <button type="submit" class="btn btn-primary">Unlock the paste</button>
+      {% else %}
+        <button type="submit" class="btn btn-danger">Unlock, read, and delete</button>
+      {% endif %}
     </form>
 {% endif %}
-{% if not burn_after_read and not password_protected or password_correct or paste.author == user %}
+{% if not paste.burn_after_read and not password_protected or password_correct or paste.author == user %}
     <h1>{{ paste.title }}</h1>
     {% with paste.author as author %}
       <div class="d-flex align-items-center">
@@ -90,7 +99,7 @@
         <div class="mx-2">{{ paste.filesize|tokilobytes }}</div>
         <div class="ms-auto">
           <a href="#" class="toolbar-copy"><span class="badge bg-primary">copy</span></a>
-          {% if not paste.password or paste.burn_after_read %}
+          {% if not paste.password or not paste.burn_after_read %}
             <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-primary">raw</span></a>
             <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-primary">download</span></a>
             {% if user.is_authenticated %}
