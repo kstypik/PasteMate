@@ -12,13 +12,11 @@
   {{ form|crispy }}
 
   <p class="form-label">Avatar</p>
-  <div class="">
+  <div>
     <img src="{{ user.avatar.url }}" style="width: 143px;">
   </div>
-  <a href="{% url 'accounts:avatar' %}" class="btn btn-secondary mb-5" style="border-radius: 0;">Change avatar</a>
+  <a href="{% url 'accounts:avatar' %}" class="btn btn-secondary" style="border-radius: 0;">Change avatar</a>
 
-  <div class="d-flex justify-content-between">
-    <button class="btn btn-primary" type="submit">Edit profile</button>
-  </div>
+  <button class="btn btn-primary btn-block mt-5" type="submit">Edit profile</button>
 </form>
 {% endblock content %}
