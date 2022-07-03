@@ -13,9 +13,11 @@
       <i class="fa-solid fa-calendar me-1" title="User joined"></i> 
       <span title="{{ author.date_joined }}" class="to-relative-datetime">{{ author.date_joined|date:"c" }}</span>
     </span>
-    <span class="me-2">
-      <i class="fa-solid fa-eye me-1" title="Unique visits of this profile"></i> {{ total_hits }}
-    </span>
+    {% if not folder %}
+      <span class="me-2">
+        <i class="fa-solid fa-eye me-1" title="Unique visits of this profile"></i> {{ total_hits }}
+      </span>
+    {% endif %}
     {% if author.location %}
       <span class="me-2">
         <i class="fa-solid fa-location-dot me-1" title="User's location"></i> {{ author.location }}
