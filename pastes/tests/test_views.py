@@ -607,7 +607,7 @@ class UserPasteListViewTest(TestCase):
         response = self.client.get(self.first_user_userlist)
 
         expiration_date = formats.date_format(self.expiring_paste.expiration_date, "c")
-        html = f'<span class="to-relative-datetime text-capitalize">{expiration_date}</span>'
+        html = f'<span class="to-relative-datetime">{expiration_date}</span>'
         self.assertInHTML(html, response.content.decode("utf-8"))
 
     def test_displays_authors_location_when_set(self):
@@ -1088,7 +1088,7 @@ class BackupUserPastesView(TestCase):
         self.client.force_login(user)
         Paste.objects.create(content="Hi", author=user)
 
-        response = self.client.get(BACKUP_URL)
+        response = self.client.post(BACKUP_URL)
 
         self.assertEqual(
             response.headers["Content-Disposition"],
