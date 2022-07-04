@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.hashers import check_password
 from hcaptcha_field import hCaptchaField
 
 from .models import Folder, Paste, Report
@@ -127,7 +128,7 @@ class PasswordProtectedPasteForm(forms.Form):
 
     def clean_password(self):
         password = self.cleaned_data["password"]
-        if password != self.correct_password:
+        if not check_password(password, encoded=self.correct_password):
             raise forms.ValidationError("Password incorrect")
         return password
 

@@ -4,6 +4,7 @@ import zipfile
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import models
@@ -80,7 +81,7 @@ class Paste(TimeStampedModel):
     folder = models.ForeignKey(
         "Folder", on_delete=models.CASCADE, related_name="pastes", null=True, blank=True
     )
-    password = models.CharField(max_length=100, blank=True)
+    password = models.CharField(max_length=128, blank=True)
     burn_after_read = models.BooleanField(default=False)
     title = models.CharField(max_length=50, blank=True)
 
@@ -185,6 +186,9 @@ class Paste(TimeStampedModel):
         calculated_expiration = self.calculate_expiration_date()
         if calculated_expiration and not self.expiration_symbol == Paste.NO_CHANGE:
             self.expiration_date = calculated_expiration
+
+        if self.password:
+            self.password = make_password(self.password)
 
         super().save(*args, **kwargs)
 
