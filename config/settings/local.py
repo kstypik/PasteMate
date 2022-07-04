@@ -1,9 +1,5 @@
-import environ
-
 from .base import *  # noqa
-from .base import BASE_DIR, env
-
-environ.Env.read_env(BASE_DIR / ".env")
+from .base import env
 
 # GENERAL
 # ------------------------------------------------------------------------------
