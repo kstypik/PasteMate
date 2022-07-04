@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.forms import BooleanField
 from django.test import TestCase
 from hcaptcha_field import hCaptchaField
@@ -192,8 +193,9 @@ class PasswordProtectedPasteFormTest(TestCase):
         self.assertEqual(form.errors["password"], ["Password incorrect"])
 
     def test_validates_when_passwords_match(self):
+        correct_password = make_password("good")
         form = forms.PasswordProtectedPasteForm(
-            data={"password": "good"}, correct_password="good"
+            data={"password": "good"}, correct_password=correct_password
         )
 
         self.assertTrue(form.is_valid())
