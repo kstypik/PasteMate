@@ -287,6 +287,10 @@ class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
             )
 
         context["as_guest"] = self.display_as_guest()
+
+        if self.request.user == self.user:
+            context["page_name"] = "my_pastes"
+
         return context
 
 
@@ -378,6 +382,7 @@ class PasteArchiveListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["syntax"] = Paste.get_full_language_name(self.syntax)
+        context["page_name"] = "archive"
         return context
 
 
@@ -460,6 +465,7 @@ class SyntaxLanguagesView(TemplateView):
             .values("syntax")
             .annotate(used=Count("syntax"))
         )
+        context["page_name"] = "languages"
         return context
 
 
