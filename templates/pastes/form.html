@@ -18,102 +18,98 @@
 
 {% endblock content %}
 
-{% block extra_js %}
-$("#id_syntax").select2({
-  theme: "bootstrap-5",
-  width: "auto",
-});
-
-$("#id_folder").select2({
-  theme: "bootstrap-5",
-  width: "auto",
-});
-
-function randomstring(L) {
-  let s = '';
-  let randomchar = function() {
-    let n = Math.floor(Math.random() * 62);
-    if (n < 10) return n; //1-10
-    if (n < 36) return String.fromCharCode(n + 55); //A-Z
-    return String.fromCharCode(n + 61); //a-z
-  }
-  while (s.length < L) s += randomchar();
-  return s;
-}
-
-{% if user.is_authenticated %}
-  const newFolderDiv = document.querySelector("#div_id_new_folder");
-  newFolderDiv.classList.add("d-none");
-
-  const chooseFolderSelect = document.querySelector("#div_id_folder .select2");
-  const newFolderField = document.querySelector("#id_new_folder");
-  console.log(newFolderField);
-  const newFolderBtn = document.createElement("button");
-  newFolderBtn.title = "Add New Folder";
-  newFolderBtn.classList.add("btn", "btn-light");
-  newFolderBtn.innerHTML = "+";
-  chooseFolderSelect.prepend(newFolderBtn);
-  chooseFolderSelect.classList.add("d-flex");
-  const selectionSpan = document.querySelector("#div_id_folder .selection");
-  selectionSpan.classList.add("flex-grow-1", "ms-1");
-  newFolderBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    newFolderField.value = "";
-    newFolderDiv.classList.toggle("d-none");
-  })
-{% endif %}
-
-const exposureSelect = document.querySelector("#id_exposure");
-const burnCheckbox = document.querySelector("#id_burn_after_read");
-burnCheckbox.addEventListener("click", () => {
-  if (burnCheckbox.checked && exposureSelect.selectedOptions[0].value == "PU") {
-    exposureSelect.value = "UN";
-  }
-});
-
-const editorTarget = document.createElement("div");
-editorTarget.id = "editorTarget";
-const contentDiv = document.querySelector("#div_id_content")
-contentDiv.insertAdjacentElement("beforebegin", editorTarget);
-
-const pastePasswordField = document.querySelector("#id_password");
-pastePasswordField.setAttribute("disabled", true);
-pastePasswordField.value = "";
-
-const enablePasswordDiv = document.createElement("div");
-enablePasswordDiv.classList.add("form-check");
-enablePasswordDiv.classList.add("mb-2");
-
-const enablePasswordCheckbox = document.createElement("input");
-enablePasswordCheckbox.setAttribute("type", 'checkbox');
-enablePasswordCheckbox.setAttribute("value", 'checkbox');
-enablePasswordCheckbox.setAttribute("id", 'enablePassword');
-enablePasswordCheckbox.classList.add("form-check-input");
-
-const enablePasswordLabel = document.createElement("label");
-enablePasswordLabel.innerHTML = "Enable";
-enablePasswordLabel.setAttribute("for", "enablePassword");
-enablePasswordCheckbox.classList.add("form-check-label");
-
-enablePasswordDiv.appendChild(enablePasswordCheckbox);
-enablePasswordDiv.appendChild(enablePasswordLabel);
-
-pastePasswordField.insertAdjacentElement("beforebegin", enablePasswordDiv);
-
-enablePasswordCheckbox.addEventListener("change", () => {
-  if (enablePasswordCheckbox.checked) {
-    pastePasswordField.removeAttribute("disabled");
-    console.log(pastePasswordField)
-    pastePasswordField.value = randomstring(10);
-  } else {
-    pastePasswordField.setAttribute("disabled", true);
-    pastePasswordField.value = "";
-  }
-})
-
-
-{% endblock extra_js %}
-
 {% block extra_js_tags %}
+<script type="text/javascript">
+  $("#id_syntax").select2({
+    theme: "bootstrap-5",
+    width: "auto",
+  });
+
+  $("#id_folder").select2({
+    theme: "bootstrap-5",
+    width: "auto",
+  });
+
+  function randomstring(L) {
+    let s = '';
+    let randomchar = function() {
+      let n = Math.floor(Math.random() * 62);
+      if (n < 10) return n; //1-10
+      if (n < 36) return String.fromCharCode(n + 55); //A-Z
+      return String.fromCharCode(n + 61); //a-z
+    }
+    while (s.length < L) s += randomchar();
+    return s;
+  }
+
+  {% if user.is_authenticated %}
+    const newFolderDiv = document.querySelector("#div_id_new_folder");
+    newFolderDiv.classList.add("d-none");
+
+    const chooseFolderSelect = document.querySelector("#div_id_folder .select2");
+    const newFolderField = document.querySelector("#id_new_folder");
+    const newFolderBtn = document.createElement("button");
+    newFolderBtn.title = "Add New Folder";
+    newFolderBtn.classList.add("btn", "btn-light");
+    newFolderBtn.innerHTML = "+";
+    chooseFolderSelect.prepend(newFolderBtn);
+    chooseFolderSelect.classList.add("d-flex");
+    const selectionSpan = document.querySelector("#div_id_folder .selection");
+    selectionSpan.classList.add("flex-grow-1", "ms-1");
+    newFolderBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      newFolderField.value = "";
+      newFolderDiv.classList.toggle("d-none");
+    })
+  {% endif %}
+
+  const exposureSelect = document.querySelector("#id_exposure");
+  const burnCheckbox = document.querySelector("#id_burn_after_read");
+  burnCheckbox.addEventListener("click", () => {
+    if (burnCheckbox.checked && exposureSelect.selectedOptions[0].value == "PU") {
+      exposureSelect.value = "UN";
+    }
+  });
+
+  const editorTarget = document.createElement("div");
+  editorTarget.id = "editorTarget";
+  const contentDiv = document.querySelector("#div_id_content")
+  contentDiv.insertAdjacentElement("beforebegin", editorTarget);
+
+  const pastePasswordField = document.querySelector("#id_password");
+  pastePasswordField.setAttribute("disabled", true);
+  pastePasswordField.value = "";
+
+  const enablePasswordDiv = document.createElement("div");
+  enablePasswordDiv.classList.add("form-check");
+  enablePasswordDiv.classList.add("mb-2");
+
+  const enablePasswordCheckbox = document.createElement("input");
+  enablePasswordCheckbox.setAttribute("type", 'checkbox');
+  enablePasswordCheckbox.setAttribute("value", 'checkbox');
+  enablePasswordCheckbox.setAttribute("id", 'enablePassword');
+  enablePasswordCheckbox.classList.add("form-check-input");
+
+  const enablePasswordLabel = document.createElement("label");
+  enablePasswordLabel.innerHTML = "Enable";
+  enablePasswordLabel.setAttribute("for", "enablePassword");
+  enablePasswordCheckbox.classList.add("form-check-label");
+
+  enablePasswordDiv.appendChild(enablePasswordCheckbox);
+  enablePasswordDiv.appendChild(enablePasswordLabel);
+
+  pastePasswordField.insertAdjacentElement("beforebegin", enablePasswordDiv);
+
+  enablePasswordCheckbox.addEventListener("change", () => {
+    if (enablePasswordCheckbox.checked) {
+      pastePasswordField.removeAttribute("disabled");
+      pastePasswordField.value = randomstring(10);
+    } else {
+      pastePasswordField.setAttribute("disabled", true);
+      pastePasswordField.value = "";
+    }
+  })
+</script>
+
 <script src="{% static 'js/editor.bundle.js' %}"></script>
 {% endblock extra_js_tags %}

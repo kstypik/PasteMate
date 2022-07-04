@@ -12,8 +12,10 @@
 </form>
 {% endblock content %}
 
-{% block extra_js %}
-$("#id_default_syntax").select2({
-  theme: "bootstrap-5",
-});
-{% endblock extra_js %}
+{% block extra_js_tags %}
+<script type="text/javascript">
+  $("#id_default_syntax").select2({
+    theme: "bootstrap-5",
+  });
+</script>
+{% endblock extra_js_tags %}
