@@ -74,7 +74,6 @@ class PasteCreateViewTest(TestCase):
             "content": "Hello World!",
             "syntax": "text",
             "exposure": "PU",
-            "h-captcha-response": "valid",
         }
         self.client.post(PASTE_CREATE_URL, data=data)
         paste = Paste.objects.first()
