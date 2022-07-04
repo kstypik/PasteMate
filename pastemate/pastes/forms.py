@@ -59,6 +59,14 @@ class PasteForm(forms.ModelForm):
 
         if passed_instance:
             self.initial.update({"expiration_symbol": "PRE"})
+
+            if kwargs.get("data"):
+                if kwargs["data"].get("enablePassword") and not kwargs["data"].get(
+                    "password"
+                ):
+                    del self.fields["password"]
+                else:
+                    self.instance.password = ""
         else:
             self.fields["expiration_symbol"].choices = filter(
                 lambda option: option[0] != Paste.NO_CHANGE,

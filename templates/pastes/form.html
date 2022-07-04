@@ -91,7 +91,12 @@
   enablePasswordCheckbox.setAttribute("type", 'checkbox');
   enablePasswordCheckbox.setAttribute("value", 'checkbox');
   enablePasswordCheckbox.setAttribute("id", 'enablePassword');
+  enablePasswordCheckbox.setAttribute("name", 'enablePassword');
   enablePasswordCheckbox.classList.add("form-check-input");
+  {% if form.instance.password %}
+    enablePasswordCheckbox.checked = true;
+    pastePasswordField.removeAttribute("disabled");
+  {% endif %}
 
   const enablePasswordLabel = document.createElement("label");
   enablePasswordLabel.innerHTML = "Enable";
