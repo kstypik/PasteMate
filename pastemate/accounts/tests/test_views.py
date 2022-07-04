@@ -177,7 +177,7 @@ class PreferencesUpdateViewTest(TestCase):
     def test_success_url(self):
         data = {
             "default_syntax": "python",
-            "default_expiration_interval_symbol": "10M",
+            "default_expiration_symbol": "10M",
             "default_exposure": "PR",
         }
         response = self.client.post(PREFERENCES_UPDATE_URL, data=data)
@@ -187,14 +187,12 @@ class PreferencesUpdateViewTest(TestCase):
     def test_can_update_preferences(self):
         data = {
             "default_syntax": "python",
-            "default_expiration_interval_symbol": "10M",
+            "default_expiration_symbol": "10M",
             "default_exposure": "PR",
         }
         self.client.post(PREFERENCES_UPDATE_URL, data=data)
         self.user.refresh_from_db()
 
         self.assertEqual(self.user.preferences.default_syntax, "python")
-        self.assertEqual(
-            self.user.preferences.default_expiration_interval_symbol, "10M"
-        )
+        self.assertEqual(self.user.preferences.default_expiration_symbol, "10M")
         self.assertEqual(self.user.preferences.default_exposure, "PR")

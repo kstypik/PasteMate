@@ -67,7 +67,7 @@ class Paste(TimeStampedModel):
     syntax = models.CharField(
         max_length=50, choices=choices.SYNTAX_HIGHLITHING_CHOICES, default="text"
     )
-    expiration_interval_symbol = models.CharField(
+    expiration_symbol = models.CharField(
         verbose_name="Paste Expiration",
         max_length=3,
         blank=True,
@@ -163,9 +163,9 @@ class Paste(TimeStampedModel):
             Paste.ONE_YEAR: timedelta(days=365),
         }
 
-        if self.expiration_interval_symbol not in to_interval_mapping:
+        if self.expiration_symbol not in to_interval_mapping:
             return None
-        return timezone.now() + to_interval_mapping[self.expiration_interval_symbol]
+        return timezone.now() + to_interval_mapping[self.expiration_symbol]
 
     @staticmethod
     def get_full_language_name(value):
@@ -183,10 +183,7 @@ class Paste(TimeStampedModel):
         self.filesize = self.calculate_filesize()
 
         calculated_expiration = self.calculate_expiration_date()
-        if (
-            calculated_expiration
-            and not self.expiration_interval_symbol == Paste.NO_CHANGE
-        ):
+        if calculated_expiration and not self.expiration_symbol == Paste.NO_CHANGE:
             self.expiration_date = calculated_expiration
 
         super().save(*args, **kwargs)

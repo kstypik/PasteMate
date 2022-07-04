@@ -111,39 +111,39 @@ class PasteModelTest(TestCase):
     def test_calculate_expiration_date(self, mock_timezone_now):
         paste_never_expiring = Paste.objects.create(
             content="I should never expire",
-            expiration_interval_symbol=Paste.NEVER,
+            expiration_symbol=Paste.NEVER,
         )
         paste_expiring_in_10_minutes = Paste.objects.create(
             content="I will expire in 10 minutes",
-            expiration_interval_symbol=Paste.TEN_MINUTES,
+            expiration_symbol=Paste.TEN_MINUTES,
         )
         paste_expiring_in_1_hour = Paste.objects.create(
             content="I will expire in 1 hour",
-            expiration_interval_symbol=Paste.ONE_HOUR,
+            expiration_symbol=Paste.ONE_HOUR,
         )
         paste_expiring_in_1_day = Paste.objects.create(
             content="I will expire in 1 day",
-            expiration_interval_symbol=Paste.ONE_DAY,
+            expiration_symbol=Paste.ONE_DAY,
         )
         paste_expiring_in_1_week = Paste.objects.create(
             content="I will expire in 1 week",
-            expiration_interval_symbol=Paste.ONE_WEEK,
+            expiration_symbol=Paste.ONE_WEEK,
         )
         paste_expiring_in_2_weeks = Paste.objects.create(
             content="I will expire in 2 weeks",
-            expiration_interval_symbol=Paste.TWO_WEEKS,
+            expiration_symbol=Paste.TWO_WEEKS,
         )
         paste_expiring_in_1_month = Paste.objects.create(
             content="I will expire in 1 month",
-            expiration_interval_symbol=Paste.ONE_MONTH,
+            expiration_symbol=Paste.ONE_MONTH,
         )
         paste_expiring_in_6_months = Paste.objects.create(
             content="I will expire in 6 months",
-            expiration_interval_symbol=Paste.SIX_MONTHS,
+            expiration_symbol=Paste.SIX_MONTHS,
         )
         paste_expiring_in_1_year = Paste.objects.create(
             content="I will expire in 1 year",
-            expiration_interval_symbol=Paste.ONE_YEAR,
+            expiration_symbol=Paste.ONE_YEAR,
         )
 
         self.assertIsNone(paste_never_expiring.calculate_expiration_date())

@@ -44,6 +44,6 @@ class PreferencesForm(forms.ModelForm):
         model = Preferences
         fields = [
             "default_syntax",
-            "default_expiration_interval_symbol",
+            "default_expiration_symbol",
             "default_exposure",
         ]

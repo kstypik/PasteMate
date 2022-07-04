@@ -171,7 +171,7 @@ class PasteDetailViewTest(TestCase):
         self.paste = Paste.objects.create(
             content="Hello World",
             author=self.paste_author,
-            expiration_interval_symbol=Paste.TEN_MINUTES,
+            expiration_symbol=Paste.TEN_MINUTES,
         )
         self.paste_url = self.paste.get_absolute_url()
 
@@ -520,7 +520,7 @@ class UserPasteListViewTest(TestCase):
         self.expiring_paste = Paste.objects.create(
             content="Expires",
             author=self.first_user,
-            expiration_interval_symbol=Paste.TEN_MINUTES,
+            expiration_symbol=Paste.TEN_MINUTES,
         )
 
         self.folder1 = Folder.objects.create(name="folder1", created_by=self.first_user)

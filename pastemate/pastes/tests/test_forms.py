@@ -17,28 +17,28 @@ class PasteFormTest(TestCase):
         self.paste = Paste.objects.create(
             content="Hello",
             syntax="html",
-            expiration_interval_symbol=Paste.NEVER,
+            expiration_symbol=Paste.NEVER,
             exposure=Paste.Exposure.PRIVATE,
         )
 
     def test_form_respects_preferences_of_logged_users(self):
         self.user.preferences.default_syntax = "python"
-        self.user.preferences.default_expiration_interval_symbol = "10M"
+        self.user.preferences.default_expiration_symbol = "10M"
         self.user.preferences.default_exposure = "PR"
         form = forms.PasteForm(user=self.user, initial={})
 
         self.assertEqual(form.initial["syntax"], "python")
-        self.assertEqual(form.initial["expiration_interval_symbol"], "10M")
+        self.assertEqual(form.initial["expiration_symbol"], "10M")
         self.assertEqual(form.initial["exposure"], "PR")
 
     def test_preferences_do_not_override_data_on_update(self):
         self.user.preferences.default_syntax = "python"
-        self.user.preferences.default_expiration_interval_symbol = "10M"
+        self.user.preferences.default_expiration_symbol = "10M"
         self.user.preferences.default_exposure = "PR"
         form = forms.PasteForm(user=self.user, initial={}, instance=self.paste)
 
         self.assertEqual(form.initial["syntax"], "html")
-        self.assertEqual(form.initial["expiration_interval_symbol"], Paste.NO_CHANGE)
+        self.assertEqual(form.initial["expiration_symbol"], Paste.NO_CHANGE)
         self.assertEqual(form.initial["exposure"], Paste.Exposure.PRIVATE)
 
     def test_form_no_change_of_syntax_when_in_initial(self):
@@ -90,7 +90,7 @@ class PasteFormTest(TestCase):
         form = forms.PasteForm(user=self.user, initial={})
 
         self.assertNotIn(
-            ("PRE", "Don't Change"), form.fields["expiration_interval_symbol"].choices
+            ("PRE", "Don't Change"), form.fields["expiration_symbol"].choices
         )
 
     def test_form_raises_error_when_paste_set_as_private_and_anonymous(self):
@@ -110,14 +110,14 @@ class PasteFormTest(TestCase):
             data={
                 "content": "Hello",
                 "syntax": "python",
-                "expiration_interval_symbol": Paste.NO_CHANGE,
+                "expiration_symbol": Paste.NO_CHANGE,
             },
             initial={},
         )
 
         form.is_valid()
 
-        self.assertIsNone(form.cleaned_data.get("expiration_interval_symbol"))
+        self.assertIsNone(form.cleaned_data.get("expiration_symbol"))
 
     def test_folder_is_set_correctly_when_already_exists(self):
         Folder.objects.create(name="test", created_by=self.user)
@@ -127,7 +127,7 @@ class PasteFormTest(TestCase):
                 "content": "Hello World",
                 "syntax": "python",
                 "exposure": Paste.Exposure.PUBLIC,
-                "expiration_interval_symbol": Paste.NEVER,
+                "expiration_symbol": Paste.NEVER,
                 "new_folder": "test",
             },
             initial={},
@@ -146,7 +146,7 @@ class PasteFormTest(TestCase):
                 "content": "Hello World",
                 "syntax": "python",
                 "exposure": Paste.Exposure.PUBLIC,
-                "expiration_interval_symbol": Paste.NEVER,
+                "expiration_symbol": Paste.NEVER,
                 "new_folder": "new",
             },
             initial={},
@@ -168,7 +168,7 @@ class PasteFormTest(TestCase):
                 "content": "Hello World",
                 "syntax": "python",
                 "exposure": Paste.Exposure.PUBLIC,
-                "expiration_interval_symbol": Paste.NEVER,
+                "expiration_symbol": Paste.NEVER,
                 "new_folder": "should be ignored",
                 "post_anonymously": True,
             },

@@ -62,7 +62,7 @@ class Preferences(models.Model):
         choices=choices.SYNTAX_HIGHLITHING_CHOICES,
         default="text",
     )
-    default_expiration_interval_symbol = models.CharField(
+    default_expiration_symbol = models.CharField(
         verbose_name="Default Expiration",
         max_length=3,
         blank=True,

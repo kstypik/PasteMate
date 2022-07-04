@@ -19,6 +19,7 @@ class PasteForm(forms.ModelForm):
         help_text=POST_ANONYMOUSLY_HELP_TEXT,
         required=False,
     )
+    hcaptcha = hCaptchaField(label="CAPTCHA")
 
     class Meta:
         model = Paste
@@ -26,55 +27,65 @@ class PasteForm(forms.ModelForm):
             "content",
             "syntax",
             "exposure",
-            "expiration_interval_symbol",
+            "expiration_symbol",
             "folder",
             "new_folder",
             "password",
             "burn_after_read",
             "title",
+            "post_anonymously",
+            "hcaptcha",
         ]
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        passed_instance = kwargs.get("instance")
+        super().__init__(*args, **kwargs)
 
-        if self.user and not kwargs.get("instance"):
-            kwargs["initial"].update(
+        if self.user and not passed_instance:
+            self.initial.update(
                 {
                     "exposure": self.user.preferences.default_exposure,
-                    "expiration_interval_symbol": self.user.preferences.default_expiration_interval_symbol,
+                    "expiration_symbol": self.user.preferences.default_expiration_symbol,
                 }
             )
-            if not kwargs["initial"].get("syntax"):
-                kwargs["initial"].update(
+            # Don't override syntax when update/clone
+            if not self.initial.get("syntax"):
+                self.initial.update(
                     {
                         "syntax": self.user.preferences.default_syntax,
                     }
                 )
 
-        if kwargs.get("instance"):
-            kwargs["initial"].update({"expiration_interval_symbol": "PRE"})
-        super().__init__(*args, **kwargs)
-        self.fields["folder"].queryset = Folder.objects.filter(created_by=self.user)
-        if not self.user:
+        if passed_instance:
+            self.initial.update({"expiration_symbol": "PRE"})
+        else:
+            self.fields["expiration_symbol"].choices = filter(
+                lambda option: option[0] != Paste.NO_CHANGE,
+                self.fields["expiration_symbol"].choices,
+            )
+
+        if self.user:
+            self.fields["folder"].queryset = self.user.folders.all()
+
+            del self.fields["hcaptcha"]
+        else:
             del self.fields["folder"]
             del self.fields["new_folder"]
-            # drop private option for guests
-            self.fields["exposure"].choices = self.fields["exposure"].choices[:2]
-            self.fields["hcaptcha"] = hCaptchaField(label="hCaptcha")
-            self
-        if kwargs.get("instance") or not self.user:
-            del self.fields["post_anonymously"]
 
-        if not kwargs.get("instance"):
-            self.fields["expiration_interval_symbol"].choices = self.fields[
-                "expiration_interval_symbol"
-            ].choices[1:]
+            self.fields["exposure"].choices = filter(
+                lambda option: option[0] != Paste.Exposure.PRIVATE,
+                self.fields["exposure"].choices,
+            )
+
+        if passed_instance or not self.user:
+            del self.fields["post_anonymously"]
 
     def clean(self):
         cleaned_data = super().clean()
         if (
             cleaned_data.get("post_anonymously")
-            and cleaned_data.get("exposure") == "PR"
+            and cleaned_data.get("exposure") == Paste.Exposure.PRIVATE
         ):
             raise forms.ValidationError("You can't create private paste as Anonymous.")
 
@@ -82,8 +93,10 @@ class PasteForm(forms.ModelForm):
 
     def save(self, commit=True):
         paste = super().save(commit=False)
+
         new_folder = self.cleaned_data.get("new_folder")
         post_anonymously = self.cleaned_data.get("post_anonymously")
+
         if not post_anonymously and self.user and new_folder:
             folder, _ = Folder.objects.get_or_create(
                 created_by=self.user, name=new_folder
@@ -91,6 +104,7 @@ class PasteForm(forms.ModelForm):
             paste.folder = folder
         if post_anonymously:
             paste.folder = None
+
         if commit:
             paste.save()
         return paste
@@ -107,6 +121,7 @@ class PasswordProtectedPasteForm(forms.Form):
         password = self.cleaned_data["password"]
         if password != self.correct_password:
             raise forms.ValidationError("Password incorrect")
+        return password
 
 
 class ReportForm(forms.ModelForm):
@@ -125,9 +140,7 @@ class FolderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean_name(self):
-        if Folder.objects.filter(
-            created_by=self.user, name__iexact=self.cleaned_data["name"]
-        ).exists():
+        if self.user.folders.filter(name__iexact=self.cleaned_data["name"]).exists():
             raise forms.ValidationError("You already have a folder with that name")
 
         return self.cleaned_data["name"]
