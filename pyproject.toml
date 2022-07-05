@@ -18,9 +18,9 @@ django-model-utils = "^4.2.0"
 django-hitcount = "^1.3.5"
 pinax-messages = "^3.0.0"
 django-hcaptcha-field = "^1.3.0"
-django-anymail = {extras = ["mailgun"], version = "^8.6"}
 psycopg2 = "^2.9.3"
 gunicorn = "^20.1.0"
+django-anymail = {extras = ["mailjet"], version = "^8.6"}
 
 [tool.poetry.dev-dependencies]
 django-debug-toolbar = "^3.4.0"
