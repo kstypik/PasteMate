@@ -2,5 +2,6 @@
   <a class="flex-sm-fill text-sm-center nav-link {% if active == "profile" %}active{% endif %}" aria-current="page" href="{% url 'accounts:profile_update' %}">Edit Profile</a>
   <a class="flex-sm-fill text-sm-center nav-link {% if active == "password" %}active{% endif %}" href="{% url 'account_change_password' %}">Edit password</a>
   <a class="flex-sm-fill text-sm-center nav-link {% if active == "email" %}active{% endif %}" href="{% url 'account_email' %}">Edit e-mail</a>
+  <a class="flex-sm-fill text-sm-center nav-link {% if active == "preferences" %}active{% endif %}" href="{% url 'accounts:preferences' %}">Edit preferences</a>
   <a class="flex-sm-fill text-sm-center nav-link {% if active == "delete" %}bg-danger text-light{% endif %}" href="{% url 'accounts:delete' %}">Delete account</a>
 </nav>

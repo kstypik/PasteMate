@@ -4,6 +4,8 @@
 {% block title %}Edit Preferences {{ block.super }}{% endblock %}
 
 {% block content %}
+{% include "account/_nav.html" with active="preferences" %}
+
 <h2>Edit Preferences</h2>
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
