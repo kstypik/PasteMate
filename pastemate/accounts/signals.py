@@ -10,7 +10,11 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Preferences.objects.create(user=instance)
 
-        admin_account = User.objects.get(id=1)
+        try:
+            admin_account = User.objects.get(id=1)
+        except User.DoesNotExist:
+            return
+
         subject = "Welcome to PasteMate!"
         content = f"""Hello {instance.username},
 Good to see that you have decided to join our community!
