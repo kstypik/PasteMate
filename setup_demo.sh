@@ -1,5 +1,4 @@
 #!/bin/bash
-poetry shell
 django-admin reset_db
 django-admin setup_admin
 django-admin reset_test_user
