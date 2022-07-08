@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    "pastemate.core",
     "pastemate.accounts",
     "pastemate.pastes",
 ]
