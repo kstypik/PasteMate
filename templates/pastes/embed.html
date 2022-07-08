@@ -11,22 +11,39 @@
   <img src="{{ paste.embeddable_image.url}}" alt="Paste's content represented as an image">
   <div class="mt-2 copy-div">
     <label for="image-link">Direct link to the image</label>
+    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
     <input type="text" class="form-control" id="image-link" value="{{ direct_embed_link }}">
   </div>
 
   <div class="mt-2 copy-div">
     <label for="html-link">HTML code</label>
+    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
     <input type="text" class="form-control" id="html-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
   </div>
 
   <div class="mt-2 copy-div">
     <label for="bbcode-link">BBCode</label>
+    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
     <input type="text" class="form-control" id="bbcode-link" value="[img]{{ direct_embed_link }}[/img]">
   </div>
 
   <div class="mt-2 copy-div">
     <label for="markdown-link">Markdown</label>
+    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
     <input type="text" class="form-control" id="markdown-link" value="!({{ direct_embed_link }})">
   </div>
 </div>
 {% endblock content %}
+
+{% block extra_js_tags %}
+<script type="text/javascript">
+  let copyBtns = document.getElementsByClassName("copy-btn");
+  let copyDivs = document.getElementsByClassName("copy-div");
+
+  for (let copyDiv of copyDivs) {
+    let copyBtn = copyDiv.querySelector(".copy-btn");
+    let linkInput = copyDiv.querySelector("input");
+    copyBtn.addEventListener("click", getCopyHandler(copyBtn, linkInput, "afterend"));
+  }
+</script>
+{% endblock extra_js_tags %}
