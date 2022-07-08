@@ -9,24 +9,24 @@
 
 <div class="mt-5">
   <img src="{{ paste.embeddable_image.url}}" alt="Paste's content represented as an image">
-  <div class="mt-2">
+  <div class="mt-2 copy-div">
     <label for="image-link">Direct link to the image</label>
     <input type="text" class="form-control" id="image-link" value="{{ direct_embed_link }}">
   </div>
 
-  <div class="mt-2">
-    <label for="image-link">HTML code</label>
-    <input type="text" class="form-control" id="image-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
+  <div class="mt-2 copy-div">
+    <label for="html-link">HTML code</label>
+    <input type="text" class="form-control" id="html-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
   </div>
 
-  <div class="mt-2">
-    <label for="image-link">BBCode</label>
-    <input type="text" class="form-control" id="image-link" value="[img]{{ direct_embed_link }}[/img]">
+  <div class="mt-2 copy-div">
+    <label for="bbcode-link">BBCode</label>
+    <input type="text" class="form-control" id="bbcode-link" value="[img]{{ direct_embed_link }}[/img]">
   </div>
 
-  <div class="mt-2">
-    <label for="image-link">Markdown</label>
-    <input type="text" class="form-control" id="image-link" value="!({{ direct_embed_link }})">
+  <div class="mt-2 copy-div">
+    <label for="markdown-link">Markdown</label>
+    <input type="text" class="form-control" id="markdown-link" value="!({{ direct_embed_link }})">
   </div>
 </div>
 {% endblock content %}
