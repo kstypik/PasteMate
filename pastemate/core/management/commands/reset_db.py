@@ -1,29 +1,43 @@
-from django.core.management.base import BaseCommand
+from io import StringIO
 
-from pastemate.accounts.models import User
-from pastemate.pastes.models import Paste
+from django.core import management
+from django.core.management.base import BaseCommand
+from django.db import connection
+
+
+def reset_db():
+    """
+    Reset database to a blank state by removing all the tables and recreating them.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("select tablename from pg_tables where schemaname = 'public'")
+        tables = [row[0] for row in cursor.fetchall()]
+
+        # Can't use query parameters here as they'll add single quotes which are not
+        # supported by postgres
+        for table in tables:
+            cursor.execute('drop table "' + table + '" cascade')
+
+    # Call migrate so that post-migrate hooks such as generating a default Site object
+    # are run
+    management.call_command("migrate", "--noinput", stdout=StringIO())
 
 
 class Command(BaseCommand):
-    help = "Generates demo pastes"
+    help = "Reset the database and load test data"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "-y",
+            "--yes",
+            action="store_true",
+            dest="force_yes",
+            default=False,
+            help="Don't ask for confirmation.",
+        )
 
     def handle(self, *args, **options):
-        test_account = User.objects.get(id=2)
-
-        lorem = """Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-In eget dapibus eros, at faucibus magna.
-Morbi eget mollis lectus, eu ornare dolor.
-Maecenas et imperdiet nibh.
-Mauris tincidunt augue eget augue fermentum, eget consectetur lorem feugiat.
-Nunc sed sagittis turpis.
-Cras dictum sodales venenatis.
-Aenean id tellus vitae felis lobortis dignissim.
-Nam hendrerit massa nec tellus convallis faucibus.
-Phasellus ut volutpat purus."""
-
-        for counter in range(221):
-            Paste.objects.create(
-                author=test_account, title=f"Test paste number {counter}", content=lorem
-            )
-
-        self.stdout.write("Generated demo pastes.")
+        self.stdout.write("Resetting the database... ", ending="")
+        self.stdout.flush()
+        reset_db()
+        self.stdout.write(self.style.SUCCESS("OK"))
