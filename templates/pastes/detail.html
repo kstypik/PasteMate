@@ -104,7 +104,7 @@
         <div class="mx-2">{{ paste.filesize|tokilobytes }}</div>
         <div class="ms-auto">
           <a href="#" class="toolbar-copy"><span class="badge bg-primary">copy</span></a>
-          {% if not paste.password and not paste.burn_after_read %}
+          {% if not paste.password and not paste.burn_after_read and not burned %}
             <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-primary">raw</span></a>
             <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-primary">download</span></a>
             {% if user.is_authenticated %}
