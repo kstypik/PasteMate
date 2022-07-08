@@ -58,6 +58,10 @@
             {% endif %}
           </span>
           <span class="me-2">
+            <i class="fa-solid fa-calendar me-1" title="When this paste was created"></i>
+            <span title="{{ paste.created }}">{{ paste.created|date }}</span>
+          </span>
+          <span class="me-2">
             <i class="fa-solid fa-eye me-1" title="Unique visits of this paste"></i> {{ hitcount.total_hits }}
           </span>
           <span class="me-2">
