@@ -201,13 +201,6 @@ class PasteDetailViewTest(TestCase):
 
         self.assertFalse(Paste.objects.filter(uuid=burnable_paste_uuid).exists())
 
-    def test_burn_after_read_in_GET_context(self):
-        burnable_paste = Paste.objects.create(content="Hello", burn_after_read=True)
-
-        response = self.client.get(burnable_paste.get_absolute_url())
-
-        self.assertTrue(response.context["burn_after_read"])
-
     def test_displays_private_message_to_author_url_for_logged(self):
         response = self.client.get(self.paste_url)
 

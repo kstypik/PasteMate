@@ -115,14 +115,12 @@ class PasteDetailView(
     def post(self, request, *args, **kwargs):
         """For handling Burn After Read"""
         self.object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
-        context = {"paste": self.object}
+        context = {"paste": self.object, "burned": True}
         self.object.burn_after_read = False
         self.object.delete()
         return self.render_to_response(context)
 
     def render_to_response(self, context, **response_kwargs):
-        if self.object.burn_after_read:
-            context["burn_after_read"] = True
         response = super().render_to_response(context, **response_kwargs)
         return response
 
