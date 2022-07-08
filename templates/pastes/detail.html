@@ -21,6 +21,7 @@
     <form action="{% url 'pastes:detail' paste.uuid %}" method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-warning">Read and delete</button>
+      <a href="#" class="btn btn-link burn-after-read-copy">Copy link to clipboard</a>
     </form>
   {% endif %}
 {% endif %}
@@ -130,11 +131,21 @@
 
 {% block extra_js_tags %}
 <script type="text/javascript">
-  let toolbarCopy = document.querySelector(".toolbar-copy");
-  let rawCopy = document.querySelector(".raw-copy");
-  let rawCode = document.querySelector(".raw-paste-data");
+  {% if not paste.burn_after_read or paste.author == user %}
+    let toolbarCopy = document.querySelector(".toolbar-copy");
+    let rawCopy = document.querySelector(".raw-copy");
+    let rawCode = document.querySelector(".raw-paste-data");
+    
+    toolbarCopy.addEventListener("click", getCopyHandler(toolbarCopy, rawCode, "beforebegin"));
+    rawCopy.addEventListener("click", getCopyHandler(rawCopy, rawCode, "afterend"));
+  {% endif %}
 
-  toolbarCopy.addEventListener("click", getCopyHandler(toolbarCopy, rawCode, "beforebegin"));
-  rawCopy.addEventListener("click", getCopyHandler(rawCopy, rawCode, "afterend"));
+  {% if paste.burn_after_read %}
+    let burnAfterReadCopy = document.querySelector(".burn-after-read-copy");
+    burnAfterReadCopy.addEventListener("click", (event) => {
+      event.preventDefault();
+      navigator.clipboard.writeText(window.location.href);
+    })
+  {% endif %}
 </script>
 {% endblock extra_js_tags %}
