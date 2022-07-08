@@ -3,8 +3,6 @@
   "model": "pastes.paste",
   "pk": 581,
   "fields": {
-    "created": "2022-07-08T14:41:39.758Z",
-    "modified": "2022-07-08T14:41:39.758Z",
     "uuid": "04aa70be-ab38-461e-b625-e5041cb83e06",
     "author": 2,
     "content": "from django.http import HttpResponse\r\nfrom django.template import loader\r\n\r\nfrom .models import Question\r\n\r\n\r\ndef index(request):\r\n    latest_question_list = Question.objects.order_by('-pub_date')[:5]\r\n    template = loader.get_template('polls/index.html')\r\n    context = {\r\n        'latest_question_list': latest_question_list,\r\n    }\r\n    return HttpResponse(template.render(context, request))",
@@ -18,7 +16,6 @@
     "burn_after_read": false,
     "title": "Django Polls Tutorial Views",
     "filesize": 395,
-    "embeddable_image": "embed/04aa70be-ab38-461e-b625-e5041cb83e06.png",
     "is_active": true
   }
 },
@@ -26,8 +23,6 @@
   "model": "pastes.paste",
   "pk": 582,
   "fields": {
-    "created": "2022-07-08T14:42:20.700Z",
-    "modified": "2022-07-08T14:42:20.700Z",
     "uuid": "924920b1-2118-4e8e-9946-b800cbd48de3",
     "author": 2,
     "content": "r = requests.get('https://api.github.com/user', auth=('user', 'pass'))\r\n\r\nr.status_code\r\n200\r\n\r\nr.headers['content-type']\r\n'application/json; charset=utf8'\r\n\r\nr.encoding\r\n'utf-8'\r\n\r\nr.text\r\n'{\"type\":\"User\"...'\r\n\r\nr.json()\r\n{'private_gists': 419, 'total_private_repos': 77, ...}",
@@ -41,7 +36,6 @@
     "burn_after_read": false,
     "title": "Python's Requests Example",
     "filesize": 277,
-    "embeddable_image": "embed/924920b1-2118-4e8e-9946-b800cbd48de3.png",
     "is_active": true
   }
 },
@@ -49,8 +43,6 @@
   "model": "pastes.paste",
   "pk": 583,
   "fields": {
-    "created": "2022-07-08T14:43:06.561Z",
-    "modified": "2022-07-08T14:43:06.561Z",
     "uuid": "a32f80c6-2c0b-4f64-aecc-8366e8b4702a",
     "author": 2,
     "content": "<?php\r\n\r\n$makefoo = true;\r\n\r\n/* We can't call foo() from here \r\n   since it doesn't exist yet,\r\n   but we can call bar() */\r\n\r\nbar();\r\n\r\nif ($makefoo) {\r\n  function foo()\r\n  {\r\n    echo \"I don't exist until program execution reaches me.\\n\";\r\n  }\r\n}\r\n\r\n/* Now we can safely call foo()\r\n   since $makefoo evaluated to true */\r\n\r\nif ($makefoo) foo();\r\n\r\nfunction bar() \r\n{\r\n  echo \"I exist immediately upon program start.\\n\";\r\n}\r\n\r\n?>",
@@ -64,7 +56,6 @@
     "burn_after_read": false,
     "title": "PHP Functions",
     "filesize": 431,
-    "embeddable_image": "embed/a32f80c6-2c0b-4f64-aecc-8366e8b4702a.png",
     "is_active": true
   }
 },
@@ -72,8 +63,6 @@
   "model": "pastes.paste",
   "pk": 584,
   "fields": {
-    "created": "2022-07-08T14:43:47.772Z",
-    "modified": "2022-07-08T14:43:47.772Z",
     "uuid": "aa85a6be-a3e2-4ebf-b93e-eac1410c5d68",
     "author": 2,
     "content": "<!doctype html>\r\n<html class=\"no-js\" lang=\"\">\r\n\r\n<head>\r\n  <meta charset=\"utf-8\">\r\n  <title></title>\r\n  <meta name=\"description\" content=\"\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n\r\n  <meta property=\"og:title\" content=\"\">\r\n  <meta property=\"og:type\" content=\"\">\r\n  <meta property=\"og:url\" content=\"\">\r\n  <meta property=\"og:image\" content=\"\">\r\n\r\n  <link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">\r\n  <link rel=\"icon\" href=\"/icon.svg\" type=\"image/svg+xml\">\r\n  <link rel=\"apple-touch-icon\" href=\"icon.png\">\r\n\r\n  <link rel=\"stylesheet\" href=\"css/normalize.css\">\r\n  <link rel=\"stylesheet\" href=\"css/style.css\">\r\n\r\n  <link rel=\"manifest\" href=\"site.webmanifest\">\r\n  <meta name=\"theme-color\" content=\"#fafafa\">\r\n</head>\r\n\r\n<body>\r\n\r\n  <!-- Add your site or application content here -->\r\n  <p>Hello world! This is HTML5 Boilerplate.</p>\r\n  <script src=\"js/vendor/modernizr-{{MODERNIZR_VERSION}}.min.js\"></script>\r\n  <script src=\"js/app.js\"></script>\r\n\r\n</body>\r\n\r\n</html>",
@@ -87,7 +76,6 @@
     "burn_after_read": false,
     "title": "HTML Boilerplate",
     "filesize": 998,
-    "embeddable_image": "embed/aa85a6be-a3e2-4ebf-b93e-eac1410c5d68.png",
     "is_active": true
   }
 },
@@ -95,8 +83,6 @@
   "model": "pastes.paste",
   "pk": 585,
   "fields": {
-    "created": "2022-07-08T14:44:25.801Z",
-    "modified": "2022-07-08T14:44:25.801Z",
     "uuid": "1a8c9980-8ee2-4263-a814-35592531a697",
     "author": 2,
     "content": "{\r\n    \"glossary\": {\r\n        \"title\": \"example glossary\",\r\n\t\t\"GlossDiv\": {\r\n            \"title\": \"S\",\r\n\t\t\t\"GlossList\": {\r\n                \"GlossEntry\": {\r\n                    \"ID\": \"SGML\",\r\n\t\t\t\t\t\"SortAs\": \"SGML\",\r\n\t\t\t\t\t\"GlossTerm\": \"Standard Generalized Markup Language\",\r\n\t\t\t\t\t\"Acronym\": \"SGML\",\r\n\t\t\t\t\t\"Abbrev\": \"ISO 8879:1986\",\r\n\t\t\t\t\t\"GlossDef\": {\r\n                        \"para\": \"A meta-markup language, used to create markup languages such as DocBook.\",\r\n\t\t\t\t\t\t\"GlossSeeAlso\": [\"GML\", \"XML\"]\r\n                    },\r\n\t\t\t\t\t\"GlossSee\": \"markup\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
@@ -110,7 +96,6 @@
     "burn_after_read": false,
     "title": "Just a JSON example...",
     "filesize": 603,
-    "embeddable_image": "embed/1a8c9980-8ee2-4263-a814-35592531a697.png",
     "is_active": true
   }
 },
@@ -118,8 +103,6 @@
   "model": "pastes.paste",
   "pk": 586,
   "fields": {
-    "created": "2022-07-08T14:45:40.459Z",
-    "modified": "2022-07-08T14:45:40.459Z",
     "uuid": "72ec8487-5858-4bde-b870-f0c8f41162a8",
     "author": 2,
     "content": "public class DoubleFormatter : IFormatProvider, ICustomFormatter\r\n{\r\n  // always use dot separator for doubles\r\n  private CultureInfo enUsCulture = CultureInfo.GetCultureInfo(\"en-US\");\r\n\r\n  public string Format(string format, object arg, IFormatProvider formatProvider)\r\n  {\r\n    // format doubles to 3 decimal places\r\n    return string.Format(enUsCulture, \"{0:0.000}\", arg);\r\n  }\r\n\r\n  public object GetFormat(Type formatType)\r\n  {\r\n    return (formatType == typeof(ICustomFormatter)) ? this : null;\r\n  }\r\n}",
@@ -133,7 +116,6 @@
     "burn_after_read": false,
     "title": "Untitled",
     "filesize": 507,
-    "embeddable_image": "embed/72ec8487-5858-4bde-b870-f0c8f41162a8.png",
     "is_active": true
   }
 },
@@ -141,8 +123,6 @@
   "model": "pastes.paste",
   "pk": 587,
   "fields": {
-    "created": "2022-07-08T14:46:29.217Z",
-    "modified": "2022-07-08T14:46:29.217Z",
     "uuid": "64753fa4-79a8-42be-a917-055d91b281f0",
     "author": 2,
     "content": "public class Main {\r\n\r\n  public static void main(String[] args) {\r\n\r\n    // value a, b, and c\r\n    double a = 2.3, b = 4, c = 5.6;\r\n    double root1, root2;\r\n\r\n    // calculate the determinant (b2 - 4ac)\r\n    double determinant = b * b - 4 * a * c;\r\n\r\n    // check if determinant is greater than 0\r\n    if (determinant > 0) {\r\n\r\n      // two real and distinct roots\r\n      root1 = (-b + Math.sqrt(determinant)) / (2 * a);\r\n      root2 = (-b - Math.sqrt(determinant)) / (2 * a);\r\n\r\n      System.out.format(\"root1 = %.2f and root2 = %.2f\", root1, root2);\r\n    }\r\n\r\n    // check if determinant is equal to 0\r\n    else if (determinant == 0) {\r\n\r\n      // two real and equal roots\r\n      // determinant is equal to 0\r\n      // so -b + 0 == -b\r\n      root1 = root2 = -b / (2 * a);\r\n      System.out.format(\"root1 = root2 = %.2f;\", root1);\r\n    }\r\n\r\n    // if determinant is less than zero\r\n    else {\r\n\r\n      // roots are complex number and distinct\r\n      double real = -b / (2 * a);\r\n      double imaginary = Math.sqrt(-determinant) / (2 * a);\r\n      System.out.format(\"root1 = %.2f+%.2fi\", real, imaginary);\r\n      System.out.format(\"\\nroot2 = %.2f-%.2fi\", real, imaginary);\r\n    }\r\n  }\r\n}",
@@ -156,7 +136,6 @@
     "burn_after_read": false,
     "title": "Java Program to Find Roots of a Quadratic Equation",
     "filesize": 1187,
-    "embeddable_image": "embed/64753fa4-79a8-42be-a917-055d91b281f0.png",
     "is_active": true
   }
 },
@@ -164,8 +143,6 @@
   "model": "pastes.paste",
   "pk": 588,
   "fields": {
-    "created": "2022-07-08T14:47:27.510Z",
-    "modified": "2022-07-08T14:47:27.510Z",
     "uuid": "1d181b0d-0301-41ab-b3f8-c022b92e2b7f",
     "author": 2,
     "content": "function serverRequest(query, callback){\r\n  setTimeout(function(){\r\n    var response = query + \"full!\";\r\n    callback(response);\r\n  },5000);\r\n}\r\n\r\nfunction getResults(results){\r\n  console.log(\"Response from the server: \" + results);\r\n}\r\n\r\nserverRequest(\"The glass is half \", getResults);\r\n\r\n// Result in console after 5 second delay:\r\n// Response from the server: The glass is half full!",
@@ -179,7 +156,6 @@
     "burn_after_read": false,
     "title": "Untitled",
     "filesize": 387,
-    "embeddable_image": "embed/1d181b0d-0301-41ab-b3f8-c022b92e2b7f.png",
     "is_active": true
   }
 },
@@ -187,8 +163,6 @@
   "model": "pastes.paste",
   "pk": 589,
   "fields": {
-    "created": "2022-07-08T14:48:05.611Z",
-    "modified": "2022-07-08T14:48:05.611Z",
     "uuid": "99e66471-fa2a-49a0-a209-f7982638c1f9",
     "author": 2,
     "content": "-- while a is not equal to b, loop.\r\nwhile a /= b loop\r\n  Ada.Text_IO.Put_Line (\"Waiting\");\r\nend loop;\r\n\r\nif a > b then\r\n  Ada.Text_IO.Put_Line (\"Condition met\");\r\nelse\r\n  Ada.Text_IO.Put_Line (\"Condition not met\");\r\nend if;\r\n\r\nfor i in 1 .. 10 loop\r\n  Ada.Text_IO.Put (\"Iteration: \");\r\n  Ada.Text_IO.Put (i);\r\n  Ada.Text_IO.Put_Line;\r\nend loop;\r\n\r\nloop\r\n  a := a + 1;\r\n  exit when a = 10;\r\nend loop;\r\n\r\ncase i is\r\n  when 0 => Ada.Text_IO.Put (\"zero\");\r\n  when 1 => Ada.Text_IO.Put (\"one\");\r\n  when 2 => Ada.Text_IO.Put (\"two\");\r\n  -- case statements have to cover all possible cases:\r\n  when others => Ada.Text_IO.Put (\"none of the above\");\r\nend case;\r\n\r\nfor aWeekday in Weekday'Range loop               -- loop over an enumeration\r\n   Put_Line ( Weekday'Image(aWeekday) );         -- output string representation of an enumeration\r\n   if aWeekday in Working_Day then               -- check of a subtype of an enumeration\r\n      Put_Line ( \" to work for \" &\r\n               Working_Hours'Image (Work_Load(aWeekday)) ); -- access into a lookup table\r\n   end if;\r\nend loop;",
@@ -202,7 +176,6 @@
     "burn_after_read": false,
     "title": "Untitled",
     "filesize": 1072,
-    "embeddable_image": "embed/99e66471-fa2a-49a0-a209-f7982638c1f9.png",
     "is_active": true
   }
 },
@@ -210,8 +183,6 @@
   "model": "pastes.paste",
   "pk": 590,
   "fields": {
-    "created": "2022-07-08T14:49:50.469Z",
-    "modified": "2022-07-08T14:51:25.250Z",
     "uuid": "a808629f-a553-44ed-97f4-a44ed115278a",
     "author": 2,
     "content": "def alternating_characters?(s)\r\n  type = [/[aeiou]/, /[^aeiou]/].cycle\r\n  if s.start_with?(/[^aeiou]/)\r\n    type.next\r\n  end\r\n  s.chars.all? { |ch| ch.match?(type.next) }\r\nend\r\nalternating_characters?(\"ateciyu\")\r\n# true",
@@ -225,7 +196,6 @@
     "burn_after_read": false,
     "title": "Ruby, Ruby, Ruby, Ruby Do you, do you, do you...",
     "filesize": 219,
-    "embeddable_image": "embed/a808629f-a553-44ed-97f4-a44ed115278a_uyMePvS.png",
     "is_active": true
   }
 },
@@ -233,8 +203,6 @@
   "model": "pastes.paste",
   "pk": 591,
   "fields": {
-    "created": "2022-07-08T14:52:22.910Z",
-    "modified": "2022-07-08T14:52:22.910Z",
     "uuid": "de3cae7f-378c-4c75-b034-2a7f5af4e3a5",
     "author": 2,
     "content": "# Define a struct for this example\r\ndefmodule User do\r\n  defstruct email: nil\r\nend\r\n\r\n# dot syntax\r\n\"c@c.com\" = %User{email: \"c@c.com\"}.email\r\n\r\n# Underlying implementation is a map\r\n# So Map methods work\r\n\"c@c.com\" = Map.get(%User{email: \"c@c.com\"}, :email)\r\n\r\n# Pattern match to get a value\r\n%{ email: email }   = %User{email: \"c@c.com\"}\r\n%User{email: email} = %User{email: \"c@c.com\"}\r\n\r\n# Access protocol not available by default\r\n%User{email: \"c@c.com\"}[:email]\r\n#** (UndefinedFunctionError) undefined function User.fetch/2 (User does not implement the Access behaviour)\r\n#             User.fetch(%User{email: \"c@c.com\"}, :email)\r\n#    (elixir) lib/access.ex:118: Access.fetch/2\r\n#    (elixir) lib/access.ex:149: Access.get/3\r\n\r\n\r\n# Enumerable protocol not available by default\r\nEnum.filter( %User{email: \"c@c.com\"}, fn({key, _}) -> key == :email  end)\r\n#** (Protocol.UndefinedError) protocol Enumerable not implemented for %User{email: \"c@c.com\"}\r\n#    (elixir) lib/enum.ex:1: Enumerable.impl_for!/1\r\n#    (elixir) lib/enum.ex:116: Enumerable.reduce/3\r\n#    (elixir) lib/enum.ex:1477: Enum.reduce/3\r\n#    (elixir) lib/enum.ex:742: Enum.filter/2",
@@ -248,7 +216,6 @@
     "burn_after_read": false,
     "title": "Get a value from a Struct",
     "filesize": 1149,
-    "embeddable_image": "embed/de3cae7f-378c-4c75-b034-2a7f5af4e3a5.png",
     "is_active": true
   }
 },
@@ -256,8 +223,6 @@
   "model": "pastes.paste",
   "pk": 592,
   "fields": {
-    "created": "2022-07-08T14:53:21.824Z",
-    "modified": "2022-07-08T14:53:21.824Z",
     "uuid": "af646d05-8ea0-46ab-be01-232f6b8d8801",
     "author": 2,
     "content": "from flask import url_for\r\n\r\n@app.route('/')\r\ndef index():\r\n    return 'index'\r\n\r\n@app.route('/login')\r\ndef login():\r\n    return 'login'\r\n\r\n@app.route('/user/<username>')\r\ndef profile(username):\r\n    return f'{username}\\'s profile'\r\n\r\nwith app.test_request_context():\r\n    print(url_for('index'))\r\n    print(url_for('login'))\r\n    print(url_for('login', next='/'))\r\n    print(url_for('profile', username='John Doe'))",
@@ -271,7 +236,6 @@
     "burn_after_read": false,
     "title": "Flask",
     "filesize": 416,
-    "embeddable_image": "embed/af646d05-8ea0-46ab-be01-232f6b8d8801.png",
     "is_active": true
   }
 }
