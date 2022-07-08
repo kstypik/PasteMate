@@ -21,9 +21,12 @@ Aenean id tellus vitae felis lobortis dignissim.
 Nam hendrerit massa nec tellus convallis faucibus.
 Phasellus ut volutpat purus."""
 
+        self.stdout.write("Generating demo pastes...")
+        self.stdout.flush()
+
         for counter in range(221):
             Paste.objects.create(
                 author=test_account, title=f"Test paste number {counter}", content=lorem
             )
 
-        self.stdout.write("Generated demo pastes.")
+        self.stdout.write(self.style.SUCCESS("OK"))
