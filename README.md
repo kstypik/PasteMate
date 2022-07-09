@@ -125,6 +125,8 @@ Now you can start the development server:
 poetry run python manage.py runserver
 ```
 
+**Note:** To support paste expiration feature, you have to add expire_pastes Django management command to your cron tasks or another scheduler.
+
 Happy coding!
 
 ## Testing
