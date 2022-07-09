@@ -1,6 +1,12 @@
 # PasteMate
 
-Pasting plain text web app with syntax highlighting, similar to Pastebin.com
+Pastebin web app allowing users to post plain text with optional syntax highlighting for many programming languages and other features.
+
+## Technologies
+- Python 3.10
+- Django 4.0
+- Bootstrap 5 + MDBootstrap
+- Node.js 18.2.0
 
 ## Features
 - Syntax highlighting for over 500 languages
@@ -26,3 +32,42 @@ Pasting plain text web app with syntax highlighting, similar to Pastebin.com
 ## Screenshots
 For more screenshots, see [SCREENSHOTS.md](SCREENSHOTS.md)
 ![screenshot_view_paste](https://user-images.githubusercontent.com/53559764/177049349-1dbc4309-d25e-4d46-902e-c129ff860a3f.png)
+
+## Getting Started
+
+Clone the code:
+```
+git clone https://github.com/kstypik/PasteMate.git
+```
+
+Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as package manager):
+```
+poetry install
+```
+
+Set required environment variables for development (for production there is more, see production settings module).
+You can create .env file with them:
+```
+DATABASE_URL=psql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DBNAME>
+DJANGO_SECRET_KEY=some random key
+DJANGO_DEBUG=True
+```
+
+Apply migrations:
+```
+poetry run python manage.py makemigrations && poetry run python manage.py migrate
+```
+
+Optionally, you can fill the database with examplary data:
+```
+poetry run python manage.py reset_test_user && poetry run pyhton manage.py generate_demo_pastes
+```
+
+Happy coding!
+
+## Testing
+
+To run tests, type:
+```
+pytest
+```
