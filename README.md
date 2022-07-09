@@ -38,7 +38,7 @@ See [SCREENSHOTS.md](SCREENSHOTS.md) for more
 
 Clone the code:
 ```
-git clone https://github.com/kstypik/PasteMate.git
+git clone https://github.com/kstypik/PasteMate.git .
 ```
 
 Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as a package manager):
@@ -54,6 +54,62 @@ DJANGO_SECRET_KEY=some random key
 DJANGO_DEBUG=True
 ```
 
+As of now, pinax_messages package needs some workarounds for compatibility with newer Django versions.
+
+Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/pinax/messages/signals.py
+
+Change
+```python
+message_sent = Signal(providing_args=["message", "thread", "reply"])
+```
+to
+```python
+message_sent = Signal()
+```
+Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/pinax/messages/urls.py
+Change
+```python
+from django.conf.urls import url
+
+from . import views
+
+app_name = "pinax_messages"
+
+urlpatterns = [
+    url(r"^inbox/$", views.InboxView.as_view(),
+        name="inbox"),
+    url(r"^create/$", views.MessageCreateView.as_view(),
+        name="message_create"),
+    url(r"^create/(?P<user_id>\d+)/$", views.MessageCreateView.as_view(),
+        name="message_user_create"),
+    url(r"^thread/(?P<pk>\d+)/$", views.ThreadView.as_view(),
+        name="thread_detail"),
+    url(r"^thread/(?P<pk>\d+)/delete/$", views.ThreadDeleteView.as_view(),
+        name="thread_delete"),
+]
+```
+to
+```python
+from django.urls import path
+
+from . import views
+
+app_name = "pinax_messages"
+
+urlpatterns = [
+    path("inbox/", views.InboxView.as_view(),
+        name="inbox"),
+    path("create/", views.MessageCreateView.as_view(),
+        name="message_create"),
+    path("create/<int:user_id>/", views.MessageCreateView.as_view(),
+        name="message_user_create"),
+    path("thread/<int:pk>/", views.ThreadView.as_view(),
+        name="thread_detail"),
+    path("thread/<int:pk>/delete/", views.ThreadDeleteView.as_view(),
+        name="thread_delete"),
+]
+```
+
 Apply migrations:
 ```
 poetry run python manage.py makemigrations && poetry run python manage.py migrate
@@ -61,7 +117,12 @@ poetry run python manage.py makemigrations && poetry run python manage.py migrat
 
 Optionally, you can fill the database with examplary data:
 ```
-poetry run python manage.py reset_test_user && poetry run pyhton manage.py generate_demo_pastes
+poetry run python manage.py reset_test_user && poetry run python manage.py generate_demo_pastes
+```
+
+Now you can start the development server:
+```
+poetry run python manage.py runserver
 ```
 
 Happy coding!
