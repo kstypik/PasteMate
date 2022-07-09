@@ -40,13 +40,13 @@ Clone the code:
 git clone https://github.com/kstypik/PasteMate.git
 ```
 
-Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as package manager):
+Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as a package manager):
 ```
 poetry install
 ```
 
 Set required environment variables for development (for production there is more, see production settings module).
-You can create .env file with them:
+You can create .env file for them:
 ```
 DATABASE_URL=psql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DBNAME>
 DJANGO_SECRET_KEY=some random key
