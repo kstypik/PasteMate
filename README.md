@@ -2,6 +2,8 @@
 
 Pastebin web app allowing users to post plain text with optional syntax highlighting for many programming languages and other features.
 
+[SEE DEMO](https://pastemate.toadres.pl)
+
 ## Technologies
 - Python 3.10
 - Django 4.0
