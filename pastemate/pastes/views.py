@@ -400,8 +400,8 @@ class EmbedPasteView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context["direct_embed_link"] = (
-            self.request.get_host() + self.object.embeddable_image.url
+        context["direct_embed_link"] = self.request.build_absolute_uri(
+            self.object.embeddable_image.url
         )
         return context
 
