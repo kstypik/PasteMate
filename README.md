@@ -31,8 +31,8 @@ Pastebin web app allowing users to post plain text with optional syntax highligh
 - Backing up of all pastes
 
 ## Screenshots
-For more screenshots, see [SCREENSHOTS.md](SCREENSHOTS.md)
-![screenshot_view_paste](https://user-images.githubusercontent.com/53559764/177049349-1dbc4309-d25e-4d46-902e-c129ff860a3f.png)
+See [SCREENSHOTS.md](SCREENSHOTS.md) for more
+![pastemate_paste_detail_smaller](https://user-images.githubusercontent.com/53559764/178123659-df31ca8d-db45-42b8-80d8-dff6bcbaac9a.png)
 
 ## Getting Started
 
