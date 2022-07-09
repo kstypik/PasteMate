@@ -66,7 +66,7 @@
             <i class="fa-solid fa-eye me-1" title="Unique visits of this paste"></i> {{ hitcount.total_hits }}
           </span>
           <span class="me-2">
-            <i class="fa-solid fa-clock me-1" title="When this paste will expire and get deleted"></i>
+            <i class="fa-solid fa-timer me-1" title="When this paste will expire and get deleted"></i>
             {% if paste.expiration_date %}
               <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
             {% else %}
