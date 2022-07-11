@@ -1,24 +1,27 @@
-from django.test import TestCase
+import pytest
 
 from pastemate.accounts.models import User
 
+pytestmark = pytest.mark.django_db
 
-class UserModelTest(TestCase):
-    def test___str__(self):
-        user = User.objects.create_user(username="John")
-        self.assertEqual(user.__str__(), user.username)
-        self.assertEqual(str(user), user.username)
 
-    def test_get_absolute_url(self):
-        user = User.objects.create_user(username="John")
+@pytest.fixture
+def user():
+    return User.objects.create_user(username="John")
+
+
+class TestUser:
+    def test___str__(self, user):
+        assert user.__str__() == user.username
+        assert str(user) == user.username
+
+    def test_get_absolute_url(self, user):
         url = user.get_absolute_url()
 
-        self.assertEqual(url, f"/user/{user.username}/")
+        assert url == f"/user/{user.username}/"
 
 
-class PreferencesModelTest(TestCase):
-    def test___str__(self):
-        user = User.objects.create_user(username="John")
-
-        self.assertEqual(user.preferences.__str__(), f"Preferences of {user.username}")
-        self.assertEqual(str(user.preferences), f"Preferences of {user.username}")
+class TestPreferences:
+    def test___str__(self, user):
+        assert user.preferences.__str__() == f"Preferences of {user.username}"
+        assert str(user.preferences) == f"Preferences of {user.username}"

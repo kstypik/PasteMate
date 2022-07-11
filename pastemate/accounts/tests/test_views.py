@@ -1,11 +1,11 @@
-import tempfile
 from io import BytesIO
 
+import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
+from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from config.utils import login_redirect_url
 from pastemate.accounts.forms import (
@@ -15,6 +15,8 @@ from pastemate.accounts.forms import (
     ProfileForm,
 )
 
+pytestmark = pytest.mark.django_db
+
 User = get_user_model()
 
 ACCOUNT_DELETE_URL = reverse("accounts:delete")
@@ -23,7 +25,8 @@ PROFILE_UPDATE_URL = reverse("accounts:profile_update")
 PREFERENCES_UPDATE_URL = reverse("accounts:preferences")
 
 
-def create_image(width, height):
+@pytest.fixture
+def image(width=100, height=100):
     image = Image.new("RGBA", (width, height))
     stream = BytesIO()
     image.save(stream, "PNG")
@@ -31,23 +34,39 @@ def create_image(width, height):
     return SimpleUploadedFile("avatar_for_testing.png", stream.read(), "image/jpeg")
 
 
-class ProfileUpdateViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username="Test", email="test@test.com")
-        self.client.force_login(self.user)
+@pytest.fixture
+def create_user():
+    return User.objects.create_user(
+        username="Test", email="test@test.com", password="test123"
+    )
 
-    def test_login_required(self):
-        response = Client().get(PROFILE_UPDATE_URL)
 
-        self.assertRedirects(response, login_redirect_url(PROFILE_UPDATE_URL))
+@pytest.fixture
+def auto_login_user(db, client, create_user):
+    def make_auto_login(user=None):
+        if user is None:
+            user = create_user
+        client.force_login(user)
+        return client, user
 
-    def test_template_name_correct(self):
-        response = self.client.get(PROFILE_UPDATE_URL)
+    return make_auto_login
 
-        self.assertTemplateUsed(response, "account/profile_edit.html")
 
-    def test_success_url_correct(self):
-        response = self.client.post(
+class TestProfileEdit:
+    def test_login_required(self, client):
+        response = client.get(PROFILE_UPDATE_URL)
+
+        assertRedirects(response, login_redirect_url(PROFILE_UPDATE_URL))
+
+    def test_template_name_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(PROFILE_UPDATE_URL)
+
+        assertTemplateUsed(response, "account/profile_edit.html")
+
+    def test_success_url_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.post(
             PROFILE_UPDATE_URL,
             data={
                 "location": "Testland",
@@ -55,148 +74,142 @@ class ProfileUpdateViewTest(TestCase):
             },
         )
 
-        self.assertRedirects(response, PROFILE_UPDATE_URL)
+        assertRedirects(response, PROFILE_UPDATE_URL)
 
-    def test_form_class_correct(self):
-        response = self.client.get(PROFILE_UPDATE_URL)
+    def test_form_class_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(PROFILE_UPDATE_URL)
 
-        self.assertIsInstance(response.context["form"], ProfileForm)
+        assert isinstance(response.context["form"], ProfileForm)
 
-    def test_can_update_profile(self):
+    def test_can_update_profile(self, auto_login_user):
+        client, user = auto_login_user()
         data = {
             "location": "My updated location",
             "website": "https://newwebsite.com",
         }
-        self.client.post(PROFILE_UPDATE_URL, data=data)
-        self.user.refresh_from_db()
+        client.post(PROFILE_UPDATE_URL, data=data)
+        user.refresh_from_db()
 
-        self.assertEqual(self.user.location, "My updated location")
-        self.assertEqual(self.user.website, "https://newwebsite.com")
+        assert user.location == "My updated location"
+        assert user.website == "https://newwebsite.com"
 
 
-class AvatarUpdateViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username="Test", email="test@test.com")
-        self.client.force_login(self.user)
+class TestAvatarEdit:
+    def test_login_required(self, client):
+        response = client.get(AVATAR_URL)
 
-        self.avatar = create_image(100, 100)
+        assertRedirects(response, login_redirect_url(AVATAR_URL))
 
-    def test_login_required(self):
-        response = Client().get(AVATAR_URL)
+    def test_template_name_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(AVATAR_URL)
 
-        self.assertRedirects(response, login_redirect_url(AVATAR_URL))
+        assertTemplateUsed(response, "account/avatar_edit.html")
 
-    def test_template_name_correct(self):
-        response = self.client.get(AVATAR_URL)
-
-        self.assertTemplateUsed(response, "account/avatar_edit.html")
-
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    def test_success_url_correct(self):
-        response = self.client.post(
+    def test_success_url_correct(self, auto_login_user, image):
+        client, user = auto_login_user()
+        response = client.post(
             AVATAR_URL,
-            data={"avatar": self.avatar},
+            data={"avatar": image},
         )
 
-        self.assertRedirects(response, PROFILE_UPDATE_URL)
+        assertRedirects(response, PROFILE_UPDATE_URL)
 
-    def test_form_class_correct(self):
-        response = self.client.get(AVATAR_URL)
+    def test_form_class_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(AVATAR_URL)
 
-        self.assertIsInstance(response.context["form"], AvatarForm)
+        assert isinstance(response.context["form"], AvatarForm)
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    def test_can_update_profile(self):
-        self.client.post(
+    def test_can_update_profile(self, auto_login_user, image):
+        client, user = auto_login_user()
+        client.post(
             AVATAR_URL,
-            data={"avatar": self.avatar},
+            data={"avatar": image},
         )
-        self.user.refresh_from_db()
+        user.refresh_from_db()
 
-        avatar_without_ext = self.avatar.name.split(".")[0]
-        self.assertIn(avatar_without_ext, self.user.avatar.name)
-
-
-class AccountDeleteViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username="Test", email="test@test.com", password="test123"
-        )
-        self.client.force_login(self.user)
-
-    def test_login_required(self):
-        response = Client().get(ACCOUNT_DELETE_URL)
-
-        self.assertRedirects(response, login_redirect_url(ACCOUNT_DELETE_URL))
-
-    def test_template_name_correct(self):
-        response = self.client.get(ACCOUNT_DELETE_URL)
-
-        self.assertTemplateUsed(response, "account/account_delete.html")
-
-    def test_form_class_correct(self):
-        response = self.client.get(ACCOUNT_DELETE_URL)
-
-        self.assertIsInstance(response.context["form"], AccountDeleteForm)
-
-    def test_success_url(self):
-        response = self.client.post(ACCOUNT_DELETE_URL, data={"password": "test123"})
-
-        self.assertRedirects(response, reverse("pastes:create"))
-
-    def test_can_delete_account(self):
-        self.client.post(ACCOUNT_DELETE_URL, data={"password": "test123"})
-
-        self.assertEqual(User.objects.count(), 0)
-
-    def test_cannot_delete_account_when_password_incorrect(self):
-        self.client.post(ACCOUNT_DELETE_URL, data={"password": "incorrect_pass"})
-
-        self.assertEqual(User.objects.count(), 1)
+        avatar_without_ext = image.name.split(".")[0]
+        assert avatar_without_ext in user.avatar.name
 
 
-class PreferencesUpdateViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username="Test",
-            email="test@test.com",
-        )
-        self.client.force_login(self.user)
+class TestAccountDelete:
+    def test_login_required(self, client):
+        response = client.get(ACCOUNT_DELETE_URL)
 
-    def test_login_required(self):
-        response = Client().get(PREFERENCES_UPDATE_URL)
+        assertRedirects(response, login_redirect_url(ACCOUNT_DELETE_URL))
 
-        self.assertRedirects(response, login_redirect_url(PREFERENCES_UPDATE_URL))
+    def test_template_name_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(ACCOUNT_DELETE_URL)
 
-    def test_template_name_correct(self):
-        response = self.client.get(PREFERENCES_UPDATE_URL)
+        assertTemplateUsed(response, "account/account_delete.html")
 
-        self.assertTemplateUsed(response, "account/preferences.html")
+    def test_form_class_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(ACCOUNT_DELETE_URL)
 
-    def test_form_class_correct(self):
-        response = self.client.get(PREFERENCES_UPDATE_URL)
+        assert isinstance(response.context["form"], AccountDeleteForm)
 
-        self.assertIsInstance(response.context["form"], PreferencesForm)
+    def test_success_url(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.post(ACCOUNT_DELETE_URL, data={"password": "test123"})
 
-    def test_success_url(self):
+        assertRedirects(response, reverse("pastes:create"))
+
+    def test_can_delete_account(self, auto_login_user):
+        client, user = auto_login_user()
+        client.post(ACCOUNT_DELETE_URL, data={"password": "test123"})
+
+        assert User.objects.count() == 0
+
+    def test_cannot_delete_account_when_password_incorrect(self, auto_login_user):
+        client, user = auto_login_user()
+        client.post(ACCOUNT_DELETE_URL, data={"password": "incorrect_pass"})
+
+        assert User.objects.count() == 1
+
+
+class TestPreferencesEdit:
+    def test_login_required(self, client):
+        response = client.get(PREFERENCES_UPDATE_URL)
+
+        assertRedirects(response, login_redirect_url(PREFERENCES_UPDATE_URL))
+
+    def test_template_name_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(PREFERENCES_UPDATE_URL)
+
+        assertTemplateUsed(response, "account/preferences.html")
+
+    def test_form_class_correct(self, auto_login_user):
+        client, user = auto_login_user()
+        response = client.get(PREFERENCES_UPDATE_URL)
+
+        assert isinstance(response.context["form"], PreferencesForm)
+
+    def test_success_url(self, auto_login_user):
+        client, user = auto_login_user()
         data = {
             "default_syntax": "python",
             "default_expiration_symbol": "10M",
             "default_exposure": "PR",
         }
-        response = self.client.post(PREFERENCES_UPDATE_URL, data=data)
+        response = client.post(PREFERENCES_UPDATE_URL, data=data)
 
-        self.assertRedirects(response, PREFERENCES_UPDATE_URL)
+        assertRedirects(response, PREFERENCES_UPDATE_URL)
 
-    def test_can_update_preferences(self):
+    def test_can_update_preferences(self, auto_login_user):
+        client, user = auto_login_user()
         data = {
             "default_syntax": "python",
             "default_expiration_symbol": "10M",
             "default_exposure": "PR",
         }
-        self.client.post(PREFERENCES_UPDATE_URL, data=data)
-        self.user.refresh_from_db()
+        client.post(PREFERENCES_UPDATE_URL, data=data)
+        user.refresh_from_db()
 
-        self.assertEqual(self.user.preferences.default_syntax, "python")
-        self.assertEqual(self.user.preferences.default_expiration_symbol, "10M")
-        self.assertEqual(self.user.preferences.default_exposure, "PR")
+        assert user.preferences.default_syntax == "python"
+        assert user.preferences.default_expiration_symbol == "10M"
+        assert user.preferences.default_exposure == "PR"
