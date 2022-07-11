@@ -16,20 +16,6 @@ User = get_user_model()
 REPORT_CHANGELIST_URL = reverse("admin:pastes_report_changelist")
 
 
-@pytest.fixture
-def create_report(create_paste):
-    paste = create_paste()
-
-    def report(reason="For testing", reporter_name="Tester"):
-        return Report.objects.create(
-            paste=paste,
-            reason=reason,
-            reporter_name=reporter_name,
-        )
-
-    return report
-
-
 def test_shows_link_to_paste_on_list(admin_client, create_paste, create_report):
     report = create_report()
     response = admin_client.get(REPORT_CHANGELIST_URL)

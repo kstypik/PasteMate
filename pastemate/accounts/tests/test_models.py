@@ -1,13 +1,6 @@
 import pytest
 
-from pastemate.accounts.models import User
-
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture
-def user():
-    return User.objects.create_user(username="John")
 
 
 class TestUser:
