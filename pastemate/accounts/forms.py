@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 
-from .models import Preferences
+from pastemate.accounts.models import Preferences
 
 User = get_user_model()
 

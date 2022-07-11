@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import ngettext
 
-from .models import Folder, Paste, Report
+from pastemate.pastes.models import Folder, Paste, Report
 
 
 @admin.register(Paste)

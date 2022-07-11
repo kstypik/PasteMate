@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from ..models import Paste, Report
+from pastemate.pastes.models import Paste, Report
 
 User = get_user_model()
 

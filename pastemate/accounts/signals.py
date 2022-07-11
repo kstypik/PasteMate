@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from pinax.messages.models import Message
 
-from .models import Preferences, User
+from pastemate.accounts.models import Preferences, User
 
 
 @receiver(post_save, sender=User)

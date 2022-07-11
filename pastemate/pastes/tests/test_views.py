@@ -7,9 +7,8 @@ from django.urls import reverse
 from django.utils import formats, timezone
 
 from config.utils import login_redirect_url
-
-from .. import forms
-from ..models import Folder, Paste, Report
+from pastemate.pastes import forms
+from pastemate.pastes.models import Folder, Paste, Report
 
 User = get_user_model()
 

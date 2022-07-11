@@ -8,8 +8,12 @@ from django.urls import reverse
 from PIL import Image
 
 from config.utils import login_redirect_url
-
-from ..forms import AccountDeleteForm, AvatarForm, PreferencesForm, ProfileForm
+from pastemate.accounts.forms import (
+    AccountDeleteForm,
+    AvatarForm,
+    PreferencesForm,
+    ProfileForm,
+)
 
 User = get_user_model()
 

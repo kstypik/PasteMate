@@ -17,7 +17,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter, ImageFormatter
 from pygments.lexers import get_lexer_by_name
 
-from . import choices
+from pastemate.pastes import choices
 
 User = get_user_model()
 

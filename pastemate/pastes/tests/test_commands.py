@@ -4,7 +4,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.test import TestCase
 
-from ..models import Paste
+from pastemate.pastes.models import Paste
 
 
 class ExpirePastesCommandTest(TestCase):

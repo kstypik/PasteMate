@@ -12,9 +12,13 @@ from hitcount.utils import get_hitcount_model
 from hitcount.views import HitCountMixin
 
 from pastemate.core.utils import paginate
-
-from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
-from .models import Folder, Paste
+from pastemate.pastes.forms import (
+    FolderForm,
+    PasswordProtectedPasteForm,
+    PasteForm,
+    ReportForm,
+)
+from pastemate.pastes.models import Folder, Paste
 
 User = get_user_model()
 

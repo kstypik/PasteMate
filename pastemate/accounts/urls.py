@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from pastemate.accounts import views
 
 app_name = "accounts"
 

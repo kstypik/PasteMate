@@ -4,7 +4,12 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, UpdateView
 
-from .forms import AccountDeleteForm, AvatarForm, PreferencesForm, ProfileForm
+from pastemate.accounts.forms import (
+    AccountDeleteForm,
+    AvatarForm,
+    PreferencesForm,
+    ProfileForm,
+)
 
 User = get_user_model()
 

@@ -4,8 +4,8 @@ from django.forms import BooleanField
 from django.test import TestCase
 from hcaptcha_field import hCaptchaField
 
-from .. import forms
-from ..models import Folder, Paste
+from pastemate.pastes import forms
+from pastemate.pastes.models import Folder, Paste
 
 User = get_user_model()
 

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.hashers import check_password
 from hcaptcha_field import hCaptchaField
 
-from .models import Folder, Paste, Report
+from pastemate.pastes.models import Folder, Paste, Report
 
 NEW_FOLDER_HELP_TEXT = "You can type a new folder name, and it will be created and chosen instead of the one above."
 POST_ANONYMOUSLY_HELP_TEXT = "If checked, your account won't be associated with this paste.\

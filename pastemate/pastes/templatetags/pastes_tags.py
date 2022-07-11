@@ -1,6 +1,6 @@
 from django import template
 
-from ..models import Paste
+from pastemate.pastes.models import Paste
 
 register = template.Library()
 
