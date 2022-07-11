@@ -864,7 +864,7 @@ class EmbedPasteViewTest(TestCase):
         response = self.client.get(self.embed_url)
 
         self.assertEqual(
-            f"testserver/media/embed/{self.paste.uuid}.png",
+            f"http://testserver/media/embed/{self.paste.uuid}.png",
             response.context["direct_embed_link"],
         )
 
