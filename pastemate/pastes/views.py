@@ -1,479 +1,394 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector
 from django.db.models import Count
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
+from django.template.response import TemplateResponse
 from django.utils import timezone
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-    View,
-)
-from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.detail import SingleObjectMixin
-from hitcount.models import HitCount
-from hitcount.views import HitCountDetailView, HitCountMixin
+from hitcount.utils import get_hitcount_model
+from hitcount.views import HitCountMixin
+
+from pastemate.core.utils import paginate
 
 from .forms import FolderForm, PasswordProtectedPasteForm, PasteForm, ReportForm
-from .models import Folder, Paste, Report
+from .models import Folder, Paste
 
 User = get_user_model()
 
 
-class AuthenticatedUserInFormKwargsMixin:
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        if self.request.user.is_authenticated:
-            kwargs.update({"user": self.request.user})
-        return kwargs
+def create_paste(request):
+    user = request.user if request.user.is_authenticated else None
+    if request.method == "POST":
+        form = PasteForm(data=request.POST, user=user)
+        if form.is_valid():
+            paste = form.save(commit=False)
+            if (
+                not form.cleaned_data.get("post_anonymously")
+                and request.user.is_authenticated
+            ):
+                paste.author = request.user
+            paste.save()
+
+            return redirect(paste)
+    else:
+        form = PasteForm(user=user)
+
+    return TemplateResponse(
+        request, "pastes/form.html", {"action_type": "Create New Paste", "form": form}
+    )
 
 
-class PasteCreateView(AuthenticatedUserInFormKwargsMixin, CreateView):
-    model = Paste
-    form_class = PasteForm
-    template_name = "pastes/form.html"
-    extra_context = {
-        "action_type": "Create New Paste",
+@login_required
+def clone_paste(request, paste_uuid):
+    cloned_paste = get_object_or_404(Paste, uuid=paste_uuid)
+    if (
+        cloned_paste.is_private
+        and not cloned_paste.is_author(request.user)
+        or not cloned_paste.is_normally_accessible
+    ):
+        raise Http404
+
+    user = request.user if request.user.is_authenticated else None
+    initial = {
+        "content": cloned_paste.content,
+        "syntax": cloned_paste.syntax,
+        "title": cloned_paste.title,
     }
+    if request.method == "POST":
+        form = PasteForm(data=request.POST, initial=initial, user=user)
+        if form.is_valid():
+            paste = form.save(commit=False)
+            if (
+                not form.cleaned_data.get("post_anonymously")
+                and request.user.is_authenticated
+            ):
+                paste.author = request.user
+            paste.save()
 
-    def form_valid(self, form):
-        if (
-            not form.cleaned_data.get("post_anonymously")
-            and self.request.user.is_authenticated
-        ):
-            form.instance.author = self.request.user
-        return super().form_valid(form)
+            return redirect(paste)
+    else:
+        form = PasteForm(initial=initial, user=user)
 
-
-class NonPrivatePasteOrUserIsAuthorMixin:
-    def get_object(self):
-        object = super().get_object()
-        if object.is_private and not object.is_author(self.request.user):
-            raise Http404
-        return object
-
-
-class NormallyAccessiblePasteMixin:
-    def get_object(self):
-        object = super().get_object()
-        if not object.is_normally_accessible:
-            raise Http404
-        return object
+    return TemplateResponse(
+        request, "pastes/form.html", {"action_type": "Clone Paste", "form": form}
+    )
 
 
-class PasteCloneView(
-    LoginRequiredMixin,
-    NonPrivatePasteOrUserIsAuthorMixin,
-    NormallyAccessiblePasteMixin,
-    PasteCreateView,
-):
-    extra_context = {
-        "action_type": "Clone Paste",
-    }
+def paste_detail(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if paste.is_private and not paste.is_author(request.user):
+        raise Http404
 
-    def get_object(self):
-        object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
-        return object
+    context = {"paste": paste}
 
-    def get_initial(self):
-        cloned_paste = self.get_object()
-        return {
-            "content": cloned_paste.content,
-            "syntax": cloned_paste.syntax,
-            "title": cloned_paste.title,
-        }
+    hit_count = get_hitcount_model().objects.get_for_object(paste)
+    hits = hit_count.hits
+    context["hitcount"] = {"pk": hit_count.pk}
+    hit_count_response = HitCountMixin.hit_count(request, hit_count)
+    if hit_count_response.hit_counted:
+        hits = hits + 1
+    context["hitcount"]["hit_counted"] = hit_count_response.hit_counted
+    context["hitcount"]["hit_message"] = hit_count_response.hit_message
+    context["hitcount"]["total_hits"] = hits
 
+    if paste.password and request.user != paste.author:
+        return redirect("pastes:detail_with_password", uuid=paste.uuid)
 
-class PasteInstanceMixin:
-    model = Paste
-    slug_field = "uuid"
-    slug_url_kwarg = "uuid"
-    context_object_name = "paste"
+    if request.method == "POST":
+        context["burned"] = True
+        paste.burn_after_read = False
+        paste.delete()
+
+    return TemplateResponse(request, "pastes/detail.html", context=context)
 
 
-class PasteDetailView(
-    PasteInstanceMixin, NonPrivatePasteOrUserIsAuthorMixin, HitCountDetailView
-):
-    template_name = "pastes/detail.html"
-    count_hit = True
-
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        if obj.password and request.user != obj.author:
-            return redirect("pastes:detail_with_password", uuid=obj.uuid)
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        """For handling Burn After Read"""
-        self.object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
-        context = {"paste": self.object, "burned": True}
-        self.object.burn_after_read = False
-        self.object.delete()
-        return self.render_to_response(context)
-
-    def render_to_response(self, context, **response_kwargs):
-        response = super().render_to_response(context, **response_kwargs)
-        return response
+def raw_paste_detail(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if (
+        paste.is_private
+        and not paste.is_author(request.user)
+        or not paste.is_normally_accessible
+    ):
+        raise Http404
+    return HttpResponse(paste.content, content_type="text/plain")
 
 
-class RawPasteDetailView(
-    PasteInstanceMixin,
-    NonPrivatePasteOrUserIsAuthorMixin,
-    NormallyAccessiblePasteMixin,
-    SingleObjectMixin,
-    View,
-):
-    def get(self, request, *args, **kwargs):
-        object = self.get_object()
-        return HttpResponse(object.content, content_type="text/plain")
+def download_paste(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if (
+        paste.is_private
+        and not paste.is_author(request.user)
+        or not paste.is_normally_accessible
+    ):
+        raise Http404
+
+    response = HttpResponse(paste.content, content_type="text/plain")
+    response["Content-Disposition"] = f'attachment; filename="paste-{paste.uuid}.txt"'
+    return response
 
 
-class DownloadPasteView(
-    PasteInstanceMixin,
-    NonPrivatePasteOrUserIsAuthorMixin,
-    NormallyAccessiblePasteMixin,
-    SingleObjectMixin,
-    View,
-):
-    def get(self, request, *args, **kwargs):
-        object = self.get_object()
-        response = HttpResponse(object.content, content_type="text/plain")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="paste-{object.uuid}.txt"'
-        return response
+def paste_detail_with_password(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if paste.is_private and not paste.is_author(request.user):
+        raise Http404
 
+    context = {"paste": paste}
 
-class PasteDetailWithPasswordView(
-    PasteInstanceMixin, NonPrivatePasteOrUserIsAuthorMixin, DetailView
-):
-    template_name = "pastes/detail.html"
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.password:
-            context = self.get_context_data(object=self.object)
-            context["password_protected"] = True
-            context["password_form"] = PasswordProtectedPasteForm(
-                correct_password=self.object.password
-            )
-
-            return self.render_to_response(context)
-        else:
-            return redirect(self.object)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.password:
-            context = self.get_context_data(object=self.object)
+    if request.method == "POST":
+        if paste.password:
             context["password_protected"] = True
             password_form = PasswordProtectedPasteForm(
-                request.POST, correct_password=self.object.password
+                request.POST, correct_password=paste.password
             )
             context["password_form"] = password_form
             if password_form.is_valid():
                 context["password_correct"] = True
-                if self.object.burn_after_read:
-                    self.object.delete()
-            return self.render_to_response(context)
+                if paste.burn_after_read:
+                    paste.delete()
         else:
-            return redirect(self.object)
+            return redirect(paste)
+    else:
+        if paste.password:
+            context["password_protected"] = True
+            context["password_form"] = PasswordProtectedPasteForm(
+                correct_password=paste.password
+            )
+        else:
+            return redirect(paste)
+    return TemplateResponse(request, "pastes/detail.html", context=context)
 
 
-class PasteAuthorMixin:
-    def get_object(self, queryset=None):
-        object = super().get_object()
-        if not object.is_author(self.request.user):
-            raise Http404
+@login_required
+def edit_paste(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if not paste.is_author(request.user):
+        raise Http404
 
-        return object
+    user = request.user if request.user.is_authenticated else None
+    if request.method == "POST":
+        form = PasteForm(data=request.POST, instance=paste, user=user)
+        if form.is_valid():
+            paste = form.save(commit=False)
+            paste.save()
+
+            return redirect(paste)
+    else:
+        form = PasteForm(instance=paste, user=user)
+
+    return TemplateResponse(
+        request,
+        "pastes/form.html",
+        {
+            "action_type": "Edit",
+            "form": form,
+            "paste": paste,
+        },
+    )
 
 
-class PasteUpdateView(
-    LoginRequiredMixin,
-    AuthenticatedUserInFormKwargsMixin,
-    PasteAuthorMixin,
-    PasteInstanceMixin,
-    UpdateView,
-):
-    form_class = PasteForm
-    template_name = "pastes/form.html"
-    extra_context = {
-        "action_type": "Edit",
+@login_required
+def delete_paste(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if not paste.is_author(request.user):
+        raise Http404
+    if request.method == "POST":
+        paste.delete()
+        messages.success(request, "Paste was deleted successfully.")
+        return redirect("/")
+    return TemplateResponse(request, "pastes/delete.html", {"paste": paste})
+
+
+def user_pastes(request, username):
+    user = get_object_or_404(User, username=username)
+    context = {"author": user}
+
+    if request.GET.get("guest") == "1":
+        display_as_guest = True
+    else:
+        display_as_guest = False
+    context["as_guest"] = display_as_guest
+
+    if request.user != user or display_as_guest:
+        pastes = Paste.public.filter(author=user)
+    else:
+        pastes = Paste.objects.filter(author=user, folder=None)
+
+    page_num = request.GET.get("page", 1)
+    context["page_obj"] = paginate(
+        pastes, page_num, settings.PASTES_USER_LIST_PAGINATE_BY
+    )
+
+    if request.user == user and not display_as_guest:
+        context["folders"] = (
+            Folder.objects.filter(created_by=request.user)
+            .annotate(num_pastes=Count("pastes"))
+            .order_by("slug")
+        )
+
+    if request.user == user:
+        context["page_name"] = "my_pastes"
+        context["stats"] = {
+            "total_pastes": Paste.objects.filter(author=request.user).count(),
+            "public_pastes": Paste.public.filter(author=request.user).count(),
+            "unlisted_pastes": Paste.objects.filter(
+                author=request.user, exposure=Paste.Exposure.UNLISTED
+            ).count(),
+            "private_pastes": Paste.objects.filter(
+                author=request.user, exposure=Paste.Exposure.PRIVATE
+            ).count(),
+        }
+
+    return TemplateResponse(request, "pastes/user_list.html", context=context)
+
+
+def search_pastes(request):
+    query = request.GET.get("q", "")
+    pastes = Paste.objects.annotate(search=SearchVector("content", "title")).filter(
+        author=request.user, search=query
+    )
+    page_num = request.GET.get("page", 1)
+    page_obj = paginate(pastes, page_num, settings.PASTES_USER_LIST_PAGINATE_BY)
+
+    context = {"query": request.GET.get("q"), "page_obj": page_obj}
+
+    return TemplateResponse(request, "pastes/search_results.html", context=context)
+
+
+@login_required
+def folder_detail(request, username, folder_slug):
+    user = get_object_or_404(User, username=username)
+    folder = get_object_or_404(Folder, created_by=request.user, slug=folder_slug)
+    pastes = folder.pastes.all()
+    page_num = request.GET.get("page", 1)
+    page_obj = paginate(pastes, page_num, settings.PASTES_USER_LIST_PAGINATE_BY)
+
+    context = {
+        "page_obj": page_obj,
+        "folder": folder,
+        "author": user,
+    }
+    return TemplateResponse(request, "pastes/user_list.html", context=context)
+
+
+@login_required
+def edit_folder(request, username, folder_slug):
+    get_object_or_404(User, username=username)
+    folder = get_object_or_404(request.user.folders, slug=folder_slug)
+
+    user = request.user if request.user.is_authenticated else None
+    if request.method == "POST":
+        form = FolderForm(data=request.POST, instance=folder, user=user)
+        if form.is_valid():
+            form.save()
+            return redirect(folder)
+    else:
+        form = FolderForm(instance=folder, user=user)
+
+    return TemplateResponse(
+        request, "pastes/folder_form.html", context={"folder": folder, "form": form}
+    )
+
+
+@login_required
+def delete_folder(request, username, folder_slug):
+    user = get_object_or_404(User, username=username)
+    folder = get_object_or_404(request.user.folders, slug=folder_slug)
+
+    if request.method == "POST":
+        folder.delete()
+        messages.success(request, "Folder has been deleted.")
+        return redirect(user)
+
+    return TemplateResponse(request, "pastes/folder_delete.html", {"folder": folder})
+
+
+def archive(request, syntax=None):
+    if syntax:
+        pastes = Paste.public.filter(syntax=syntax)[: settings.PASTES_ARCHIVE_LENGTH]
+    else:
+        pastes = Paste.public.all()[: settings.PASTES_ARCHIVE_LENGTH]
+
+    context = {
+        "pastes": pastes,
+        "syntax": Paste.get_full_language_name(syntax),
+        "page_name": "archive",
+    }
+    return TemplateResponse(request, "pastes/archive.html", context=context)
+
+
+def embed_paste(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+
+    if paste.is_private or not paste.is_normally_accessible:
+        raise Http404
+
+    context = {
+        "paste": paste,
+        "direct_embed_link": request.build_absolute_uri(paste.embeddable_image.url),
     }
 
-
-class PasteDeleteView(
-    LoginRequiredMixin, PasteAuthorMixin, PasteInstanceMixin, DeleteView
-):
-    success_url = "/"
-    template_name = "pastes/delete.html"
+    return TemplateResponse(request, "pastes/embed.html", context)
 
 
-class UserListMixin:
-    context_object_name = "pastes"
-    template_name = "pastes/user_list.html"
+def print_paste(request, uuid):
+    paste = get_object_or_404(Paste, uuid=uuid)
+    if (
+        paste.is_private
+        and not paste.is_author(request.user)
+        or not paste.is_normally_accessible
+    ):
+        raise Http404
 
-    def get_paginate_by(self, queryset):
-        return settings.PASTES_USER_LIST_PAGINATE_BY
-
-
-class UserStatsMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        show_stats = context.pop("show_stats", None)
-        if show_stats:
-            context["stats"] = {
-                "total_pastes": Paste.objects.filter(author=self.request.user).count(),
-                "public_pastes": Paste.public.filter(author=self.request.user).count(),
-                "unlisted_pastes": Paste.objects.filter(
-                    author=self.request.user, exposure=Paste.Exposure.UNLISTED
-                ).count(),
-                "private_pastes": Paste.objects.filter(
-                    author=self.request.user, exposure=Paste.Exposure.PRIVATE
-                ).count(),
-            }
-        return context
+    return TemplateResponse(request, "pastes/print.html", {"paste": paste})
 
 
-class UserPasteListView(UserStatsMixin, UserListMixin, ListView, HitCountMixin):
-    def display_as_guest(self):
-        if self.request.GET.get("guest") == "1":
-            return True
-        return False
+def report_paste(request, uuid):
+    reported_paste = get_object_or_404(Paste, uuid=uuid)
+    if (
+        not reported_paste.is_normally_accessible
+        or reported_paste.is_author(request.user)
+        or reported_paste.is_private
+    ):
+        raise Http404
 
-    def get_queryset(self):
-        self.user = get_object_or_404(User, username=self.kwargs["username"])
-
-        if self.request.user != self.user or self.display_as_guest():
-            return Paste.public.filter(author=self.user)
-        return Paste.objects.filter(author=self.user, folder=None)
-
-    def should_show_stats(self):
-        if self.request.user == self.user:
-            return True
-        return False
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(
-            show_stats=self.should_show_stats(), **kwargs
-        )
-        context["author"] = self.user
-
-        hit_count = HitCount.objects.get_for_object(self.user)
-        hits = hit_count.hits
-
-        hit_count_response = self.hit_count(self.request, hit_count)
-        if hit_count_response.hit_counted:
-            hits = hits + 1
-        context["total_hits"] = hits
-
-        if self.request.user == self.user and not self.display_as_guest():
-            context["folders"] = (
-                Folder.objects.filter(created_by=self.request.user)
-                .annotate(num_pastes=Count("pastes"))
-                .order_by("slug")
+    if request.method == "POST":
+        form = ReportForm(data=request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.paste = reported_paste
+            report.save()
+            messages.success(
+                request, "Your report was submitted and is awaiting for moderation."
             )
+            return redirect(reported_paste)
+    else:
+        form = ReportForm()
 
-        context["as_guest"] = self.display_as_guest()
-
-        if self.request.user == self.user:
-            context["page_name"] = "my_pastes"
-
-        return context
-
-
-class SearchResultsView(LoginRequiredMixin, ListView):
-    context_object_name = "pastes"
-    template_name = "pastes/search_results.html"
-    paginate_by = settings.PASTES_USER_LIST_PAGINATE_BY
-
-    def get_queryset(self):
-        query = self.request.GET.get("q", "")
-        return Paste.objects.annotate(search=SearchVector("content", "title")).filter(
-            author=self.request.user, search=query
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["query"] = self.request.GET.get("q")
-        return context
+    return TemplateResponse(
+        request, "pastes/report.html", {"form": form, "reported_paste": reported_paste}
+    )
 
 
-class UserFolderListView(LoginRequiredMixin, UserStatsMixin, UserListMixin, ListView):
-    def get_queryset(self):
-        self.user = get_object_or_404(User, username=self.kwargs["username"])
-        self.folder = get_object_or_404(
-            Folder, created_by=self.request.user, slug=self.kwargs["folder_slug"]
-        )
-        return self.folder.pastes.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(show_stats=True, **kwargs)
-        context["folder"] = self.folder
-        context["author"] = self.request.user
-        return context
+def syntax_languages(request):
+    return TemplateResponse(
+        request,
+        "pastes/syntax_languages.html",
+        {"languages": Paste.public.languages(), "page_name": "languages"},
+    )
 
 
-class UserFolderUpdateView(
-    LoginRequiredMixin,
-    SuccessMessageMixin,
-    AuthenticatedUserInFormKwargsMixin,
-    UpdateView,
-):
-    slug_url_kwarg = "folder_slug"
-    form_class = FolderForm
-    context_object_name = "folder"
-    success_message = 'Folder "%(name)s" has been updated.'
-    template_name = "pastes/folder_form.html"
-
-    def get_queryset(self):
-        return Folder.objects.filter(created_by=self.request.user)
-
-    def get_success_url(self):
-        return reverse(
-            "pastes:user_folder",
-            kwargs={
-                "username": self.request.user.username,
-                "folder_slug": self.object.slug,
-            },
-        )
-
-
-class UserFolderDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
-    slug_url_kwarg = "folder_slug"
-    context_object_name = "folder"
-    template_name = "pastes/folder_delete.html"
-    success_message = "Folder has been deleted."
-
-    def get_queryset(self):
-        return self.request.user.folders.all()
-
-    def get_success_url(self):
-        return reverse(
-            "pastes:user_pastes",
-            kwargs={
-                "username": self.request.user.username,
-            },
-        )
-
-
-class PasteArchiveListView(ListView):
-    context_object_name = "pastes"
-    template_name = "pastes/archive.html"
-
-    def get_queryset(self):
-        self.syntax = self.kwargs.get("syntax")
-        if self.syntax:
-            return Paste.public.filter(syntax=self.syntax)
-        return Paste.public.all()[: settings.PASTES_ARCHIVE_LENGTH]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["syntax"] = Paste.get_full_language_name(self.syntax)
-        context["page_name"] = "archive"
-        return context
-
-
-class EmbedPasteView(
-    PasteInstanceMixin,
-    NonPrivatePasteOrUserIsAuthorMixin,
-    NormallyAccessiblePasteMixin,
-    DetailView,
-):
-    template_name = "pastes/embed.html"
-
-    def get_object(self, queryset=None):
-        obj = super().get_object()
-        if obj.is_private:
-            raise Http404
-        return obj
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context["direct_embed_link"] = self.request.build_absolute_uri(
-            self.object.embeddable_image.url
-        )
-        return context
-
-
-class PrintPasteView(
-    PasteInstanceMixin,
-    NonPrivatePasteOrUserIsAuthorMixin,
-    NormallyAccessiblePasteMixin,
-    TemplateResponseMixin,
-    SingleObjectMixin,
-    View,
-):
-    template_name = "pastes/print.html"
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data()
-        return self.render_to_response(context)
-
-
-class ReportPasteView(SuccessMessageMixin, CreateView):
-    model = Report
-    form_class = ReportForm
-    template_name = "pastes/report.html"
-    success_message = "Your report was submitted and is awaiting for moderation."
-
-    def dispatch(self, request, *args, **kwargs):
-        self.paste_object = get_object_or_404(Paste, uuid=self.kwargs["uuid"])
-        if (
-            not self.paste_object.is_normally_accessible
-            or self.paste_object.is_author(request.user)
-            or self.paste_object.is_private
-        ):
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["reported_paste"] = self.paste_object
-        return context
-
-    def form_valid(self, form):
-        form.instance.paste = self.paste_object
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return self.paste_object.get_absolute_url()
-
-
-class SyntaxLanguagesView(TemplateView):
-    template_name = "pastes/syntax_languages.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["languages"] = (
-            Paste.public.exclude(syntax="text")
-            .order_by("syntax")
-            .distinct()
-            .values("syntax")
-            .annotate(used=Count("syntax"))
-        )
-        context["page_name"] = "languages"
-        return context
-
-
-class BackupUserPastesView(LoginRequiredMixin, View):
-    def post(self, request, *args, **kwargs):
+@login_required
+def backup_pastes(request):
+    if request.method == "POST":
         response = HttpResponse(content_type="application/zip")
 
-        Paste.make_backup_archive(response, self.request.user)
+        Paste.make_backup_archive(response, request.user)
         date_str = timezone.now().strftime("%Y%m%d")
         archive_name = f"pastemate_backup_{date_str}.zip"
 
         response["Content-Disposition"] = f"attachment; filename={archive_name}"
         return response
+    return HttpResponseNotAllowed(["POST"])

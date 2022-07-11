@@ -10,7 +10,6 @@ from config.utils import login_redirect_url
 
 from .. import forms
 from ..models import Folder, Paste, Report
-from ..views import PasteDetailView
 
 User = get_user_model()
 
@@ -149,7 +148,7 @@ class PasteCloneViewTest(TestCase):
             content="Hello World!", exposure="PR", author=private_paste_author
         )
 
-        response = self.client.get(private_paste.get_absolute_url())
+        response = self.client.get(reverse("pastes:clone", args=[private_paste.uuid]))
 
         self.assertEqual(response.status_code, 404)
 
@@ -178,10 +177,6 @@ class PasteDetailViewTest(TestCase):
         response = self.client.get(self.paste_url)
 
         self.assertTemplateUsed(response, "pastes/detail.html")
-
-    def test_counts_hits(self):
-        """Ensure the view counts hits with django-hitcount"""
-        self.assertTrue(PasteDetailView.count_hit)
 
     def test_redirects_pastes_with_passwords_to_appropriate_view(self):
         paste_with_pass = Paste.objects.create(content="Hello", password="pass12")
@@ -526,23 +521,23 @@ class UserPasteListViewTest(TestCase):
     def test_user_can_see_their_own_pastes(self):
         response = self.client.get(self.first_user_userlist)
 
-        self.assertIn(self.public_paste, response.context["pastes"])
-        self.assertIn(self.unlisted_paste, response.context["pastes"])
-        self.assertIn(self.private_paste, response.context["pastes"])
+        self.assertIn(self.public_paste, response.context["page_obj"])
+        self.assertIn(self.unlisted_paste, response.context["page_obj"])
+        self.assertIn(self.private_paste, response.context["page_obj"])
 
     def test_others_cannot_see_users_private_pastes(self):
         response = self.another_client.get(self.first_user_userlist)
 
-        self.assertIn(self.public_paste, response.context["pastes"])
-        self.assertNotIn(self.unlisted_paste, response.context["pastes"])
-        self.assertNotIn(self.private_paste, response.context["pastes"])
+        self.assertIn(self.public_paste, response.context["page_obj"])
+        self.assertNotIn(self.unlisted_paste, response.context["page_obj"])
+        self.assertNotIn(self.private_paste, response.context["page_obj"])
 
     def test_user_can_see_their_list_as_guest(self):
         response = self.client.get(self.first_user_userlist, {"guest": "1"})
 
-        self.assertIn(self.public_paste, response.context["pastes"])
-        self.assertNotIn(self.unlisted_paste, response.context["pastes"])
-        self.assertNotIn(self.private_paste, response.context["pastes"])
+        self.assertIn(self.public_paste, response.context["page_obj"])
+        self.assertNotIn(self.unlisted_paste, response.context["page_obj"])
+        self.assertNotIn(self.private_paste, response.context["page_obj"])
 
     def test_user_can_see_their_folders_on_list(self):
         response = self.client.get(self.first_user_userlist)
@@ -654,7 +649,7 @@ class SearchResultsViewTest(TestCase):
     def test_finds_appropriate_results(self):
         response = self.client.get(self.search_url, {"q": "search"})
 
-        self.assertEqual(response.context["pastes"].count(), 3)
+        self.assertEqual(len(response.context["page_obj"]), 3)
 
     def test_query_in_context(self):
         response = self.client.get(self.search_url, {"q": "search"})
@@ -689,7 +684,7 @@ class UserFolderListViewTest(TestCase):
     def test_author_can_view_pastes_in_folder(self):
         response = self.client.get(self.folder_list_url)
 
-        self.assertEqual(response.context["pastes"].count(), 5)
+        self.assertEqual(len(response.context["page_obj"]), 5)
 
     def test_user_cannot_view_folders_of_other_users(self):
         another_user = User.objects.create_user(

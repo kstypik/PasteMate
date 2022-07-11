@@ -127,7 +127,7 @@ class PasteUrlsTest(SimpleTestCase):
             reverse(
                 "pastes:clone",
                 kwargs={
-                    "uuid": UID,
+                    "paste_uuid": UID,
                 },
             ),
             f"/{UID}/clone/",

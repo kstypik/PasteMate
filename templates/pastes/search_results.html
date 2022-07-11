@@ -7,7 +7,7 @@
 <h2>Your pastes matching keyword: {{ query }}</h2>
 
 {% include "_includes/pastes_search.html" %}
-{% if pastes %}
+{% if page_obj %}
   <table class="table mt-3">
     <thead>
       <tr>
@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for paste in pastes %}
+      {% for paste in page_obj %}
       <tr>
         <td>
           {% if paste.exposure == "PU" %}<i title="Public paste. Everyone can see it." class="fa-solid fa-globe"></i>{% endif %}

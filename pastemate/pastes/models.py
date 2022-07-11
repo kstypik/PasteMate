@@ -8,6 +8,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import models
+from django.db.models import Count
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -29,6 +30,15 @@ class ActiveManager(models.Manager):
 class PublicManager(ActiveManager):
     def get_queryset(self):
         return super().get_queryset().filter(exposure=Paste.Exposure.PUBLIC)
+
+    def languages(self):
+        return (
+            self.exclude(syntax="text")
+            .order_by("syntax")
+            .distinct()
+            .values("syntax")
+            .annotate(used=Count("syntax"))
+        )
 
 
 class Paste(TimeStampedModel):

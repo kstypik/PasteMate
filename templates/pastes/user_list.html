@@ -65,7 +65,7 @@
 </div>
 {% endif %}
 
-{% if pastes or folders %}
+{% if page_obj or folders %}
   {% if user == author and not as_guest %}
     {% include "_includes/pastes_search.html" %}
   {% endif %}
@@ -89,7 +89,7 @@
         </tr>    
         {% endfor %}
       {% endif %}
-      {% for paste in pastes %}
+      {% for paste in page_obj %}
       <tr>
         <td>
           {% include "_includes/pastes_exposure_icons.html" %}
