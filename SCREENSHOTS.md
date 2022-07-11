@@ -1,20 +1,17 @@
 # PasteMate Screenshots
 
-## Create New Paste
-![screenshot_create_new_paste](https://user-images.githubusercontent.com/53559764/177049333-a469e984-3482-41e7-bfa3-2a8a7ca7465d.png)
-
+## Paste Create/Edit
+![pastemate_paste_edit](https://user-images.githubusercontent.com/53559764/178123556-21035b57-b501-4e60-acf5-64323dc977b1.png)
 
 ## View Paste
-![screenshot_view_paste](https://user-images.githubusercontent.com/53559764/177049349-1dbc4309-d25e-4d46-902e-c129ff860a3f.png)
-
+![pastemate_paste_detail](https://user-images.githubusercontent.com/53559764/178123557-af818b2d-2842-4498-b29c-37e5e838a07d.png)
 
 ## Edit Profile
-![screenshot_edit_profile](https://user-images.githubusercontent.com/53559764/177049337-ab14f778-a94a-4c43-8769-eb6e1d42e9f2.png)
-
+![pastemate_edit_profile](https://user-images.githubusercontent.com/53559764/178123555-7430e9e5-12a3-4e50-84b3-639bd0758b7e.png)
 
 ## Syntax Highlighting Languages List
-![screenshot_languages_list](https://user-images.githubusercontent.com/53559764/177049338-7293ef46-a5a5-43bc-bf76-6de8b7878413.png)
+![pastemate_languages](https://user-images.githubusercontent.com/53559764/178123554-1c1ed815-2ef2-4ad0-ad2c-cfc6d4e9439b.png)
 
 
 ## User Pastes List
-![screenshot_userlist](https://user-images.githubusercontent.com/53559764/177049342-1a6fc73c-04ea-4cf6-8ae7-6b65db7eb428.png)
+![pastemate_user_pastes](https://user-images.githubusercontent.com/53559764/178123552-0071f817-cb55-49ff-83e7-ec9403bbc00d.png)
