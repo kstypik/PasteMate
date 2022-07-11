@@ -40,10 +40,37 @@ class PasteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        passed_instance = kwargs.get("instance")
+        self.passed_instance = kwargs.get("instance")
         super().__init__(*args, **kwargs)
 
-        if self.user and not passed_instance:
+        self.remove_folder_options_for_guest()
+        self.disallow_private_pastes_for_guest()
+
+        self.handle_user_preferences()
+        self.handle_expiration()
+        self.handle_password(data=kwargs.get("data"))
+        self.set_user_folder_choices()
+
+        if self.user:
+            del self.fields["hcaptcha"]
+
+        if self.passed_instance or not self.user:
+            del self.fields["post_anonymously"]
+
+    def remove_folder_options_for_guest(self):
+        if not self.user:
+            del self.fields["folder"]
+            del self.fields["new_folder"]
+
+    def disallow_private_pastes_for_guest(self):
+        if not self.user:
+            self.fields["exposure"].choices = filter(
+                lambda option: option[0] != Paste.Exposure.PRIVATE,
+                self.fields["exposure"].choices,
+            )
+
+    def handle_user_preferences(self):
+        if self.user and not self.passed_instance:
             self.initial.update(
                 {
                     "exposure": self.user.preferences.default_exposure,
@@ -58,37 +85,25 @@ class PasteForm(forms.ModelForm):
                     }
                 )
 
-        if passed_instance:
+    def handle_expiration(self):
+        if self.passed_instance:
             self.initial.update({"expiration_symbol": "PRE"})
-
-            if kwargs.get("data"):
-                if kwargs["data"].get("enablePassword") and not kwargs["data"].get(
-                    "password"
-                ):
-                    del self.fields["password"]
-                else:
-                    self.instance.password = ""
         else:
             self.fields["expiration_symbol"].choices = filter(
                 lambda option: option[0] != Paste.NO_CHANGE,
                 self.fields["expiration_symbol"].choices,
             )
 
+    def handle_password(self, data):
+        if self.passed_instance and data:
+            if data.get("enablePassword") and not data.get("password"):
+                del self.fields["password"]
+            else:
+                self.instance.password = ""
+
+    def set_user_folder_choices(self):
         if self.user:
             self.fields["folder"].queryset = self.user.folders.all()
-
-            del self.fields["hcaptcha"]
-        else:
-            del self.fields["folder"]
-            del self.fields["new_folder"]
-
-            self.fields["exposure"].choices = filter(
-                lambda option: option[0] != Paste.Exposure.PRIVATE,
-                self.fields["exposure"].choices,
-            )
-
-        if passed_instance or not self.user:
-            del self.fields["post_anonymously"]
 
     def clean(self):
         cleaned_data = super().clean()
