@@ -6,7 +6,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import formats, timezone
 
-from config.utils import login_redirect_url
+from pastemate.core.utils import login_redirect_url
 from pastemate.pastes import forms
 from pastemate.pastes.models import Folder, Paste, Report
 

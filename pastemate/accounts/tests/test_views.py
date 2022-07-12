@@ -7,13 +7,13 @@ from django.urls import reverse
 from PIL import Image
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
-from config.utils import login_redirect_url
 from pastemate.accounts.forms import (
     AccountDeleteForm,
     AvatarForm,
     PreferencesForm,
     ProfileForm,
 )
+from pastemate.core.utils import login_redirect_url
 
 pytestmark = pytest.mark.django_db
 
