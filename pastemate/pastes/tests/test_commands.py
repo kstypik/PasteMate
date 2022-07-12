@@ -9,30 +9,6 @@ from pastemate.pastes.models import Paste
 pytestmark = pytest.mark.django_db
 
 
-# def setUp():
-#     paste_to_delete = Paste.objects.create(
-#         content="Hi",
-#         expiration_date=datetime.datetime(
-#             2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
-#         ),
-#     )
-#     paste_to_delete2 = Paste.objects.create(
-#         content="Hi",
-#         expiration_date=datetime.datetime(
-#             2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
-#         ),
-#     )
-#     paste_to_delete3 = Paste.objects.create(
-#         content="Hi",
-#         expiration_date=datetime.datetime(
-#             2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
-#         ),
-#     )
-
-#     paste_not_for_deletion = Paste.objects.create(content="Hi")
-#     paste_not_for_deletion2 = Paste.objects.create(content="Hi")
-
-
 def test_show_pastes_scheduled_for_expiring(create_paste):
     paste_to_delete = create_paste(
         title="First",

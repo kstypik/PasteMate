@@ -7,8 +7,6 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertInHTML
 
-from pastemate.pastes.models import Report
-
 pytestmark = pytest.mark.django_db
 
 User = get_user_model()
