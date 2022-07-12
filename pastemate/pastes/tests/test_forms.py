@@ -1,113 +1,105 @@
+import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.forms import BooleanField
-from django.test import TestCase
 from hcaptcha_field import hCaptchaField
 
 from pastemate.pastes import forms
 from pastemate.pastes.models import Folder, Paste
 
+pytestmark = pytest.mark.django_db
+
 User = get_user_model()
 
 
-class PasteFormTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username="Test", email="test@test.com", password="test123"
+class TestPasteForm:
+    def test_form_respects_preferences_of_logged_users(self, user):
+        user.preferences.default_syntax = "python"
+        user.preferences.default_expiration_symbol = "10M"
+        user.preferences.default_exposure = "PR"
+        form = forms.PasteForm(user=user, initial={})
+
+        assert form.initial["syntax"] == "python"
+        assert form.initial["expiration_symbol"] == "10M"
+        assert form.initial["exposure"] == "PR"
+
+    def test_preferences_do_not_override_data_on_update(self, user, create_paste):
+        paste = create_paste(
+            author=user, syntax="html", exposure=Paste.Exposure.PRIVATE
         )
-        self.paste = Paste.objects.create(
-            content="Hello",
-            syntax="html",
-            expiration_symbol=Paste.NEVER,
-            exposure=Paste.Exposure.PRIVATE,
-        )
+        user.preferences.default_syntax = "python"
+        user.preferences.default_expiration_symbol = "10M"
+        user.preferences.default_exposure = "PR"
+        form = forms.PasteForm(user=user, initial={}, instance=paste)
 
-    def test_form_respects_preferences_of_logged_users(self):
-        self.user.preferences.default_syntax = "python"
-        self.user.preferences.default_expiration_symbol = "10M"
-        self.user.preferences.default_exposure = "PR"
-        form = forms.PasteForm(user=self.user, initial={})
+        assert form.initial["syntax"] == "html"
+        assert form.initial["expiration_symbol"] == Paste.NO_CHANGE
+        assert form.initial["exposure"] == Paste.Exposure.PRIVATE
 
-        self.assertEqual(form.initial["syntax"], "python")
-        self.assertEqual(form.initial["expiration_symbol"], "10M")
-        self.assertEqual(form.initial["exposure"], "PR")
+    def test_form_no_change_of_syntax_when_in_initial(self, user):
+        user.preferences.default_syntax = "python"
+        form = forms.PasteForm(user=user, initial={"syntax": "html"})
 
-    def test_preferences_do_not_override_data_on_update(self):
-        self.user.preferences.default_syntax = "python"
-        self.user.preferences.default_expiration_symbol = "10M"
-        self.user.preferences.default_exposure = "PR"
-        form = forms.PasteForm(user=self.user, initial={}, instance=self.paste)
+        assert form.initial["syntax"] == "html"
 
-        self.assertEqual(form.initial["syntax"], "html")
-        self.assertEqual(form.initial["expiration_symbol"], Paste.NO_CHANGE)
-        self.assertEqual(form.initial["exposure"], Paste.Exposure.PRIVATE)
-
-    def test_form_no_change_of_syntax_when_in_initial(self):
-        self.user.preferences.default_syntax = "python"
-        form = forms.PasteForm(user=self.user, initial={"syntax": "html"})
-
-        self.assertEqual(form.initial["syntax"], "html")
-
-    def test_folder_choices_only_for_folders_created_by_the_user(self):
+    def test_folder_choices_only_for_folders_created_by_the_user(self, user):
         another_user = User.objects.create_user(
             username="another", email="another@mail.com"
         )
-        folder1 = Folder.objects.create(name="folder1", created_by=self.user)
-        folder2 = Folder.objects.create(name="folder2", created_by=self.user)
+        folder1 = Folder.objects.create(name="folder1", created_by=user)
+        folder2 = Folder.objects.create(name="folder2", created_by=user)
         folder3 = Folder.objects.create(name="folder3", created_by=another_user)
 
-        form = forms.PasteForm(user=self.user, initial={})
+        form = forms.PasteForm(user=user, initial={})
 
-        self.assertIn(folder1, form.fields["folder"].queryset)
-        self.assertIn(folder2, form.fields["folder"].queryset)
-        self.assertNotIn(folder3, form.fields["folder"].queryset)
+        assert folder1 in form.fields["folder"].queryset
+        assert folder2 in form.fields["folder"].queryset
+        assert folder3 not in form.fields["folder"].queryset
 
     def test_folder_options_only_for_logged_users(self):
         form = forms.PasteForm(initial={})
 
-        self.assertIsNone(form.fields.get("folder"))
-        self.assertIsNone(form.fields.get("new_folder"))
+        assert form.fields.get("folder") is None
+        assert form.fields.get("new_folder") is None
 
     def test_does_not_display_private_exposure_for_unlogged(self):
         form = forms.PasteForm(initial={})
 
-        self.assertNotIn(("PR", "Private"), form.fields["exposure"].choices)
+        assert ("PR", "Private") not in form.fields["exposure"].choices
 
-    def test_displays_captcha_only_for_unlogged(self):
-        form_for_logged = forms.PasteForm(user=self.user, initial={})
+    def test_displays_captcha_only_for_unlogged(self, user):
+        form_for_logged = forms.PasteForm(user=user, initial={})
         form_for_unlogged = forms.PasteForm(initial={})
 
-        self.assertIsNone(form_for_logged.fields.get("hcaptcha"))
-        self.assertIsInstance(form_for_unlogged.fields["hcaptcha"], hCaptchaField)
+        assert form_for_logged.fields.get("hcaptcha") is None
+        assert isinstance(form_for_unlogged.fields["hcaptcha"], hCaptchaField)
 
-    def test_post_anonymously_only_for_logged(self):
-        form_for_logged = forms.PasteForm(user=self.user, initial={})
+    def test_post_anonymously_only_for_logged(self, user):
+        form_for_logged = forms.PasteForm(user=user, initial={})
         form_for_unlogged = forms.PasteForm(initial={})
 
-        self.assertIsNone(form_for_unlogged.fields.get("post_anonymously"))
-        self.assertIsInstance(form_for_logged.fields["post_anonymously"], BooleanField)
+        assert form_for_unlogged.fields.get("post_anonymously") is None
+        assert isinstance(form_for_logged.fields["post_anonymously"], BooleanField)
 
-    def test_does_not_display_no_change_expiration_when_no_instance(self):
-        form = forms.PasteForm(user=self.user, initial={})
+    def test_does_not_display_no_change_expiration_when_no_instance(self, user):
+        form = forms.PasteForm(user=user, initial={})
 
-        self.assertNotIn(
-            ("PRE", "Don't Change"), form.fields["expiration_symbol"].choices
-        )
+        assert ("PRE", "Don't Change") not in form.fields["expiration_symbol"].choices
 
-    def test_form_raises_error_when_paste_set_as_private_and_anonymous(self):
+    def test_form_raises_error_when_paste_set_as_private_and_anonymous(self, user):
         form = forms.PasteForm(
-            user=self.user,
+            user=user,
             data={"post_anonymously": True, "exposure": Paste.Exposure.PRIVATE},
             initial={},
         )
 
-        self.assertEqual(
-            form.non_field_errors(), ["You can't create private paste as Anonymous."]
-        )
+        assert form.non_field_errors() == [
+            "You can't create private paste as Anonymous."
+        ]
 
-    def test_expiration_symbol_is_deleted_when_no_change_chosen(self):
+    def test_expiration_symbol_is_deleted_when_no_change_chosen(self, user):
         form = forms.PasteForm(
-            user=self.user,
+            user=user,
             data={
                 "content": "Hello",
                 "syntax": "python",
@@ -118,12 +110,12 @@ class PasteFormTest(TestCase):
 
         form.is_valid()
 
-        self.assertIsNone(form.cleaned_data.get("expiration_symbol"))
+        assert form.cleaned_data.get("expiration_symbol") is None
 
-    def test_folder_is_set_correctly_when_already_exists(self):
-        Folder.objects.create(name="test", created_by=self.user)
+    def test_folder_is_set_correctly_when_already_exists(self, user):
+        Folder.objects.create(name="test", created_by=user)
         form = forms.PasteForm(
-            user=self.user,
+            user=user,
             data={
                 "content": "Hello World",
                 "syntax": "python",
@@ -136,13 +128,13 @@ class PasteFormTest(TestCase):
         if form.is_valid():
             form.save()
         else:
-            self.fail()
+            pytest.fail()
 
-        self.assertEqual(Folder.objects.count(), 1)
+        assert Folder.objects.count() == 1
 
-    def test_folder_is_created_and_set_when_does_not_exist(self):
+    def test_folder_is_created_and_set_when_does_not_exist(self, user):
         form = forms.PasteForm(
-            user=self.user,
+            user=user,
             data={
                 "content": "Hello World",
                 "syntax": "python",
@@ -155,16 +147,16 @@ class PasteFormTest(TestCase):
         if form.is_valid():
             saved_paste = form.save()
         else:
-            self.fail()
+            pytest.fail()
 
         folder = Folder.objects.first()
-        self.assertEqual(Folder.objects.count(), 1)
-        self.assertEqual(saved_paste.folder.name, folder.name)
-        self.assertEqual(saved_paste.folder.created_by, self.user)
+        assert Folder.objects.count() == 1
+        assert saved_paste.folder.name == folder.name
+        assert saved_paste.folder.created_by == user
 
-    def test_folder_is_ignored_when_posting_anonymously(self):
+    def test_folder_is_ignored_when_posting_anonymously(self, user):
         form = forms.PasteForm(
-            user=self.user,
+            user=user,
             data={
                 "content": "Hello World",
                 "syntax": "python",
@@ -178,19 +170,19 @@ class PasteFormTest(TestCase):
         if form.is_valid():
             saved_paste = form.save()
         else:
-            self.fail()
+            pytest.fail()
 
-        self.assertEqual(Folder.objects.count(), 0)
-        self.assertIsNone(saved_paste.folder)
+        assert Folder.objects.count() == 0
+        assert saved_paste.folder is None
 
 
-class PasswordProtectedPasteFormTest(TestCase):
+class TestPasswordProtectedPasteForm:
     def test_raises_error_when_password_incorrect(self):
         form = forms.PasswordProtectedPasteForm(
             data={"password": "wrong"}, correct_password="good"
         )
 
-        self.assertEqual(form.errors["password"], ["Password incorrect"])
+        assert form.errors["password"] == ["Password incorrect"]
 
     def test_validates_when_passwords_match(self):
         correct_password = make_password("good")
@@ -198,21 +190,16 @@ class PasswordProtectedPasteFormTest(TestCase):
             data={"password": "good"}, correct_password=correct_password
         )
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
 
-class FolderFormTest(TestCase):
-    def test_raises_error_when_folder_already_exists(self):
-        user = User.objects.create_user(username="Test", email="test@test.com")
-        Folder.objects.create(name="exists", created_by=user)
-        form = forms.FolderForm(user=user, data={"name": "exists"})
+class TestFolderForm:
+    def test_raises_error_when_folder_already_exists(self, folder):
+        form = forms.FolderForm(user=folder.created_by, data={"name": "Testing folder"})
 
-        self.assertEqual(
-            form.errors["name"], ["You already have a folder with that name"]
-        )
+        assert form.errors["name"] == ["You already have a folder with that name"]
 
-    def test_validates_when_folder_does_not_exist(self):
-        user = User.objects.create_user(username="Test", email="test@test.com")
+    def test_validates_when_folder_does_not_exist(self, user):
         form = forms.FolderForm(user=user, data={"name": "does not exist"})
 
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
