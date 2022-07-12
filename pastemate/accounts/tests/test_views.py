@@ -34,24 +34,6 @@ def image(width=100, height=100):
     return SimpleUploadedFile("avatar_for_testing.png", stream.read(), "image/jpeg")
 
 
-@pytest.fixture
-def create_user():
-    return User.objects.create_user(
-        username="Test", email="test@test.com", password="test123"
-    )
-
-
-@pytest.fixture
-def auto_login_user(db, client, create_user):
-    def make_auto_login(user=None):
-        if user is None:
-            user = create_user
-        client.force_login(user)
-        return client, user
-
-    return make_auto_login
-
-
 class TestProfileEdit:
     def test_login_required(self, client):
         response = client.get(PROFILE_UPDATE_URL)

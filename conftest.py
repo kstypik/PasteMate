@@ -34,4 +34,15 @@ def create_paste():
 
 @pytest.fixture
 def user():
-    return User.objects.create_user(username="John")
+    return User.objects.create_user(username="John", password="test123")
+
+
+@pytest.fixture
+def auto_login_user(db, client, user):
+    def make_auto_login(user_obj=None):
+        if user_obj is None:
+            user_obj = user
+        client.force_login(user_obj)
+        return client, user_obj
+
+    return make_auto_login
