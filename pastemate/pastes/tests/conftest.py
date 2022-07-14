@@ -1,4 +1,5 @@
 import pytest
+from django.urls import reverse
 
 from pastemate.pastes.models import Folder, Report
 
@@ -30,3 +31,13 @@ def create_folder(user):
         return Folder.objects.create(name=name, created_by=created_by)
 
     return folder
+
+
+@pytest.fixture
+def create_paste_with_url(create_paste):
+    def make_paste_with_url(viewname, **kwargs):
+        paste = create_paste(**kwargs)
+        url = reverse(viewname, args=[paste.uuid])
+        return paste, url
+
+    return make_paste_with_url
