@@ -1,6 +1,6 @@
 # PasteMate
 
-Pastebin web app allowing users to post plain text with optional syntax highlighting for many programming languages and other features.
+Pastebin web app allowing users to post plain text with optional syntax highlighting for many programming languages and with a bunch of other features.
 
 [SEE DEMO](https://pastemate.toadres.pl)
 
@@ -15,11 +15,11 @@ Pastebin web app allowing users to post plain text with optional syntax highligh
 - Syntax highlighting for over 500 languages
 - Online editor with highlighting, autocomplete, search/replace and much more
 - Limiting access to pastes (public/private/unlisted on the website)
-- "Burn After Read" – auto removal of paste after someone reads it
+- "Burn After Read" – auto removal of pastes after someone reads them
 - Password protection of pastes
 - Time-limited pastes (e.g. remove after 10 minutes)
 - User Paste List
-- Organization of pastes in folders
+- Organization of pastes into folders
 - Searching of user's pastes
 - Pastes Archive
 - Displaying pastes only for specific language
@@ -48,17 +48,16 @@ Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as 
 poetry install
 ```
 
-Set required environment variables for development (for production there is more, see production settings module).
-You can create .env file for them:
+Set required environment variable for development (for production there is more, see production settings module).
+You can create .env file in the project's base directory with your environment variables (don't forget to replace placeholder data with your own Postgres credentials:
 ```
 DATABASE_URL=psql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DBNAME>
-DJANGO_SECRET_KEY=some random key
-DJANGO_DEBUG=True
 ```
 
 As of now, pinax_messages package needs some workarounds for compatibility with newer Django versions.
 
-Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/pinax/messages/signals.py
+Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/lib/python<PYTHON_VERSION>/site-packages/pinax/messages/signals.py
+
 
 Change
 ```python
@@ -68,7 +67,9 @@ to
 ```python
 message_sent = Signal()
 ```
-Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/pinax/messages/urls.py
+Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/lib/python<PYTHON_VERSION>/site-packages/pinax/messages/urls.py
+
+
 Change
 ```python
 from django.conf.urls import url
@@ -117,6 +118,16 @@ Apply migrations:
 poetry run python manage.py makemigrations && poetry run python manage.py migrate
 ```
 
+Install the Node dependencies:
+```
+npm install
+```
+
+Build the [CodeMirror](codemirror.net/) editor:
+```
+npm start
+```
+
 Optionally, you can fill the database with examplary data:
 ```
 poetry run python manage.py reset_test_user && poetry run python manage.py generate_demo_pastes
@@ -127,7 +138,7 @@ Now you can start the development server:
 poetry run python manage.py runserver
 ```
 
-**Note:** To support paste expiration feature, you have to add expire_pastes Django management command to your cron tasks or another scheduler.
+**Note:** To support paste expiration feature, you have to add expire_pastes Django management command to your cron tasks or to another scheduler.
 
 Happy coding!
 
