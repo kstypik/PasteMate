@@ -14,13 +14,13 @@ User = get_user_model()
 REPORT_CHANGELIST_URL = reverse("admin:pastes_report_changelist")
 
 
-def test_shows_link_to_paste_on_list(admin_client, create_paste, create_report):
+def test_shows_link_to_paste_on_list(admin_client, create_report):
     report = create_report()
     response = admin_client.get(REPORT_CHANGELIST_URL)
-
+    print(response.content.decode("utf-8"))
     html = f"""
 <td class="field-linked_paste">
-Should be linked <a href="{report.paste.get_absolute_url()}">(view)</a>
+Paste For Testing <a href="{report.paste.get_absolute_url()}">(view)</a>
 </td>"""
     assertInHTML(html, response.content.decode("utf-8"))
 
