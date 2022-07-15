@@ -16,8 +16,9 @@ REPORT_CHANGELIST_URL = reverse("admin:pastes_report_changelist")
 
 def test_shows_link_to_paste_on_list(admin_client, create_report):
     report = create_report()
+
     response = admin_client.get(REPORT_CHANGELIST_URL)
-    print(response.content.decode("utf-8"))
+
     html = f"""
 <td class="field-linked_paste">
 Paste For Testing <a href="{report.paste.get_absolute_url()}">(view)</a>
