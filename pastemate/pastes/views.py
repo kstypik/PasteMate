@@ -230,7 +230,6 @@ def user_pastes(request, username):
             .order_by("slug")
         )
 
-    if request.user == user:
         context["page_name"] = "my_pastes"
         context["stats"] = {
             "total_pastes": Paste.objects.filter(author=request.user).count(),
