@@ -184,3 +184,8 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy("account_em
 
 PASTES_ARCHIVE_LENGTH = 50
 PASTES_USER_LIST_PAGINATE_BY = 20
+
+
+# Django-cleanup
+# NOTE: django_cleanup should be placed last in INSTALLED_APPS.
+INSTALLED_APPS.append("django_cleanup")

@@ -63,7 +63,7 @@ class TestPaste:
     def test_make_embeddable_image(self, create_paste):
         paste = Paste()
 
-        assert paste.make_embeddable_image() == f"embed/{paste.uuid}.png"
+        assert paste.create_embeddable_image() == f"embed/{paste.uuid}.png"
 
     def test_make_backup_archive(self, user, create_paste):
         paste1 = create_paste(content="Hi", author=user)

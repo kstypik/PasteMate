@@ -138,7 +138,7 @@ class Paste(TimeStampedModel):
 
         return highlight(self.content, lexer, formatter)
 
-    def make_embeddable_image(self, format=".png"):
+    def create_embeddable_image(self, format=".png"):
         filepath = f"embed/{self.uuid}{format}"
         with tempfile.TemporaryFile() as fh:
             django_file = File(fh)
@@ -146,6 +146,14 @@ class Paste(TimeStampedModel):
             saved_file = default_storage.save(filepath, django_file)
 
         return saved_file
+
+    def handle_embeddable_image(self):
+        if not self.is_private and self.is_normally_accessible:
+            self.embeddable_image = self.create_embeddable_image()
+        else:
+            if self.embeddable_image:
+                self.embeddable_image.delete()
+            self.embeddable_image = ""
 
     @classmethod
     def make_backup_archive(cls, destination, user_obj):
@@ -189,9 +197,10 @@ class Paste(TimeStampedModel):
         if not self.title:
             self.title = "Untitled"
         self.content_html = self.highlight_syntax()
-        if not (self.is_private or not self.is_normally_accessible):
-            self.embeddable_image = self.make_embeddable_image()
+
         self.filesize = self.calculate_filesize()
+
+        self.handle_embeddable_image()
 
         calculated_expiration = self.calculate_expiration_date()
         if calculated_expiration and not self.expiration_symbol == Paste.NO_CHANGE:
