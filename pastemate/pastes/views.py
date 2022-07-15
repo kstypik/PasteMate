@@ -79,7 +79,7 @@ def clone_paste(request, paste_uuid):
 
 
 def paste_detail(request, uuid):
-    queryset = Paste.objects.all().select_related("folder")
+    queryset = Paste.objects.all().select_related("folder", "author")
     paste = get_object_or_404(queryset, uuid=uuid)
     if paste.is_private and not paste.is_author(request.user):
         raise Http404

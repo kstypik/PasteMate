@@ -54,52 +54,50 @@
         </ol>
       </nav>
     {% endif %}
-    {% with paste.author as author %}
-      <div class="d-flex align-items-center">
-        <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
-        <div class="ms-3">
-          <span class="me-2">
-            <i class="fa-solid fa-user me-1"></i> 
-            {% if paste.author %}
-              <a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a> 
-              {% if user.is_authenticated and not user == paste.author %}
-                <a href="{% url "pinax_messages:message_user_create" user_id=paste.author.id %}">
-                  <i class="fa-solid fa-envelope" title="Send private message to this user"></i>
-                </a>
-              {% endif %}
-            {% else %}
-              Anonymous
+    <div class="d-flex align-items-center">
+      <img src="{% if paste.author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+      <div class="ms-3">
+        <span class="me-2">
+          <i class="fa-solid fa-user me-1"></i> 
+          {% if paste.author %}
+            <a href="{{ paste.author.get_absolute_url }}">{{ paste.author }}</a> 
+            {% if user.is_authenticated and not user == paste.author %}
+              <a href="{% url "pinax_messages:message_user_create" user_id=paste.author.id %}">
+                <i class="fa-solid fa-envelope" title="Send private message to this user"></i>
+              </a>
             {% endif %}
-          </span>
-          <span class="me-2">
-            <i class="fa-solid fa-calendar me-1" title="When this paste was created"></i>
-            <span title="{{ paste.created }}">{{ paste.created|date }}</span>
-          </span>
-          <span class="me-2">
-            <i class="fa-solid fa-eye me-1" title="Unique visits of this paste"></i> {{ hitcount.total_hits }}
-          </span>
-          <span class="me-2">
-            <i class="fa-solid fa-hourglass me-1" title="When this paste will expire and get deleted"></i>
-            {% if paste.expiration_date %}
-              <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
-            {% else %}
-              Never
-            {% endif %}
-          </span>
-          {% if author.location %}
-            <span class="me-2">
-              <i class="fa-solid fa-location-dot me-1" title="User's location"></i> {{ author.location }}
-            </span>
+          {% else %}
+            Anonymous
           {% endif %}
-          {% if author.website %}
-            <span class="me-2">
-              <i class="fa-solid fa-globe me-1" title="User's website"></i> 
-              <a href="{{ author.website }}">{{ author.website}}</a>
-            </span>
+        </span>
+        <span class="me-2">
+          <i class="fa-solid fa-calendar me-1" title="When this paste was created"></i>
+          <span title="{{ paste.created }}">{{ paste.created|date }}</span>
+        </span>
+        <span class="me-2">
+          <i class="fa-solid fa-eye me-1" title="Unique visits of this paste"></i> {{ hitcount.total_hits }}
+        </span>
+        <span class="me-2">
+          <i class="fa-solid fa-hourglass me-1" title="When this paste will expire and get deleted"></i>
+          {% if paste.expiration_date %}
+            <span class="to-relative-datetime text-capitalize">{{ paste.expiration_date|date:"c" }}</span>
+          {% else %}
+            Never
           {% endif %}
-        </div>
+        </span>
+        {% if paste.author.location %}
+          <span class="me-2">
+            <i class="fa-solid fa-location-dot me-1" title="User's location"></i> {{ paste.author.location }}
+          </span>
+        {% endif %}
+        {% if paste.author.website %}
+          <span class="me-2">
+            <i class="fa-solid fa-globe me-1" title="User's website"></i> 
+            <a href="{{ paste.author.website }}">{{ paste.author.website}}</a>
+          </span>
+        {% endif %}
+      </div>
     </div>
-    {% endwith %}
     <div class="mt-4">
       {% if user == paste.author %}
       <a href="{% url 'pastes:update' paste.uuid %}" class="btn btn-info">Edit</a>
