@@ -41,6 +41,19 @@
 {% endif %}
 {% if not paste.burn_after_read and not password_protected or password_correct or paste.author == user %}
     <h1>{{ paste.title }}</h1>
+    {% if paste.folder %}
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><i class="fa-solid fa-list"></i> <a href="{% url 'pastes:user_pastes' user.username %}">My Pastes</a></li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <i class="fa-solid fa-folder"></i>
+            <a href="{% url 'pastes:user_folder' user.username paste.folder.slug %}">
+              {{ paste.folder.name }}
+            </a>
+          </li>
+        </ol>
+      </nav>
+    {% endif %}
     {% with paste.author as author %}
       <div class="d-flex align-items-center">
         <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
