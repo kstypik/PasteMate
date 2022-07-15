@@ -1,8 +1,9 @@
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth import get_user_model
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains
 
-from pastemate.core.utils import login_redirect_url
 from pastemate.pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
@@ -26,14 +27,6 @@ def test_action_type_in_template(auto_login_user, create_paste_with_copied_url):
     response = client.get(url)
 
     assertContains(response, action_type)
-
-
-def test_login_required(client, create_paste_with_copied_url):
-    paste, url = create_paste_with_copied_url()
-
-    response = client.get(url)
-
-    assertRedirects(response, login_redirect_url(url))
 
 
 def test_correct_initial_data(auto_login_user, create_paste_with_copied_url):
@@ -97,3 +90,49 @@ def test_cannot_clone_private_paste(auto_login_user, create_paste_with_copied_ur
     response = client.get(url)
 
     assert response.status_code == 404
+
+
+@patch("hcaptcha_field.fields.hCaptchaField.validate", return_value=True)
+def test_guest_can_clone_paste_with_default_data(
+    mock, client, create_paste_with_copied_url
+):
+    paste, url = create_paste_with_copied_url()
+
+    data = {
+        "content": paste.content,
+        "title": paste.title,
+        "syntax": paste.syntax,
+        "exposure": "PU",
+        "h-captcha-response": "valid",
+    }
+    client.post(url, data=data)
+
+    created_paste = Paste.objects.first()
+    assert Paste.objects.count() == 2
+    assert created_paste.content == paste.content
+    assert created_paste.syntax == paste.syntax
+    assert created_paste.title == paste.title
+    assert created_paste.author is None
+
+
+@patch("hcaptcha_field.fields.hCaptchaField.validate", return_value=True)
+def test_guest_can_clone_paste_with_custom_data(
+    mock, client, create_paste_with_copied_url
+):
+    cloned_paste, url = create_paste_with_copied_url()
+
+    data = {
+        "title": "My Cloned Paste",
+        "syntax": "python",
+        "content": "print('Hello World')",
+        "exposure": "PU",
+        "h-captcha-response": "valid",
+    }
+    client.post(url, data=data)
+    created_paste = Paste.objects.first()
+
+    assert Paste.objects.count() == 2
+    assert created_paste.content == "print('Hello World')"
+    assert created_paste.syntax == "python"
+    assert created_paste.title == "My Cloned Paste"
+    assert created_paste.author is None

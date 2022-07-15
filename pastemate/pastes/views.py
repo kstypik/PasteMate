@@ -43,7 +43,6 @@ def create_paste(request):
     )
 
 
-@login_required
 def clone_paste(request, paste_uuid):
     cloned_paste = get_object_or_404(Paste, uuid=paste_uuid)
     if (

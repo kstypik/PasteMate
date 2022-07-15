@@ -107,9 +107,7 @@
           {% if not paste.password and not paste.burn_after_read and not burned %}
             <a href="{% url 'pastes:raw_detail' paste.uuid %}"><span class="badge bg-primary">raw</span></a>
             <a href="{% url 'pastes:paste_download' paste.uuid %}"><span class="badge bg-primary">download</span></a>
-            {% if user.is_authenticated %}
-              <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-primary">clone</span></a>
-            {% endif %}
+            <a href="{% url 'pastes:clone' paste.uuid %}"><span class="badge bg-primary">clone</span></a>
             {% if not paste.exposure == "PR" %}
               <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-primary">embed</span></a>
             {% endif %}
