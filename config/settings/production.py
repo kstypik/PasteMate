@@ -60,5 +60,37 @@ EMAIL_HOST_PASSWORD = env("DJANGO_EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL")
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL")
 
+# LOGGING
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/4.0/topics/logging/
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {"level": "INFO", "handlers": ["file"]},
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/django.log",
+            "formatter": "app",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["file"], "level": "INFO", "propagate": True},
+    },
+    "formatters": {
+        "app": {
+            "format": (
+                "%(asctime)s [%(levelname)-8s] " "(%(module)s.%(funcName)s) %(message)s"
+            ),
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+}
+
+# hCaptcha-field
+# ------------------------------------------------------------------------------
+# https://github.com/tiesjan/django-hcaptcha-field
 HCAPTCHA_SITEKEY = env("HCAPTCHA_SITEKEY")
 HCAPTCHA_SECRET = env("HCAPTCHA_SECRET")
