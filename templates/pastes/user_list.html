@@ -48,15 +48,17 @@
   If you want to back up all your pastes, <form action="{% url 'pastes:backup' %}" method="POST" class="d-inline">{% csrf_token %}<button class="btn-like-a">click here</button></form> to download an archive with them.
 </div>
 
-<div class="alert alert-info" role="alert">
-  <b>Your stats</b>:
-  <ul class="mb-0">
-    <li>Total number of active pastes: {{ stats.total_pastes }}</li>
-    <li>Number of public pastes: {{ stats.public_pastes }}</li>
-    <li>Number of unlisted pastes: {{ stats.unlisted_pastes }}</li>
-    <li>Number of private pastes: {{ stats.private_pastes }}</li>
-  </ul>
-</div>
+{% if not folder %}
+  <div class="alert alert-info" role="alert">
+    <b>Your stats</b>:
+    <ul class="mb-0">
+      <li>Total number of active pastes: {{ stats.total_pastes }}</li>
+      <li>Number of public pastes: {{ stats.public_pastes }}</li>
+      <li>Number of unlisted pastes: {{ stats.unlisted_pastes }}</li>
+      <li>Number of private pastes: {{ stats.private_pastes }}</li>
+    </ul>
+  </div>
+{% endif %}
 {% endif %}
 
 {% if as_guest %}
