@@ -8,10 +8,8 @@ from django.http import Http404, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
-from hitcount.utils import get_hitcount_model
-from hitcount.views import HitCountMixin
 
-from pastemate.core.utils import paginate
+from pastemate.core.utils import count_hit, paginate
 from pastemate.pastes.forms import (
     FolderForm,
     PasswordProtectedPasteForm,
@@ -88,15 +86,8 @@ def paste_detail(request, uuid):
 
     context = {"paste": paste}
 
-    hit_count = get_hitcount_model().objects.get_for_object(paste)
-    hits = hit_count.hits
-    context["hitcount"] = {"pk": hit_count.pk}
-    hit_count_response = HitCountMixin.hit_count(request, hit_count)
-    if hit_count_response.hit_counted:
-        hits = hits + 1
-    context["hitcount"]["hit_counted"] = hit_count_response.hit_counted
-    context["hitcount"]["hit_message"] = hit_count_response.hit_message
-    context["hitcount"]["total_hits"] = hits
+    hitcount = count_hit(request, paste)
+    context["hitcount"] = hitcount
 
     if paste.password and request.user != paste.author:
         return redirect("pastes:detail_with_password", uuid=paste.uuid)
@@ -150,6 +141,10 @@ def paste_detail_with_password(request, uuid):
             context["password_form"] = password_form
             if password_form.is_valid():
                 context["password_correct"] = True
+
+                hitcount = count_hit(request, paste)
+                context["hitcount"] = hitcount
+
                 if paste.burn_after_read:
                     paste.delete()
         else:
@@ -208,6 +203,9 @@ def delete_paste(request, uuid):
 def user_pastes(request, username):
     user = get_object_or_404(User, username=username)
     context = {"author": user}
+
+    hitcount = count_hit(request, user)
+    context["hitcount"] = hitcount
 
     if request.GET.get("guest") == "1":
         display_as_guest = True
