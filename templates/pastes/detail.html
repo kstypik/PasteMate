@@ -55,7 +55,7 @@
       </nav>
     {% endif %}
     <div class="d-flex align-items-center">
-      <img src="{% if paste.author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+      <img src="{% if paste.author %}{{ paste.author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
       <div class="ms-3">
         <span class="me-2">
           <i class="fa-solid fa-user me-1"></i> 
