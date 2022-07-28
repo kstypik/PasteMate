@@ -20,6 +20,7 @@ class PasteForm(forms.ModelForm):
         help_text=POST_ANONYMOUSLY_HELP_TEXT,
         required=False,
     )
+    title = forms.CharField(initial="Untitled", required=False)
     hcaptcha = hCaptchaField(label="CAPTCHA")
 
     class Meta:
