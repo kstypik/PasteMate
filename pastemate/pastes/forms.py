@@ -45,7 +45,6 @@ class PasteForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.remove_folder_options_for_guest()
-        self.disallow_private_pastes_for_guest()
 
         self.handle_user_preferences()
         self.handle_expiration()
@@ -62,13 +61,6 @@ class PasteForm(forms.ModelForm):
         if not self.user:
             del self.fields["folder"]
             del self.fields["new_folder"]
-
-    def disallow_private_pastes_for_guest(self):
-        if not self.user:
-            self.fields["exposure"].choices = filter(
-                lambda option: option[0] != Paste.Exposure.PRIVATE,
-                self.fields["exposure"].choices,
-            )
 
     def handle_user_preferences(self):
         if self.user and not self.passed_instance:
@@ -108,10 +100,9 @@ class PasteForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if (
-            cleaned_data.get("post_anonymously")
-            and cleaned_data.get("exposure") == Paste.Exposure.PRIVATE
-        ):
+        if (cleaned_data.get("post_anonymously") or not self.user) and cleaned_data.get(
+            "exposure"
+        ) == Paste.Exposure.PRIVATE:
             raise forms.ValidationError("You can't create private paste as Anonymous.")
 
         return cleaned_data

@@ -62,11 +62,6 @@ class TestPasteForm:
         assert form.fields.get("folder") is None
         assert form.fields.get("new_folder") is None
 
-    def test_does_not_display_private_exposure_for_unlogged(self):
-        form = forms.PasteForm(initial={})
-
-        assert ("PR", "Private") not in form.fields["exposure"].choices
-
     def test_displays_captcha_only_for_unlogged(self, user):
         form_for_logged = forms.PasteForm(user=user, initial={})
         form_for_unlogged = forms.PasteForm(initial={})
@@ -89,6 +84,16 @@ class TestPasteForm:
     def test_form_raises_error_when_paste_set_as_private_and_anonymous(self, user):
         form = forms.PasteForm(
             user=user,
+            data={"post_anonymously": True, "exposure": Paste.Exposure.PRIVATE},
+            initial={},
+        )
+
+        assert form.non_field_errors() == [
+            "You can't create private paste as Anonymous."
+        ]
+
+    def test_form_raises_error_when_paste_set_as_private_and_no_user(self, user):
+        form = forms.PasteForm(
             data={"post_anonymously": True, "exposure": Paste.Exposure.PRIVATE},
             initial={},
         )
