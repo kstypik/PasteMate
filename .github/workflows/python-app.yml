@@ -45,8 +45,8 @@ jobs:
     - name: Black Code Formatter
       run: |
         poetry run black .
-    - name: Test with pytest
-      run: |
-        poetry run pytest
-      env:
-        DATABASE_URL: psql://user:pass@localhost:5432/pastemate
+#     - name: Test with pytest
+#       run: |
+#         poetry run pytest
+#       env:
+#         DATABASE_URL: psql://user:pass@localhost:5432/pastemate
