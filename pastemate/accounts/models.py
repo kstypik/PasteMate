@@ -13,9 +13,7 @@ class User(AbstractUser):
 
     website = models.URLField(blank=True)
     location = models.CharField(max_length=150, blank=True)
-    avatar = models.ImageField(
-        upload_to="avatars/", blank=True, default="default_avatar.png"
-    )
+    avatar = models.ImageField(upload_to="avatars/", blank=True)
 
     def __str__(self):
         return self.username

@@ -7,7 +7,7 @@
 <h2>{{ author }}'s Pastes {% if folder %}from {{ folder.name }} folder{% endif %}</h2>
 
 <div class="d-flex align-items-center">
-  <img src="{% if author %}{{ author.avatar.url }}{% else %}{{ MEDIA_URL }}default_avatar.png{% endif %}" alt="User Avatar" class="rounded-circle avatar-normal">
+  <img src="{% include "_includes/avatar_url.html" with user_obj=author %}" alt="User Avatar" class="rounded-circle avatar-normal">
   <div class="ms-3">
     <span class="me-2">
       <i class="fa-solid fa-calendar me-1" title="User joined"></i> 
@@ -98,11 +98,11 @@
           <a href="{{ paste.get_absolute_url }}">{{ paste.title }}</a>
         </td>
         <td>{{ paste.created|date }}</td>
-        <td class="d-none d-sm-table-cell">
+        <td class="d-none d-sm-table-cell text-capitalize">
           {% if paste.expiration_date %}
-            <span class="to-relative-datetime">{{ paste.expiration_date|date:"c" }}</span>
+            <span class="to-relative-datetime">{{ paste.expiration_date|date:"c"|capfirst }}</span>
           {% else %}
-              never
+              Never
           {% endif %}
         </td>
         <td class="d-none d-sm-table-cell"><a href="{% url 'pastes:syntax_archive' paste.syntax %}">{{ paste.get_syntax_display }}</a></td>

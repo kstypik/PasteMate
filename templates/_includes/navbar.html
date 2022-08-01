@@ -28,7 +28,7 @@
         </ul>
         <div class="dropdown">
           <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s avatar" class="rounded-circle avatar-small me-1">
+            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}https://robohash.org/{{ user.username }}.png?set=set4&bgset=bg1{% endif %}" alt="{{ user.username }}'s avatar" class="rounded-circle avatar-small me-1">
             {{ user.username}}
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">

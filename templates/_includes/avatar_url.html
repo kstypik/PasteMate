@@ -1,0 +1,5 @@
+{% if user_obj.avatar %}
+  {{ user_obj.avatar.url }}
+{% else %}
+  https://robohash.org/{{ user_obj.username }}.png?set=set4&bgset=bg1
+{% endif %}

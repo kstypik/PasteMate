@@ -9,9 +9,8 @@
 <form method="post" action="{% url 'accounts:avatar' %}" enctype="multipart/form-data">
   {% csrf_token %}
 
-  
   <div class="my-3">
-    <img class="mb-2 avatar-full" src="{{ user.avatar.url }}" alt="Avatar of {{ user.username }}">
+    <img class="mb-2 avatar-full" src="{% include "_includes/avatar_url.html" with user_obj=user %}" alt="Avatar of {{ user.username }}">
     <input type="file" class="form-control" id="id_avatar" name="avatar" />
   </div>
 

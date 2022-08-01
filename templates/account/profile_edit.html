@@ -13,7 +13,7 @@
 
   <p class="form-label">Avatar</p>
   <div>
-    <img src="{{ user.avatar.url }}" style="width: 143px;">
+    <img src="{% include "_includes/avatar_url.html" with user_obj=user %}" style="width: 143px;">
   </div>
   <a href="{% url 'accounts:avatar' %}" class="btn btn-secondary" style="border-radius: 0;">Change avatar</a>
 
