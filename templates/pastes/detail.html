@@ -122,7 +122,7 @@
             {% if not paste.exposure == "PR" %}
               <a href="{% url 'pastes:embed' paste.uuid %}"><span class="badge bg-primary">embed</span></a>
             {% endif %}
-            <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-primary">print</span></a>
+            <a href="{% url 'pastes:print' paste.uuid %}"><span class="badge bg-primary d-none d-xl-inline">print</span></a>
             {% if user != paste.author %}
               <a href="{% url 'pastes:report' paste.uuid %}"><span class="badge bg-primary">report</span></a>
             {% endif %}
