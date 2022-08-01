@@ -129,7 +129,9 @@
           {% endif %}
         </div>
       </div>
-      {{ paste.content_html|safe }}
+      <div style="font-size: {% if user.is_authenticated %}{{ user.preferences.paste_font_size }}{% else %}13{% endif %}px !important;">
+        {{ paste.content_html|safe }}
+      </div>
     </div>
 
     <h2 class="mt-4 h5">RAW Paste Data <a href="#" class="raw-copy ms-2"><i class="fa-solid fa-clipboard" title="Copy raw paste data to clipboard"></i></a></h2>

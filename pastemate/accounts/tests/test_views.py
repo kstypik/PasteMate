@@ -179,6 +179,7 @@ class TestPreferencesEdit:
             "default_expiration_symbol": Preferences.TEN_MINUTES,
             "default_exposure": Preferences.Exposure.PRIVATE,
             "layout_width": Preferences.LayoutWidth.WIDE,
+            "paste_font_size": Preferences.PasteFontSize.BIGGER,
         }
         response = client.post(PREFERENCES_UPDATE_URL, data=data)
 
@@ -191,6 +192,7 @@ class TestPreferencesEdit:
             "default_expiration_symbol": Preferences.TEN_MINUTES,
             "default_exposure": Preferences.Exposure.PRIVATE,
             "layout_width": Preferences.LayoutWidth.WIDE,
+            "paste_font_size": Preferences.PasteFontSize.BIGGER,
         }
         client.post(PREFERENCES_UPDATE_URL, data=data)
         user.refresh_from_db()
@@ -199,3 +201,4 @@ class TestPreferencesEdit:
         assert user.preferences.default_expiration_symbol == Preferences.TEN_MINUTES
         assert user.preferences.default_exposure == Preferences.Exposure.PRIVATE
         assert user.preferences.layout_width == Preferences.LayoutWidth.WIDE
+        assert user.preferences.paste_font_size == Preferences.PasteFontSize.BIGGER

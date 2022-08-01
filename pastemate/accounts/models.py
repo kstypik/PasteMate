@@ -55,6 +55,12 @@ class Preferences(models.Model):
         NARROW = ("N", "Fixed (narrow)")
         WIDE = ("W", "Fluid (wide)")
 
+    class PasteFontSize(models.TextChoices):
+        SMALL = ("11", "Small")
+        NORMAL = ("13", "Normal")
+        BIGGER = ("14", "Bigger")
+        HUGE = ("15", "Huge")
+
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="preferences"
     )
@@ -82,6 +88,12 @@ class Preferences(models.Model):
         max_length=1,
         choices=LayoutWidth.choices,
         default=LayoutWidth.NARROW,
+    )
+    paste_font_size = models.CharField(
+        verbose_name="Paste Font Size",
+        max_length=2,
+        choices=PasteFontSize.choices,
+        default=PasteFontSize.NORMAL,
     )
 
     def __str__(self):
