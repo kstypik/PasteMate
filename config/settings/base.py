@@ -45,6 +45,7 @@ LOCAL_APPS = [
     "pastemate.core",
     "pastemate.accounts",
     "pastemate.pastes",
+    "pastemate.demo",  # Remove, if you don't use PasteMate for demonstration purposes
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

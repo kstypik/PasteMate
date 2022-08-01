@@ -13,8 +13,7 @@ class Command(BaseCommand):
 
         no_embed_pastes = Paste.objects.filter(embeddable_image="")
         for paste in no_embed_pastes:
-            if not (paste.is_private or not paste.is_normally_accessible):
-                paste.embeddable_image = paste.make_embeddable_image()
-                paste.save()
+            paste.handle_embeddable_image()
+            paste.save()
 
         self.stdout.write(self.style.SUCCESS("OK"))
