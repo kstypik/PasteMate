@@ -72,6 +72,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .vm { color: #19177C } /* Name.Variable.Magic */
 .il { color: #666666 } /* Literal.Number.Integer.Long */
 
+td.linenos, .card-header { background-color: rgba(249,249,249,var(--mdb-bg-opacity)) !important; }
+td.linenos, td.code {
+    padding: 10px 5px 0 10px;
+}
+td.linenos {
+    border-right: 2px solid #f5f5f5;
+}
+
 .highlight {
     overflow: auto;
 }
