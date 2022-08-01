@@ -8,30 +8,34 @@
 <p>This is an image version of this paste for easy sharing on other websites.</p>
 
 <div class="mt-5">
-  <img src="{{ paste.embeddable_image.url}}" alt="Paste's content represented as an image">
-  <div class="mt-2 copy-div">
-    <label for="image-link">Direct link to the image</label>
-    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
-    <input type="text" class="form-control" id="image-link" value="{{ direct_embed_link }}">
-  </div>
+  {% if paste.embeddable_image %}
+    <img src="{{ paste.embeddable_image.url}}" alt="Paste's content represented as an image">
+    <div class="mt-2 copy-div">
+      <label for="image-link">Direct link to the image</label>
+      <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
+      <input type="text" class="form-control" id="image-link" value="{{ direct_embed_link }}">
+    </div>
 
-  <div class="mt-2 copy-div">
-    <label for="html-link">HTML code</label>
-    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
-    <input type="text" class="form-control" id="html-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
-  </div>
+    <div class="mt-2 copy-div">
+      <label for="html-link">HTML code</label>
+      <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
+      <input type="text" class="form-control" id="html-link" value="&lt;img&nbsp;src=&quot;{{ direct_embed_link }}&quot;&gt;">
+    </div>
 
-  <div class="mt-2 copy-div">
-    <label for="bbcode-link">BBCode</label>
-    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
-    <input type="text" class="form-control" id="bbcode-link" value="[img]{{ direct_embed_link }}[/img]">
-  </div>
+    <div class="mt-2 copy-div">
+      <label for="bbcode-link">BBCode</label>
+      <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
+      <input type="text" class="form-control" id="bbcode-link" value="[img]{{ direct_embed_link }}[/img]">
+    </div>
 
-  <div class="mt-2 copy-div">
-    <label for="markdown-link">Markdown</label>
-    <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
-    <input type="text" class="form-control" id="markdown-link" value="!({{ direct_embed_link }})">
-  </div>
+    <div class="mt-2 copy-div">
+      <label for="markdown-link">Markdown</label>
+      <a href="#" class="copy-btn ms-2 fs-5"><i class="fa-solid fa-copy"></i></a>
+      <input type="text" class="form-control" id="markdown-link" value="!({{ direct_embed_link }})">
+    </div>
+  {% else %}
+    <p class="fs-4">Unfortunately, this paste cannot be embeded.</p>
+  {% endif %}
 </div>
 {% endblock content %}
 

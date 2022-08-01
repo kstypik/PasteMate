@@ -331,8 +331,12 @@ def embed_paste(request, uuid):
 
     context = {
         "paste": paste,
-        "direct_embed_link": request.build_absolute_uri(paste.embeddable_image.url),
     }
+
+    if paste.embeddable_image:
+        context["direct_embed_link"] = request.build_absolute_uri(
+            paste.embeddable_image.url
+        )
 
     return TemplateResponse(request, "pastes/embed.html", context)
 

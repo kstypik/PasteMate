@@ -21,6 +21,8 @@ from pastemate.pastes import choices
 
 User = get_user_model()
 
+MAX_LINE_LENGTH_FOR_EMBEDS = 111
+
 
 class ActiveManager(models.Manager):
     def get_queryset(self):
@@ -148,12 +150,25 @@ class Paste(TimeStampedModel):
         return saved_file
 
     def handle_embeddable_image(self):
-        if not self.is_private and self.is_normally_accessible:
+        if (
+            not self.is_private
+            and self.is_normally_accessible
+            and not self.longest_line_length > MAX_LINE_LENGTH_FOR_EMBEDS
+            and not self.lines_num > 100
+        ):
             self.embeddable_image = self.create_embeddable_image()
         else:
             if self.embeddable_image:
                 self.embeddable_image.delete()
             self.embeddable_image = ""
+
+    @property
+    def longest_line_length(self):
+        return len(max(self.content.split("\n"), key=len))
+
+    @property
+    def lines_num(self):
+        return len(self.content.split("\n"))
 
     @classmethod
     def make_backup_archive(cls, destination, user_obj):
