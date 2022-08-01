@@ -176,9 +176,9 @@ class TestPreferencesEdit:
         client, user = auto_login_user()
         data = {
             "default_syntax": "python",
-            "default_expiration_symbol": "10M",
-            "default_exposure": "PR",
-            "layout_width": Preferences.LayoutWidth.NARROW,
+            "default_expiration_symbol": Preferences.TEN_MINUTES,
+            "default_exposure": Preferences.Exposure.PRIVATE,
+            "layout_width": Preferences.LayoutWidth.WIDE,
         }
         response = client.post(PREFERENCES_UPDATE_URL, data=data)
 
@@ -188,14 +188,14 @@ class TestPreferencesEdit:
         client, user = auto_login_user()
         data = {
             "default_syntax": "python",
-            "default_expiration_symbol": "10M",
-            "default_exposure": "PR",
+            "default_expiration_symbol": Preferences.TEN_MINUTES,
+            "default_exposure": Preferences.Exposure.PRIVATE,
             "layout_width": Preferences.LayoutWidth.WIDE,
         }
         client.post(PREFERENCES_UPDATE_URL, data=data)
         user.refresh_from_db()
 
         assert user.preferences.default_syntax == "python"
-        assert user.preferences.default_expiration_symbol == "10M"
-        assert user.preferences.default_exposure == "PR"
-        assert user.preferences.layout_width == "W"
+        assert user.preferences.default_expiration_symbol == Preferences.TEN_MINUTES
+        assert user.preferences.default_exposure == Preferences.Exposure.PRIVATE
+        assert user.preferences.layout_width == Preferences.LayoutWidth.WIDE
