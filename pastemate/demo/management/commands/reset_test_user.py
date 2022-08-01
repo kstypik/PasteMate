@@ -12,7 +12,6 @@ class Command(BaseCommand):
             "email": "test@example.com",
             "location": "Testland",
             "website": "https://example.com",
-            "avatar": "default_avatar.png",
         }
         test_account, created = User.objects.get_or_create(id=2, defaults=defaults)
         test_account.set_password("test12")
