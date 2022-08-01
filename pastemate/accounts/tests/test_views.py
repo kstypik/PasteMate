@@ -13,6 +13,7 @@ from pastemate.accounts.forms import (
     PreferencesForm,
     ProfileForm,
 )
+from pastemate.accounts.models import Preferences
 from pastemate.core.utils import login_redirect_url
 
 pytestmark = pytest.mark.django_db
@@ -177,6 +178,7 @@ class TestPreferencesEdit:
             "default_syntax": "python",
             "default_expiration_symbol": "10M",
             "default_exposure": "PR",
+            "layout_width": Preferences.LayoutWidth.NARROW,
         }
         response = client.post(PREFERENCES_UPDATE_URL, data=data)
 
@@ -188,6 +190,7 @@ class TestPreferencesEdit:
             "default_syntax": "python",
             "default_expiration_symbol": "10M",
             "default_exposure": "PR",
+            "layout_width": Preferences.LayoutWidth.WIDE,
         }
         client.post(PREFERENCES_UPDATE_URL, data=data)
         user.refresh_from_db()
@@ -195,3 +198,4 @@ class TestPreferencesEdit:
         assert user.preferences.default_syntax == "python"
         assert user.preferences.default_expiration_symbol == "10M"
         assert user.preferences.default_exposure == "PR"
+        assert user.preferences.layout_width == "W"

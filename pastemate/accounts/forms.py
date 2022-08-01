@@ -46,4 +46,5 @@ class PreferencesForm(forms.ModelForm):
             "default_syntax",
             "default_expiration_symbol",
             "default_exposure",
+            "layout_width",
         ]

@@ -51,6 +51,10 @@ class Preferences(models.Model):
         (ONE_YEAR, "1 Year"),
     )
 
+    class LayoutWidth(models.TextChoices):
+        NARROW = ("N", "Fixed (narrow)")
+        WIDE = ("W", "Fluid (wide)")
+
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="preferences"
     )
@@ -72,6 +76,12 @@ class Preferences(models.Model):
         max_length=2,
         choices=Exposure.choices,
         default=Exposure.PUBLIC,
+    )
+    layout_width = models.CharField(
+        verbose_name="Layout Width",
+        max_length=1,
+        choices=LayoutWidth.choices,
+        default=LayoutWidth.NARROW,
     )
 
     def __str__(self):

@@ -45,7 +45,7 @@
   </head>
   <body>
     {% include "_includes/navbar.html" %}
-    <div class="container mt-5 mb-5">
+    <div class="container{% if user.preferences.layout_width == "W" %}-fluid{% endif %} mt-5 mb-5">
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
