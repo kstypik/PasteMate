@@ -20,6 +20,8 @@
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form|crispy }}
-  <button class="btn btn-danger btn-block mt-5" type="submit">Delete account</button>
+  <div class="d-grid d-xl-block">
+    <button class="btn btn-danger mt-5" type="submit">Delete account</button>
+  </div>
 </form>
 {% endblock content %}
