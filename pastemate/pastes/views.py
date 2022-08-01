@@ -86,11 +86,11 @@ def paste_detail(request, uuid):
 
     context = {"paste": paste}
 
-    hitcount = count_hit(request, paste)
-    context["hitcount"] = hitcount
-
     if paste.password and request.user != paste.author:
         return redirect("pastes:detail_with_password", uuid=paste.uuid)
+
+    hitcount = count_hit(request, paste)
+    context["hitcount"] = hitcount
 
     if request.method == "POST":
         context["burned"] = True
