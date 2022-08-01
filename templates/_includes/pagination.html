@@ -19,7 +19,7 @@
       {% endif %}
     {% endfor %}
     {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:'-4' %}
-      {% if page_obj.number < 6 %}
+      {% if page_obj.paginator.num_pages > page_obj.number|add:5  %}
         <li class="page-item disabled"><a class="page-link">&#8230;</a></li>
       {% endif %}
       <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
