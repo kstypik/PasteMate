@@ -101,7 +101,8 @@ def paste_detail(request, uuid):
 
 
 def raw_paste_detail(request, uuid):
-    paste = get_object_or_404(Paste, uuid=uuid)
+    queryset = Paste.objects.all().select_related("folder", "author")
+    paste = get_object_or_404(queryset, uuid=uuid)
     if (
         paste.is_private
         and not paste.is_author(request.user)
@@ -112,7 +113,8 @@ def raw_paste_detail(request, uuid):
 
 
 def download_paste(request, uuid):
-    paste = get_object_or_404(Paste, uuid=uuid)
+    queryset = Paste.objects.all().select_related("folder", "author")
+    paste = get_object_or_404(queryset, uuid=uuid)
     if (
         paste.is_private
         and not paste.is_author(request.user)
@@ -126,7 +128,8 @@ def download_paste(request, uuid):
 
 
 def paste_detail_with_password(request, uuid):
-    paste = get_object_or_404(Paste, uuid=uuid)
+    queryset = Paste.objects.all().select_related("folder", "author")
+    paste = get_object_or_404(queryset, uuid=uuid)
     if paste.is_private and not paste.is_author(request.user):
         raise Http404
 
