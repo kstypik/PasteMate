@@ -1,8 +1,13 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from pastemate.pastes import views
+from pastemate.pastes import views, views_api
 
 app_name = "pastes"
+
+router = DefaultRouter()
+router.register("pastes", views_api.PasteViewSet, basename="pastes")
+
 
 urlpatterns = [
     path("archive/", views.archive, name="archive"),
@@ -44,5 +49,6 @@ urlpatterns = [
     ),
     path("<uuid:uuid>/edit/", views.edit_paste, name="update"),
     path("<uuid:uuid>/delete/", views.delete_paste, name="delete"),
+    path("api/", include(router.urls)),
     path("", views.create_paste, name="create"),
 ]
