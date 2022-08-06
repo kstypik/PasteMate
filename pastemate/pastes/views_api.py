@@ -7,3 +7,6 @@ from pastemate.pastes.serializers import PasteSerializer
 class PasteViewSet(viewsets.ModelViewSet):
     queryset = Paste.objects.all()
     serializer_class = PasteSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
