@@ -8,5 +8,8 @@ class PasteViewSet(viewsets.ModelViewSet):
     queryset = Paste.objects.all()
     serializer_class = PasteSerializer
 
+    def get_queryset(self):
+        return self.request.user.paste_set.all()
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
