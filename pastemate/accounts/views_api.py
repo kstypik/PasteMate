@@ -1,4 +1,7 @@
-from rest_framework import generics
+from django.contrib.auth import login
+from knox.views import LoginView as KnoxLoginView
+from rest_framework import generics, permissions
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from pastemate.accounts.serializers import UserSerializer
 
@@ -8,3 +11,14 @@ class UserProfileView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class LoginView(KnoxLoginView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, format=None):
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        login(request, user)
+        return super(LoginView, self).post(request, format=None)

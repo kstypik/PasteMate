@@ -40,6 +40,7 @@ THIRD_PARTY_APPS = [
     "pinax.messages",
     "hcaptcha_field",
     "rest_framework",
+    "knox",
 ]
 
 LOCAL_APPS = [
@@ -186,6 +187,7 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy("account_em
 # https://www.django-rest-framework.org/
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
