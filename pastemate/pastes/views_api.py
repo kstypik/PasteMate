@@ -1,4 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import renderers, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from pastemate.pastes.models import Paste
 from pastemate.pastes.serializers import PasteSerializer
@@ -13,3 +15,7 @@ class PasteViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def raw(self, request, *args, **kwargs):
+        return Response(self.get_object().content)
