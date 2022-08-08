@@ -1,10 +1,13 @@
 from rest_framework import serializers
 
-from pastemate.pastes.models import Paste
+from pastemate.pastes.models import Folder, Paste
 
 
 class PasteSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="pastes:pastes-detail")
+    folder = serializers.HyperlinkedRelatedField(
+        view_name="pastes:folders-detail", read_only=True
+    )
 
     class Meta:
         model = Paste
@@ -19,6 +22,7 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
             "expiration_symbol",
             "exposure",
             "password",
+            "folder",
             "burn_after_read",
             "url",
         ]
@@ -40,3 +44,11 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
             lambda option: option not in (Paste.NO_CHANGE, Paste.NEVER),
             self.fields["expiration_symbol"].choices,
         )
+
+
+class FolderSerializer(serializers.ModelSerializer):
+    pastes = PasteSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Folder
+        fields = ["slug", "name", "pastes"]

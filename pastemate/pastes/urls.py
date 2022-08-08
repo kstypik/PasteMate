@@ -7,6 +7,7 @@ app_name = "pastes"
 
 router = SimpleRouter()
 router.register("pastes", views_api.PasteViewSet, basename="pastes")
+router.register("folders", views_api.FolderViewSet, basename="folders")
 
 
 urlpatterns = [

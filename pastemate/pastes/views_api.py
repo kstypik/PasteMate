@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from pastemate.pastes.models import Paste
-from pastemate.pastes.serializers import PasteSerializer
+from pastemate.pastes.serializers import FolderSerializer, PasteSerializer
 
 
 class PasteViewSet(viewsets.ModelViewSet):
@@ -19,3 +19,13 @@ class PasteViewSet(viewsets.ModelViewSet):
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def raw(self, request, *args, **kwargs):
         return Response(self.get_object().content)
+
+
+class FolderViewSet(viewsets.ModelViewSet):
+    serializer_class = FolderSerializer
+
+    def get_queryset(self):
+        return self.request.user.folders.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
