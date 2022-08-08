@@ -9,12 +9,16 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Paste
         fields = [
+            "content",
             "title",
+            "syntax",
             "created",
             "filesize",
             "expiration_date",
+            "expiration_symbol",
             "exposure",
-            "syntax",
+            "password",
+            "burn_after_read",
             "url",
         ]
         read_only_fields = [
@@ -22,3 +26,15 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
             "filesize",
             "expiration_date",
         ]
+        extra_kwargs = {
+            "content": {"write_only": True},
+            "expiration_symbol": {"write_only": True},
+            "password": {"write_only": True},
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["expiration_symbol"].choices = filter(
+            lambda option: option not in (Paste.NO_CHANGE, Paste.NEVER),
+            self.fields["expiration_symbol"].choices,
+        )
