@@ -1,11 +1,11 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 
 from pastemate.pastes import views, views_api
 
 app_name = "pastes"
 
-router = DefaultRouter()
+router = SimpleRouter()
 router.register("pastes", views_api.PasteViewSet, basename="pastes")
 
 

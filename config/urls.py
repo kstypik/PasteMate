@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from pastemate.accounts import views_api
+from pastemate.core.views_api import api_root
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
@@ -13,6 +14,7 @@ urlpatterns = [
     path("", include("pastemate.pastes.urls")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/user/", views_api.UserProfileView.as_view(), name="api_profile"),
+    path("api/", api_root, name="api_root"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
