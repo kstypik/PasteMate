@@ -9,6 +9,7 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Paste
         fields = [
+            "uuid",
             "content",
             "title",
             "syntax",
@@ -22,6 +23,7 @@ class PasteSerializer(serializers.HyperlinkedModelSerializer):
             "url",
         ]
         read_only_fields = [
+            "uuid",
             "created",
             "filesize",
             "expiration_date",
