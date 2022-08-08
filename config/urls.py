@@ -5,7 +5,6 @@ from django.urls import include, path
 from knox import views as knox_views
 
 from pastemate.accounts import views_api
-from pastemate.core.views_api import api_root
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
@@ -19,7 +18,6 @@ urlpatterns = [
         "api/auth/logoutall/", knox_views.LogoutAllView.as_view(), name="knox_logoutall"
     ),
     path("api/user/", views_api.UserProfileView.as_view(), name="api_profile"),
-    path("api/", api_root, name="api_root"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
