@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = [
     "hcaptcha_field",
     "rest_framework",
     "knox",
+    "drf_spectacular",
 ]
 
 LOCAL_APPS = [
@@ -193,6 +194,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -205,3 +207,11 @@ PASTES_USER_LIST_PAGINATE_BY = 20
 # Django-cleanup
 # NOTE: django_cleanup should be placed last in INSTALLED_APPS.
 INSTALLED_APPS.append("django_cleanup")
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "PasteMate",
+    "DESCRIPTION": "Pastebin web app allowing users to post plain text with optional syntax highlighting.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
