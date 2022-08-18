@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
@@ -62,7 +63,7 @@ class Preferences(models.Model):
         HUGE = ("15", "Huge")
 
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="preferences"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferences"
     )
     default_syntax = models.CharField(
         verbose_name="Default Syntax",

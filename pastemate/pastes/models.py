@@ -3,7 +3,7 @@ import uuid
 import zipfile
 from datetime import timedelta
 
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -18,8 +18,6 @@ from pygments.formatters import HtmlFormatter, ImageFormatter
 from pygments.lexers import get_lexer_by_name
 
 from pastemate.pastes import choices
-
-User = get_user_model()
 
 MAX_LINE_LENGTH_FOR_EMBEDS = 111
 
@@ -74,7 +72,9 @@ class Paste(TimeStampedModel):
     )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
     content = models.TextField()
     content_html = models.TextField(blank=True)
     syntax = models.CharField(
@@ -231,7 +231,7 @@ class Folder(TimeStampedModel):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)
     created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="folders"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="folders"
     )
 
     class Meta:
@@ -265,7 +265,7 @@ class Report(TimeStampedModel):
     reporter_name = models.CharField(max_length=100)
     moderated = models.BooleanField(default=False)
     moderated_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
     )
     moderated_at = models.DateTimeField(null=True, blank=True)
 
