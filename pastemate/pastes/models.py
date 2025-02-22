@@ -95,7 +95,7 @@ class Paste(TimeStampedModel):
     )
     password = models.CharField(max_length=128, blank=True)
     burn_after_read = models.BooleanField(default=False)
-    title = models.CharField(max_length=50, blank=True)
+    title = models.CharField(max_length=50, blank=True, default="Untitled")
 
     filesize = models.IntegerField()
 
@@ -210,8 +210,6 @@ class Paste(TimeStampedModel):
         return "Unknown"
 
     def save(self, *args, **kwargs):
-        if not self.title:
-            self.title = "Untitled"
         self.content_html = self.highlight_syntax()
 
         self.filesize = self.calculate_filesize()
