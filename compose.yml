@@ -1,0 +1,34 @@
+services:
+  pastemate:
+    build:
+      context: .
+      dockerfile: pastemate/Dockerfile
+    command: ["/start.sh"]
+    volumes:
+      - ./pastemate:/app/pastemate:z
+      - ./pyproject.toml:/app/pyproject.toml:z
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:

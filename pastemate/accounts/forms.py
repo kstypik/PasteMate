@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 
-from pastemate.accounts.models import Preferences
+from accounts.models import Preferences
 
 User = get_user_model()
 
@@ -36,7 +36,8 @@ class AccountDeleteForm(forms.Form):
         if not authenticate(
             self.request, username=self.request.user.username, password=input_password
         ):
-            raise forms.ValidationError("Entered password is invalid.")
+            msg = "Entered password is invalid."
+            raise forms.ValidationError(msg)
 
 
 class PreferencesForm(forms.ModelForm):

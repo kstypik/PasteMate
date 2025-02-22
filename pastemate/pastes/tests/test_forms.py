@@ -4,8 +4,8 @@ from django.contrib.auth.hashers import make_password
 from django.forms import BooleanField
 from hcaptcha_field import hCaptchaField
 
-from pastemate.pastes import forms
-from pastemate.pastes.models import Folder, Paste
+from pastes import forms
+from pastes.models import Folder, Paste
 
 pytestmark = pytest.mark.django_db
 
@@ -133,7 +133,7 @@ class TestPasteForm:
         if form.is_valid():
             form.save()
         else:
-            pytest.fail()
+            pytest.fail("Form is not valid")
 
         assert Folder.objects.count() == 1
 
@@ -152,7 +152,7 @@ class TestPasteForm:
         if form.is_valid():
             saved_paste = form.save()
         else:
-            pytest.fail()
+            pytest.fail("Form is not valid")
 
         folder = Folder.objects.first()
         assert Folder.objects.count() == 1
@@ -175,7 +175,7 @@ class TestPasteForm:
         if form.is_valid():
             saved_paste = form.save()
         else:
-            pytest.fail()
+            pytest.fail("Form is not valid")
 
         assert Folder.objects.count() == 0
         assert saved_paste.folder is None

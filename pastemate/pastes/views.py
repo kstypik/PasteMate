@@ -9,14 +9,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
 
-from pastemate.core.utils import count_hit, paginate
-from pastemate.pastes.forms import (
+from core.utils import count_hit, paginate
+from pastes.forms import (
     FolderForm,
     PasswordProtectedPasteForm,
     PasteForm,
     ReportForm,
 )
-from pastemate.pastes.models import Folder, Paste
+from pastes.models import Folder, Paste
 
 User = get_user_model()
 
@@ -46,10 +46,8 @@ def create_paste(request):
 def clone_paste(request, paste_uuid):
     cloned_paste = get_object_or_404(Paste, uuid=paste_uuid)
     if (
-        cloned_paste.is_private
-        and not cloned_paste.is_author(request.user)
-        or not cloned_paste.is_normally_accessible
-    ):
+        cloned_paste.is_private and not cloned_paste.is_author(request.user)
+    ) or not cloned_paste.is_normally_accessible:
         raise Http404
 
     user = request.user if request.user.is_authenticated else None
@@ -104,10 +102,8 @@ def raw_paste_detail(request, uuid):
     queryset = Paste.objects.all().select_related("folder", "author")
     paste = get_object_or_404(queryset, uuid=uuid)
     if (
-        paste.is_private
-        and not paste.is_author(request.user)
-        or not paste.is_normally_accessible
-    ):
+        paste.is_private and not paste.is_author(request.user)
+    ) or not paste.is_normally_accessible:
         raise Http404
     return HttpResponse(paste.content, content_type="text/plain")
 
@@ -116,10 +112,8 @@ def download_paste(request, uuid):
     queryset = Paste.objects.all().select_related("folder", "author")
     paste = get_object_or_404(queryset, uuid=uuid)
     if (
-        paste.is_private
-        and not paste.is_author(request.user)
-        or not paste.is_normally_accessible
-    ):
+        paste.is_private and not paste.is_author(request.user)
+    ) or not paste.is_normally_accessible:
         raise Http404
 
     response = HttpResponse(paste.content, content_type="text/plain")
@@ -210,10 +204,7 @@ def user_pastes(request, username):
     hitcount = count_hit(request, user)
     context["hitcount"] = hitcount
 
-    if request.GET.get("guest") == "1":
-        display_as_guest = True
-    else:
-        display_as_guest = False
+    display_as_guest = request.GET.get("guest") == "1"
     context["as_guest"] = display_as_guest
 
     if request.user != user or display_as_guest:
@@ -344,10 +335,8 @@ def embed_paste(request, uuid):
 def print_paste(request, uuid):
     paste = get_object_or_404(Paste, uuid=uuid)
     if (
-        paste.is_private
-        and not paste.is_author(request.user)
-        or not paste.is_normally_accessible
-    ):
+        paste.is_private and not paste.is_author(request.user)
+    ) or not paste.is_normally_accessible:
         raise Http404
 
     return TemplateResponse(request, "pastes/print.html", {"paste": paste})

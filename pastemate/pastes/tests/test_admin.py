@@ -29,7 +29,7 @@ Paste For Testing <a href="{report.paste.get_absolute_url()}">(view)</a>
 @patch.object(
     timezone,
     "now",
-    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.timezone.utc),
+    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.UTC),
 )
 def test_mark_reports_as_moderated(mocked_now, admin_client, admin_user, create_report):
     report = create_report()
@@ -47,10 +47,10 @@ def test_mark_reports_as_moderated(mocked_now, admin_client, admin_user, create_
     assert report.moderated_by == admin_user
     assert additional_report.moderated_by == admin_user
     assert report.moderated_at == datetime.datetime(
-        2022, 6, 24, 12, 0, tzinfo=datetime.timezone.utc
+        2022, 6, 24, 12, 0, tzinfo=datetime.UTC
     )
     assert additional_report.moderated_at == datetime.datetime(
-        2022, 6, 24, 12, 0, tzinfo=datetime.timezone.utc
+        2022, 6, 24, 12, 0, tzinfo=datetime.UTC
     )
     assertContains(
         response,
@@ -80,7 +80,7 @@ def test_mark_reports_as_unmoderated(admin_client, create_report):
 @patch.object(
     timezone,
     "now",
-    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.timezone.utc),
+    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.UTC),
 )
 def test_deactivate_reported_pastes(
     mocked_now, admin_client, admin_user, create_report
@@ -100,10 +100,10 @@ def test_deactivate_reported_pastes(
     assert report.moderated_by == admin_user
     assert additional_report.moderated_by == admin_user
     assert report.moderated_at == datetime.datetime(
-        2022, 6, 24, 12, 0, tzinfo=datetime.timezone.utc
+        2022, 6, 24, 12, 0, tzinfo=datetime.UTC
     )
     assert additional_report.moderated_at == datetime.datetime(
-        2022, 6, 24, 12, 0, tzinfo=datetime.timezone.utc
+        2022, 6, 24, 12, 0, tzinfo=datetime.UTC
     )
     assertContains(
         response,

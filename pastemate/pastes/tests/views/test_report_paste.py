@@ -2,8 +2,8 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
-from pastemate.pastes import forms
-from pastemate.pastes.models import Paste, Report
+from pastes import forms
+from pastes.models import Paste, Report
 
 pytestmark = pytest.mark.django_db
 

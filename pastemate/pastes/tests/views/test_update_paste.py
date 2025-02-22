@@ -1,7 +1,7 @@
 import pytest
 from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
-from pastemate.pastes import forms
+from pastes import forms
 
 pytestmark = pytest.mark.django_db
 

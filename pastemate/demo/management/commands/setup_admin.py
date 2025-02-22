@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from config.settings.base import env
-from pastemate.accounts.models import User
+from accounts.models import User
 
 
 class Command(BaseCommand):

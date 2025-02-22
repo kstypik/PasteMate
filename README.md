@@ -4,11 +4,11 @@ Pastebin web app allowing users to post plain text with optional syntax highligh
 
 ## Technologies
 
-- Python 3.10
+- Python 3.13
 - Django 4.0
-- PostgreSQL 12.0
+- PostgreSQL 17
 - Bootstrap 5 + MDBootstrap
-- Node.js 18.2.0
+- Node.js 22
 
 ## Features
 

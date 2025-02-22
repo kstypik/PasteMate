@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
-from pastemate.pastes import forms
-from pastemate.pastes.models import Paste
+from pastes import forms
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 

@@ -3,7 +3,7 @@ from django.db.models import F
 from django.db.models.functions import Now
 from django.db.models.lookups import GreaterThanOrEqual
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 
 class Command(BaseCommand):
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 qs.delete()
                 self.stdout.write(
                     self.style.SUCCESS(
-                        "Successfully deleted %s expired pastes" % removed_pastes_num
+                        "Successfully deleted %s expired pastes" % removed_pastes_num  # noqa: UP031
                     )
                 )
         else:

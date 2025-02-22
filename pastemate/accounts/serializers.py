@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from pastemate.accounts.models import Preferences, User
+from accounts.models import Preferences, User
 
 
 class PreferencesSerializer(serializers.ModelSerializer):

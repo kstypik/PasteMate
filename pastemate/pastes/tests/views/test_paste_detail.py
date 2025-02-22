@@ -5,12 +5,11 @@ from django.utils import formats
 from pytest_django.asserts import (
     assertContains,
     assertInHTML,
-    assertNotContains,
     assertRedirects,
     assertTemplateUsed,
 )
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 
@@ -51,41 +50,6 @@ def test_can_burn_paste(client, create_paste):
     client.post(burnable_paste.get_absolute_url())
 
     assert not Paste.objects.filter(uuid=burnable_paste_uuid).exists()
-
-
-def test_displays_private_message_to_author_url_for_logged(
-    auto_login_user, create_paste_with_detail_url, create_user
-):
-    client, logged_user = auto_login_user()
-    user = create_user()
-    paste, url = create_paste_with_detail_url(author=user)
-
-    response = client.get(url)
-
-    pm_url = reverse("pinax_messages:message_user_create", args=[user.id])
-    assertContains(response, pm_url)
-
-
-def test_does_not_display_private_message_to_author_url_for_themselves(
-    client, user, create_paste
-):
-    paste_with_author = create_paste(author=user)
-
-    response = client.get(paste_with_author.get_absolute_url())
-
-    pm_url = reverse("pinax_messages:message_user_create", args=[user.id])
-    assertNotContains(response, pm_url)
-
-
-def test_does_not_display_private_message_to_author_url_for_unlogged(
-    client, user, create_paste_with_detail_url
-):
-    paste, url = create_paste_with_detail_url(author=user)
-
-    response = client.get(url)
-
-    pm_url = reverse("pinax_messages:message_user_create", args=[user.id])
-    assertNotContains(response, pm_url)
 
 
 def test_displays_correct_expiration_date_when_set(

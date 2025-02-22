@@ -1,6 +1,6 @@
 from django import template
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 register = template.Library()
 
@@ -19,7 +19,7 @@ def show_my_pastes(user, count=8):
 
 @register.filter()
 def tokilobytes(value):
-    return "%.2f" % float(value / 1024) + " KB"
+    return f"{float(value / 1024):.2f} KB"
 
 
 @register.filter()

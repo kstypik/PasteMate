@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from pastemate.pastes.models import Folder, Paste
+from pastes.models import Folder, Paste
 
 
 class PasteSerializer(serializers.HyperlinkedModelSerializer):

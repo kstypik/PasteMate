@@ -4,7 +4,7 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 
@@ -13,19 +13,19 @@ def test_show_pastes_scheduled_for_expiring(create_paste):
     paste_to_delete = create_paste(
         title="First",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     paste_to_delete2 = create_paste(
         title="Second",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     paste_to_delete3 = create_paste(
         title="Third",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     paste_not_for_deletion = create_paste(title="This one not")
@@ -51,19 +51,19 @@ def test_delete_pastes_scheduled_for_expiring(create_paste):
     create_paste(
         title="First",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     create_paste(
         title="Second",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     create_paste(
         title="Third",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     create_paste(title="This one not")
@@ -79,19 +79,19 @@ def test_shows_info_when_nothing_to_remove(create_paste):
     create_paste(
         title="First",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     create_paste(
         title="Second",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     create_paste(
         title="Third",
         expiration_date=datetime.datetime(
-            2020, 1, 1, 12, 00, tzinfo=datetime.timezone.utc
+            2020, 1, 1, 12, 00, tzinfo=datetime.UTC
         ),
     )
     Paste.objects.all().delete()
