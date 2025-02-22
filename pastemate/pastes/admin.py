@@ -38,7 +38,9 @@ class ReportAdmin(admin.ModelAdmin):
     @admin.display(description="Name")
     def linked_paste(self, obj):
         return format_html(
-            f"{obj.paste} <a href='{obj.paste.get_absolute_url()}'>(view)</a>"
+            f"{obj.paste} <a href='{obj.paste.get_absolute_url()}'>(view)</a>",
+            obj.paste,
+            obj.paste.get_absolute_url(),
         )
 
     @admin.action(description="Mark as moderated")

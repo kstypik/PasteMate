@@ -8,6 +8,7 @@ User = get_user_model()
 
 class ProfileForm(forms.ModelForm):
     username = forms.CharField(disabled=True, required=False)
+    website = forms.URLField(required=False, assume_scheme="https")
 
     class Meta:
         model = User
