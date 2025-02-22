@@ -1,9 +1,11 @@
 services:
   pastemate:
+    container_name: pastemate_app
     build:
       context: .
       dockerfile: pastemate/Dockerfile
     command: ["/start.sh"]
+    tty: true
     volumes:
       - ./pastemate:/app/pastemate:z
       - ./pyproject.toml:/app/pyproject.toml:z
@@ -16,6 +18,7 @@ services:
         condition: service_healthy
 
   db:
+    container_name: pastemate_db
     image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data
