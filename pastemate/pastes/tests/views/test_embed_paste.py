@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertTemplateUsed
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 

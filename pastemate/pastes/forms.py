@@ -2,11 +2,13 @@ from django import forms
 from django.contrib.auth.hashers import check_password
 from hcaptcha_field import hCaptchaField
 
-from pastemate.pastes.models import Folder, Paste, Report
+from pastes.models import Folder, Paste, Report
 
 NEW_FOLDER_HELP_TEXT = "You can type a new folder name, and it will be created and chosen instead of the one above."
-POST_ANONYMOUSLY_HELP_TEXT = "If checked, your account won't be associated with this paste.\
+POST_ANONYMOUSLY_HELP_TEXT = (
+    "If checked, your account won't be associated with this paste.\
                              You won't be able to edit or delete it later."
+)
 
 
 class PasteForm(forms.ModelForm):
@@ -103,11 +105,12 @@ class PasteForm(forms.ModelForm):
         if (cleaned_data.get("post_anonymously") or not self.user) and cleaned_data.get(
             "exposure"
         ) == Paste.Exposure.PRIVATE:
-            raise forms.ValidationError("You can't create private paste as Anonymous.")
+            msg = "You can't create private paste as Anonymous."
+            raise forms.ValidationError(msg)
 
         return cleaned_data
 
-    def save(self, commit=True):
+    def save(self, commit=True):  # noqa: FBT002
         paste = super().save(commit=False)
 
         new_folder = self.cleaned_data.get("new_folder")
@@ -136,7 +139,8 @@ class PasswordProtectedPasteForm(forms.Form):
     def clean_password(self):
         password = self.cleaned_data["password"]
         if not check_password(password, encoded=self.correct_password):
-            raise forms.ValidationError("Password incorrect")
+            msg = "Password incorrect"
+            raise forms.ValidationError(msg)
         return password
 
 
@@ -157,6 +161,7 @@ class FolderForm(forms.ModelForm):
 
     def clean_name(self):
         if self.user.folders.filter(name__iexact=self.cleaned_data["name"]).exists():
-            raise forms.ValidationError("You already have a folder with that name")
+            msg = "You already have a folder with that name"
+            raise forms.ValidationError(msg)
 
         return self.cleaned_data["name"]

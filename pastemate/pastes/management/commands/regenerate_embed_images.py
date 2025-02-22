@@ -1,13 +1,12 @@
 from django.core.management.base import BaseCommand
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 
 class Command(BaseCommand):
     help = "Generates demo pastes"
 
     def handle(self, *args, **options):
-
         self.stdout.write("Regenerating embeddable images...", ending=" ")
         self.stdout.flush()
 

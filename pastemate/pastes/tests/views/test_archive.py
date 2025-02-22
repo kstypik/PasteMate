@@ -3,7 +3,7 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertTemplateUsed
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 
@@ -44,7 +44,7 @@ def test_can_view_archive_of_specific_language(client, create_paste):
 def test_syntax_in_context_of_language_archive(client):
     response = client.get(reverse("pastes:syntax_archive", args=["python"]))
 
-    assert "Python" == response.context["syntax"]
+    assert response.context["syntax"] == "Python"
 
 
 def test_displays_message_when_no_pastes(client):

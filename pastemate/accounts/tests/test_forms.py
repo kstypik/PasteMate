@@ -2,7 +2,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 
-from pastemate.accounts.forms import AccountDeleteForm
+from accounts.forms import AccountDeleteForm
 
 User = get_user_model()
 

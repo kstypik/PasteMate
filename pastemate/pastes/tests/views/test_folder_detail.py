@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
-from pastemate.core.utils import login_redirect_url
+from core.utils import login_redirect_url
 
 pytestmark = pytest.mark.django_db
 

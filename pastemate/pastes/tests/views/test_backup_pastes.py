@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertRedirects
 
-from pastemate.core.utils import login_redirect_url
+from core.utils import login_redirect_url
 
 pytestmark = pytest.mark.django_db
 
@@ -22,7 +22,7 @@ def test_login_required(client):
 @patch.object(
     timezone,
     "now",
-    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.timezone.utc),
+    return_value=datetime.datetime(2022, 6, 24, 12, 00, tzinfo=datetime.UTC),
 )
 def test_backup_archive_with_correct_name(mock, auto_login_user, create_paste):
     client, user = auto_login_user()

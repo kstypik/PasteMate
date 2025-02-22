@@ -7,8 +7,8 @@ from pytest_django.asserts import (
     assertTemplateUsed,
 )
 
-from pastemate.pastes import forms
-from pastemate.pastes.models import Paste
+from pastes import forms
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 
@@ -45,7 +45,7 @@ def test_password_protected_in_context(
     assert response.context["password_protected"]
 
 
-def test_redirects_to_normal_detail_on_GET_when_paste_has_no_password(
+def test_redirects_to_normal_detail_on_get_when_paste_has_no_password(
     client, create_paste
 ):
     paste_without_pass = create_paste()
@@ -57,7 +57,7 @@ def test_redirects_to_normal_detail_on_GET_when_paste_has_no_password(
     assertRedirects(response, paste_without_pass.get_absolute_url())
 
 
-def test_redirects_to_normal_detail_on_POST_when_paste_has_no_password(
+def test_redirects_to_normal_detail_on_post_when_paste_has_no_password(
     create_paste, client
 ):
     paste_without_pass = create_paste()
@@ -101,7 +101,7 @@ def test_cannot_access_paste_when_submitted_password_wrong(
     assertNotContains(response, paste.content)
 
 
-def test_cannot_access_password_protected_paste_on_GET(
+def test_cannot_access_password_protected_paste_on_get(
     client, create_paste_with_detail_with_password_url
 ):
     paste, url = create_paste_with_detail_with_password_url(password="pass")
@@ -137,7 +137,7 @@ def test_cannot_burn_paste_with_password_when_wrong_password_provided(
     assert Paste.objects.filter(uuid=burnable_paste_uuid).exists()
 
 
-def test_cannot_burn_paste_with_password_on_GET(client, create_paste):
+def test_cannot_burn_paste_with_password_on_get(client, create_paste):
     burnable_paste_with_pass = create_paste(burn_after_read=True, password="pass123")
     burnable_paste_uuid = burnable_paste_with_pass.uuid
     paste_url = reverse(

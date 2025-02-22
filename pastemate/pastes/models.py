@@ -17,7 +17,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter, ImageFormatter
 from pygments.lexers import get_lexer_by_name
 
-from pastemate.pastes import choices
+from pastes import choices
 
 MAX_LINE_LENGTH_FOR_EMBEDS = 111
 
@@ -129,22 +129,22 @@ class Paste(TimeStampedModel):
     def calculate_filesize(self):
         return len(self.content.encode("utf-8"))
 
-    def highlight_syntax(self, format="html"):
+    def highlight_syntax(self, format_type="html"):
         lexer = get_lexer_by_name(self.syntax, stripall=True)
-        if format == "html":
+        if format_type == "html":
             formatter = HtmlFormatter(linenos=True)
-        elif format == "image":
+        elif format_type == "image":
             formatter = ImageFormatter()
         else:
             return NotImplemented
 
         return highlight(self.content, lexer, formatter)
 
-    def create_embeddable_image(self, format=".png"):
-        filepath = f"embed/{self.uuid}{format}"
+    def create_embeddable_image(self, format_type=".png"):
+        filepath = f"embed/{self.uuid}{format_type}"
         with tempfile.TemporaryFile() as fh:
             django_file = File(fh)
-            django_file.write(self.highlight_syntax(format="image"))
+            django_file.write(self.highlight_syntax(format_type="image"))
             saved_file = default_storage.save(filepath, django_file)
 
         return saved_file
@@ -207,6 +207,7 @@ class Paste(TimeStampedModel):
         for language in languages:
             if language[0] == value:
                 return language[1]
+        return "Unknown"
 
     def save(self, *args, **kwargs):
         if not self.title:
@@ -218,7 +219,7 @@ class Paste(TimeStampedModel):
         self.handle_embeddable_image()
 
         calculated_expiration = self.calculate_expiration_date()
-        if calculated_expiration and not self.expiration_symbol == Paste.NO_CHANGE:
+        if calculated_expiration and self.expiration_symbol != Paste.NO_CHANGE:
             self.expiration_date = calculated_expiration
 
         if self.password:

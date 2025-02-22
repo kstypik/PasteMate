@@ -2,8 +2,8 @@ from rest_framework import renderers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from pastemate.pastes.models import Paste
-from pastemate.pastes.serializers import FolderSerializer, PasteSerializer
+from pastes.models import Paste
+from pastes.serializers import FolderSerializer, PasteSerializer
 
 
 class PasteViewSet(viewsets.ModelViewSet):

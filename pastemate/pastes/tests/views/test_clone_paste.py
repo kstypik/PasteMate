@@ -4,7 +4,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from pytest_django.asserts import assertContains
 
-from pastemate.pastes.models import Paste
+from pastes.models import Paste
 
 pytestmark = pytest.mark.django_db
 

@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from pastemate.pastes.models import Folder, Report
+from pastes.models import Folder, Report
 
 
 @pytest.fixture

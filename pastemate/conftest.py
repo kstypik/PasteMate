@@ -2,8 +2,8 @@ import uuid
 
 import pytest
 
-from pastemate.accounts.models import User
-from pastemate.pastes.models import Paste
+from accounts.models import User
+from pastes.models import Paste
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def create_paste():
         expiration_date=None,
         author=None,
         password="",
-        burn_after_read=False,
+        burn_after_read=False,  # noqa: FBT002
         exposure=Paste.Exposure.PUBLIC,
         expiration_symbol=Paste.NEVER,
         folder=None,
@@ -40,7 +40,7 @@ def create_paste():
 def user():
     return User.objects.create_user(
         username="John",
-        password="test123",
+        password="test123",  # noqa: S106
         location="Testland",
         website="https://example.com",
     )

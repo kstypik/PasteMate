@@ -37,7 +37,6 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "hitcount",
-    "pinax.messages",
     "hcaptcha_field",
     "rest_framework",
     "knox",
@@ -45,10 +44,10 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "pastemate.core",
-    "pastemate.accounts",
-    "pastemate.pastes",
-    "pastemate.demo",  # Remove, if you don't use PasteMate for demonstration purposes
+    "core",
+    "accounts",
+    "pastes",
+    "demo",  # Remove, if you don't use PasteMate for demonstration purposes
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -61,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -107,7 +107,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -140,7 +140,7 @@ ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR.parent / "static-build"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media files

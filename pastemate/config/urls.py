@@ -9,14 +9,13 @@ from drf_spectacular.views import (
 )
 from knox import views as knox_views
 
-from pastemate.accounts import views_api
+from accounts import views_api
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
-    path("accounts/", include("pastemate.accounts.urls")),
+    path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),
-    path("messages/", include("pinax.messages.urls", namespace="pinax_messages")),
-    path("", include("pastemate.pastes.urls")),
+    path("", include("pastes.urls")),
     path("api/auth/login/", views_api.LoginView.as_view(), name="knox_login"),
     path("api/auth/logout/", knox_views.LogoutView.as_view(), name="knox_logout"),
     path(
@@ -34,7 +33,8 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+]
 
 if settings.DEBUG:
     urlpatterns += (path("__debug__/", include("debug_toolbar.urls")),)

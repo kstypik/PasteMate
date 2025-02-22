@@ -1,0 +1,12 @@
+# This file is an example of how to override the default compose.yml file.
+# DON'T USE IT IN THIS FORM IN PRODUCTION ENVIRONMENT. 
+# It's made to help you with local development.
+# If you want to use it, rename it to compose.override.yml and customize to your liking.
+
+services:
+  pastemate:
+    volumes:
+      - ./.env:/app/.env:z
+  db:
+    ports:
+      - "5432:5432" 

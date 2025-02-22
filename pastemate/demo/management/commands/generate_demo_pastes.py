@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
-from pastemate.accounts.models import User
-from pastemate.pastes.models import Paste
+from accounts.models import User
+from pastes.models import Paste
 
 
 class Command(BaseCommand):

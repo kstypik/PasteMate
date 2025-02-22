@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-from pastemate.pastes import views, views_api
+from pastes import views, views_api
 
 app_name = "pastes"
 

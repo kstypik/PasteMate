@@ -170,3 +170,5 @@ media
 node_modules
 static/js/editor.bundle.js
 staticfiles/
+
+compose.override.yml
