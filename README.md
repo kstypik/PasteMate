@@ -23,7 +23,6 @@ Pastebin web app allowing users to post plain text with optional syntax highligh
 - Searching of user's pastes
 - Pastes Archive
 - Displaying pastes only for specific language
-- Private messaging between users
 - Profile & Avatar for users
 - User adjustable preferences on default syntax, expiration time and exposure of pastes
 - Counting views of pastes and user profiles
@@ -56,70 +55,6 @@ You can create .env file in the project's base directory with your environment v
 
 ```
 DATABASE_URL=psql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DBNAME>
-```
-
-As of now, pinax_messages package needs some workarounds for compatibility with newer Django versions.
-
-Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/lib/python<PYTHON_VERSION>/site-packages/pinax/messages/signals.py
-
-Change
-
-```python
-message_sent = Signal(providing_args=["message", "thread", "reply"])
-```
-
-to
-
-```python
-message_sent = Signal()
-```
-
-Open <PATH_TO_YOUR_PYTHON_VIRTUAL_ENVIRONMENT>/lib/python<PYTHON_VERSION>/site-packages/pinax/messages/urls.py
-
-Change
-
-```python
-from django.conf.urls import url
-
-from . import views
-
-app_name = "pinax_messages"
-
-urlpatterns = [
-    url(r"^inbox/$", views.InboxView.as_view(),
-        name="inbox"),
-    url(r"^create/$", views.MessageCreateView.as_view(),
-        name="message_create"),
-    url(r"^create/(?P<user_id>\d+)/$", views.MessageCreateView.as_view(),
-        name="message_user_create"),
-    url(r"^thread/(?P<pk>\d+)/$", views.ThreadView.as_view(),
-        name="thread_detail"),
-    url(r"^thread/(?P<pk>\d+)/delete/$", views.ThreadDeleteView.as_view(),
-        name="thread_delete"),
-]
-```
-
-to
-
-```python
-from django.urls import path
-
-from . import views
-
-app_name = "pinax_messages"
-
-urlpatterns = [
-    path("inbox/", views.InboxView.as_view(),
-        name="inbox"),
-    path("create/", views.MessageCreateView.as_view(),
-        name="message_create"),
-    path("create/<int:user_id>/", views.MessageCreateView.as_view(),
-        name="message_user_create"),
-    path("thread/<int:pk>/", views.ThreadView.as_view(),
-        name="thread_detail"),
-    path("thread/<int:pk>/delete/", views.ThreadDeleteView.as_view(),
-        name="thread_delete"),
-]
 ```
 
 Apply migrations:

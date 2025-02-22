@@ -489,18 +489,6 @@ docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-issues
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
-name = "pinax-messages"
-version = "3.0.0"
-description = "a reusable private user messages application for Django"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-django = ">=2.2"
-django-appconf = ">=1.0.2"
-
-[[package]]
 name = "platformdirs"
 version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -1029,10 +1017,7 @@ pillow = [
     {file = "Pillow-9.2.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:0030fdbd926fb85844b8b92e2f9449ba89607231d3dd597a21ae72dc7fe26927"},
     {file = "Pillow-9.2.0.tar.gz", hash = "sha256:75e636fd3e0fb872693f23ccb8a5ff2cd578801251f3a4f6854c6a5d437d3c04"},
 ]
-pinax-messages = [
-    {file = "pinax-messages-3.0.0.tar.gz", hash = "sha256:339123494dc06b40d9d916575b9475f48474928fda3a2934b55d838bd1221018"},
-    {file = "pinax_messages-3.0.0-py3-none-any.whl", hash = "sha256:d2dad96210670dd02893680e98df6029ecae3569d96b83918a647a4dee3ffcef"},
-]
+
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
