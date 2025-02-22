@@ -97,7 +97,8 @@ RUN chmod +x /entrypoint.sh
 COPY containers/start.sh /start.sh
 RUN chmod +x /start.sh
 
-RUN mkdir -p /app/staticfiles /app/media && chown app:app /app/staticfiles /app/media
+RUN mkdir -p /app/staticfiles /app/media /app/.pytest_cache && \
+    chown app:app /app/staticfiles /app/media /app/.pytest_cache
 
 COPY --chown=app:app --from=build /app /app
 COPY --chown=app:app --from=node-builder /app/static /app/static-build
