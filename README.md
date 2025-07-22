@@ -44,10 +44,10 @@ Clone the code:
 git clone https://github.com/kstypik/PasteMate.git .
 ```
 
-Install the dependencies (PasteMate uses [poetry](https://python-poetry.org) as a package manager):
+Install the dependencies (PasteMate uses [uv](https://docs.astral.sh/uv/) as a package manager):
 
 ```
-poetry install
+uv sync
 ```
 
 Set required environment variable for development (for production there is more, see production settings module).
@@ -60,7 +60,7 @@ DATABASE_URL=psql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DBNAME>
 Apply migrations:
 
 ```
-poetry run python manage.py makemigrations && poetry run python manage.py migrate
+uv run python manage.py makemigrations && uv run python manage.py migrate
 ```
 
 Install the Node dependencies:
@@ -78,13 +78,13 @@ npm start
 Optionally, you can fill the database with examplary data:
 
 ```
-poetry run python manage.py reset_test_user && poetry run python manage.py generate_demo_pastes
+uv run python manage.py reset_test_user && uv run python manage.py generate_demo_pastes
 ```
 
 Now you can start the development server:
 
 ```
-poetry run python manage.py runserver
+uv run python manage.py runserver
 ```
 
 **Note:** To support paste expiration feature, you have to add expire_pastes Django management command to your cron tasks or to another scheduler.
@@ -96,5 +96,5 @@ Happy coding!
 To run tests, type:
 
 ```
-pytest
+uv run pytest
 ```
